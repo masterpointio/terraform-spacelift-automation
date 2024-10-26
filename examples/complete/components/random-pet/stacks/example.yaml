@@ -1,0 +1,6 @@
+stack_settings:
+  manage_state: true
+tfvars:
+  enabled: false
+
+

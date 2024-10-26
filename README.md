@@ -1,32 +1,8 @@
-# terraform-module-template
+# terraform-spacelift-automation
 
-[![Release](https://img.shields.io/github/release/masterpointio/terraform-module-template.svg)](https://github.com/masterpointio/terraform-module-template/releases/latest)
+[![Release](https://img.shields.io/github/release/masterpointio/terraform-spacelift-automation.svg)](https://github.com/masterpointio/terraform-spacelift-automation/releases/latest)
 
-This repository serves as a template for creating Terraform modules, providing a standardized structure and essential files for efficient module development. It's designed to ensure consistency and best practices across Terraform projects.
-
-## Usage
-
-TODO
-
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-
-## Requirements
-
-No requirements.
-
-## Providers
-
-No provider.
-
-## Inputs
-
-No input.
-
-## Outputs
-
-No output.
-
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+This Terraform module collection provides infrastructure automation for projects in [Spacelift](https://docs.spacelift.io/).
 
 ## Contributing
 

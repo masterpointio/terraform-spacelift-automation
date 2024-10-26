@@ -1,19 +1,3 @@
-# AWS
-variable "aws_role_arn" {
-  type        = string
-  description = "ARN of the AWS IAM role to assume and put its temporary credentials in the runtime environment"
-  default     = null
-}
-
-variable "aws_role_enabled" {
-  type        = bool
-  description = <<-EOT
-  Flag to enable/disable Spacelift to use AWS STS to assume the supplied IAM role
-  and put its temporary credentials in the runtime environment
-  EOT
-  default     = true
-}
-
 # GitHub
 variable "github_enterprise" {
   type = object({
@@ -51,7 +35,7 @@ variable "terraform_workflow_tool" {
   type        = string
   description = <<-EOT
   Defines the tool that will be used to execute the workflow.
-  This can be one of OPEN_TOFU, TERRAFORM_FOSS or CUSTOM. Defaults to TERRAFORM_FOSS.
+  This can be one of OPEN_TOFU, TERRAFORM_FOSS or CUSTOM.
   EOT
   default     = "OPEN_TOFU"
 
@@ -59,25 +43,6 @@ variable "terraform_workflow_tool" {
     condition     = contains(["OPEN_TOFU", "TERRAFORM_FOSS", "CUSTOM"], var.terraform_workflow_tool)
     error_message = "Valid values for terraform_workflow_tool are (OPEN_TOFU, TERRAFORM_FOSS, CUSTOM)."
   }
-}
-
-variable "root_modules" {
-  description = "Map of modules, each containing one or more stacks configured for Spacelift."
-  type = map(object({
-    # These are the common configurations for all stacks created for the root module workspaces
-    common_stack_configs = optional(object({
-      administrative       = optional(bool)
-      autodeploy           = optional(bool)
-      depends_on_stack_ids = optional(list(string))
-      description          = optional(string)
-      space_id             = optional(string)
-      worker_pool_id       = optional(string)
-    }))
-    # These are the configurations for each stack created for the root module workspaces.
-    # The overrides will take precedence over the common configurations.
-    stacks = optional(any)
-  }))
-  default = {}
 }
 
 # Stack Cloud Integrations
@@ -98,6 +63,12 @@ variable "aws_integration_attachment_write" {
   default     = true
 }
 
+# Configuration for the Spacelift Stack
+variable "common_config_file" {
+  type        = string
+  description = "Name of the common configuration file for the stack across a root module."
+  default     = "common.yaml"
+}
 # Default Stack Configuration
 variable "administrative" {
   type        = bool
@@ -174,7 +145,7 @@ variable "before_perform" {
 variable "before_plan" {
   type        = list(string)
   description = "List of before-plan scripts"
-  default     = [""]
+  default     = []
 }
 
 variable "description" {

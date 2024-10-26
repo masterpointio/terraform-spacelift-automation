@@ -1,3 +1,0 @@
-stack_settings:
-  autodeploy: true
-  description: TRIGGER policy that allows automatically restarting the failed run

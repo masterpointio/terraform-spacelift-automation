@@ -1,5 +1,10 @@
-provider "spacelift" {
-  api_key_endpoint = "https://masterpointio.app.spacelift.io"
-  api_key_id       = "01JAQWRR9Q71WNQ345CF2X6DNQ"
-  api_key_secret   = "b2a142ab75da6572f29ccac4daeb13fb39606ca430c127f98da7619af934e7c8"
-}
+# Earlier versions of OpenTofu used empty provider blocks ("proxy provider configurations")
+# for child modules to declare their need to be passed a provider configuration by their
+# callers. That approach was ambiguous and is now deprecated.
+#
+# If you control this module, you can migrate to the new declaration syntax by removing all
+# of the empty provider "spacelift" blocks and then adding or updating an entry like the
+# following to the required_providers block of module.automation:
+#     spacelift = {
+#       source = "spacelift-io/spacelift"
+#     }

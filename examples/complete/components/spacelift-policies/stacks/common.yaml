@@ -1,8 +1,0 @@
-# Common settings for all stacks
-tfvars:
-  enabled: true
-stack_settings:
-  administrative: true
-  manage_state: true
-
-

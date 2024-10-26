@@ -2,34 +2,22 @@
 # and configurations defined in the Git repository, default Stack values and additional input variables.
 # It primarily relies on dynamic local expressions to generate configurations based on the
 # input variables and Git structure so it can be consumed by Spacelift resources.
-# This module can also manage the automation stack intself, but it should be bootsrapped manually.
+# This module can also manage the automation stack itself, but it should be bootstrapped manually.
 #
 # It handles the following:
-# 1. Workspaces (see ## Workspaces)
-# Reads workspace names for each root module set in the root_modules variable in the spacelift-automation
-# Workspace names are extracted from the files in each root module `tfvars` directory, and are equal to the file names.
-# Stacks names are build from the root module name and workspace name.
 #
-# 2. Stack Configurations from Git (see ## Stack Configurations from Git)
+# 1. Stack Configurations from Git (see ## Stack Configurations from Git)
 # Reads the Spacelift stack configurations strictly based on the root modules structure in Git and file names.
 # These are the configurations required to be set for a stack, e.g. project_root, terraform_workspace, root_module.
 #
-# 3. Stack Configurations from Terraform variables (see ## Stack Configurations from Terraform variables)
-# Reads the Spacelift stack configurations explicitly specified in the spacelift-automation tfvars file.
-# These configurations are intended to override the default values.
-#
-# 4. Common Stack configrations
-# Some configurations are euqal across the whole root module, and can be set it on a root module level:
-# * Space IDs: in the majority if cases all the workspaces in a root module belong to the same Spacelift space, so
+# 2. Common Stack configurations
+# Some configurations are equal across the whole root module, and can be set it on a root module level:
+# * Space IDs: in the majority of cases all the workspaces in a root module belong to the same Spacelift space, so
 # we allow setting a "global" space_id for all stacks on a root module level.
 # * Autodeploy: if all the stacks in a root module should be autodeployed.
 # * Administrative: if all the stacks in a root module are administrative, e.g stacks that manage Spacelift resources.
 #
-# 5. Dependencies (see ## Dependencies)
-# Builds stack dependencies based on the root modules configuration.
-# Our main case is to support the dependency from each child from its parent stack, which is spacelift-automation-<workspace>.
-#
-# 6. Labels (see ## Labels)
+# 3. Labels (see ## Labels)
 # Generates labels for the stacks based on administrative, dependency, and folder information.
 #
 # Syntax note:
@@ -37,230 +25,47 @@
 # that are not directly used in the resource creation.
 
 locals {
-  enabled          = module.this.enabled
-  aws_role_enabled = local.enabled && var.aws_role_enabled
+  enabled = module.this.enabled
 
-  ## Workspaces
-  # Extracts the list of workspace names from tfvars files for each given root module.
-  # Root module name is used as a key of the map.
-  # For root_modules = {
-  #   "client-infra" = {},
-  #   "spacelift-automation" = {
-  #     stacks = {
-  #       mp-automation = {
-  #         administrative = true
-  #         description    = "Administrative Spacelift Stack for managing Masterpoint's Infrastructure."
-  #       }
-  #     }
-  #   }
-  # }
-  # If the tfvars directory for `client-infra` contains files "client1.tfvars" and "client2.tfvars",
-  # and for `spacelift-automation` it contains "mp-automation.tfvars":
-  # The resulting workspaces will be:
-  # {
-  #   "client-infra" = [
-  #     "client1",
-  #     "client2",
-  #   ]
-  #   "spacelift-automation" = [
-  #     "mp-automation",
-  #   ]
-  # }
-
-  _workspaces = {
-    for key in keys(var.root_modules) : key => [
-      for file in fileset(format("../../%s/%s/tfvars/", var.root_modules_path, key), "*.tfvars") :
-      trimsuffix(file, ".tfvars")
-    ]
+  # Read and decode Stack YAML files from the root directory
+  root_module_yaml_decoded = {
+    for module in var.enabled_root_modules : module => {
+      for yaml_file in fileset("${path.root}/${var.root_modules_path}/${module}/stacks", "*.yaml") :
+      yaml_file => yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stacks/${yaml_file}"))
+    }
   }
 
-  ## Stack Configurations from Git
-  # Creates a map of the Git based stack configurations for each root module.
-  # Example for workspaces `client1` and `client2` in `client-infra` root module:
-  # {
-  #   "client-infra" = {
-  #     "client-infra-client1" = {
-  #       "terraform_workspace" = "client1"
-  #       "project_root"        = "root-modules/client-infra"
-  #       "root_module"         = "client-infra"
-  #     }
-  #     "client-infra-client2" = {
-  #       "terraform_workspace" = "client2"
-  #       "project_root"        = "root-modules/client-infra"
-  #       "root_module"         = "client-infra"
-  #     }
-  #   }
-  # }
+  # Retrieve common Stack configurations for each root module
+  common_configs = {
+    for module, file in local.root_module_yaml_decoded : module => lookup(file, var.common_config_file, {})
+  }
 
-  _git_stack_configs = {
-    for module, workspaces in local._workspaces : module => {
-      for workspace in workspaces : "${module}-${workspace}" =>
+  # Merge all Stack configurations from the root modules into a single map
+  root_module_stack_configs = merge([for module, files in local.root_module_yaml_decoded : {
+    for file, content in files : "${module}-${trimsuffix(file, ".yaml")}" =>
+    merge(
       {
-        terraform_workspace = workspace,
-        project_root        = format("%s/%s", var.root_modules_path, module)
-        root_module         = module
-      }
-    }
-  }
-
-  # Flatten the stack configurations based into a single map.
-  # Example for the `client-infra` root module:
-  # {
-  #   "client-infra-client1" = {
-  #     "terraform_workspace" = "client1"
-  #     "project_root"        = "root-modules/client-infra"
-  #     "root_module"         = "client-infra"
-  #   }
-  #   "client-infra-client2" = {
-  #     "terraform_workspace" = "client2"
-  #     "project_root"        = "root-modules/client-infra"
-  #     "root_module"         = "client-infra"
-  #   }
-  # }
-
-  _flat_git_stack_configs = merge([
-    for module, stacks in local._git_stack_configs : {
-      for stack_name, stack in stacks : stack_name => stack
+        "project_root"        = replace(format("%s/%s", var.root_modules_path, module), "../", "")
+        "root_module"         = module,
+        "terraform_workspace" = trimsuffix(file, ".yaml"),
+      },
+      content
+    ) if file != var.common_config_file
     }
   ]...)
 
-  ## Stack Configurations from Terraform variables
-  # Creates a map of the stack configurations that should be created for each root module specified in
-  # the spacelift-automation tfvars file.
-  # Example for workspaces `trigger-automated-retries` and `trigger-dependencies` in `spacelift-policies` root module:
-  # {
-  #   "spacelift-policies" = {
-  #     "spacelift-policies-trigger-automated-retries" = {
-  #       "administrative" = true
-  #     }
-  #     "spacelift-policies-trigger-dependencies" = {
-  #       "administrative" = true
-  #       "description" = "Policy to trigger other stacks."
-  #   }
-  # }
-
-  _tfvars_stack_configs = {
-    for module_name, configs in var.root_modules : module_name => {
-      for workspace_name, workspace_configs in coalesce(configs.stacks, {}) : "${module_name}-${workspace_name}" => workspace_configs
-    }
+  # Get the configs for each stack, merged with the common configurations
+  configs = {
+    for key, value in module.deep : key => value.merged
   }
 
-  # Flatten the configured stacks into a single map and merge with the common stack configurations.
-  # Example for the `spacelift-policies` root module:
-  # {
-  #   "spacelift-policies-trigger-automated-retries" = {
-  #     "administrative" = true
-  #   }
-  #   "spacelift-policies-trigger-dependencies" = {
-  #     "administrative" = true
-  #     "description" = "Policy to trigger other stacks."
-  #   }
-  # }
-
-  _flat_tfvars_stack_configs = merge([
-    for module, stack in local._tfvars_stack_configs : {
-      for stack_name, stack_config in stack : stack_name => stack_config
-    }
-  ]...)
-
-  _common_stack_configs = {
-    for module, stacks in local._git_stack_configs : module => {
-      for stack_name, stack in stacks : stack_name => try(var.root_modules[module].common_stack_configs, {})
-    }
+  # Get the Stacks configs, this is just to improve code readability
+  stack_configs = {
+    for key, value in local.configs : key => value.stack_settings
   }
-
-  _flat_common_stack_configs = merge([
-    for module, stack in local._common_stack_configs : {
-      for stack_name, stack_config in stack : stack_name => stack_config
-    }
-  ]...)
-
-  # Iterate over stack configs in git and merge all stack configurations from tfvars into a single map.
-  # stack_configs = {
-  #   for k, v in local._flat_git_stack_configs : k => merge(
-  #     v,
-  #     try(local._flat_common_stack_configs[k], {}),
-  #     try(local._flat_tfvars_stack_configs[k], {}),
-  #   )
-  # }
 
   # Get the list of all stack names
-  #stacks = toset(keys(local.stack_configs))
   stacks = toset(keys(local.stack_configs))
-
-  ## Dependencies
-
-  # Get the dependencies from the root modules configuration.
-  # Expected to be set on a per-module. Might want to revisit this in the future.
-  # Child stacks always depend on the spacelift-automation stack.
-  # Example for the `client-infra` root module:
-  # {
-  #   "client-infra" = {
-  #     "depends_on_stack_ids" = tolist([
-  #       "spacelift-automation-mp-main",
-  #       "spacelift-webhooks-slack-notifications",
-  #     ])
-  #   }
-  # }
-
-  _module_depends_on_stack_ids = {
-    for module_name, module in var.root_modules : module_name => {
-      depends_on_stack_ids = [format("%s-%s", "spacelift-automation", terraform.workspace)]
-    }
-  }
-  # Creates a map of the dependencies list based for each stack.
-  # Example for the `client-infra` root module:
-  # {
-  #   "client-infra-client1" = {
-  #     depends_on_stack_ids = ["spacelift-automation-mp-main", "spacelift-webhooks-slack-notifications"]
-  #   }
-  #   "client-infra-client2" = {
-  #     depends_on_stack_ids = ["spacelift-automation-mp-main", "spacelift-webhooks-slack-notifications"]
-  #   }
-  # }
-
-  _depends_on_stack_ids = merge([
-    for module, stacks in local._git_stack_configs : {
-      for stack_name, stack in stacks : stack_name => {
-        depends_on_stack_ids = concat(
-          values(lookup(local._module_depends_on_stack_ids, module, [])),
-          try(local.stack_configs[stacks.stack_name].depends_on_stack_ids, [])
-        )
-      }
-    }
-  ]...)
-
-  # Break dependencies into a flat list.
-  # Example for the `client-infra` root module:
-  # [
-  #   {
-  #     stack_id            = "client-infra-client1"
-  #     depends_on_stack_id = "spacelift-automation-mp-main"
-  #   },
-  #   {
-  #     stack_id            = "client-infra-client1"
-  #     depends_on_stack_id = "spacelift-webhooks-slack-notifications"
-  #   },
-  #   {
-  #     stack_id            = "client-infra-client2"
-  #     depends_on_stack_id = "spacelift-automation-mp-main"
-  #   },
-  #   {
-  #     stack_id            = "client-infra-client2"
-  #     depends_on_stack_id = "spacelift-webhooks-slack-notifications"
-  #   }
-  # ]
-
-  _dependency_list = flatten([
-    for stack_name, config in local._depends_on_stack_ids : [
-      for depends_on in config.depends_on_stack_ids : [
-        for id in depends_on : {
-          stack_id            = stack_name
-          depends_on_stack_id = id
-        }
-      ]
-    ]
-  ])
 
   ## Labels
   # Сreates a map of administrative labels for each stack that has the administrative property set to true.
@@ -269,18 +74,13 @@ locals {
   #   "spacelift-automation-mp-main" = [
   #     "administrative",
   #   ]
-  #   "spacelift-policies-notify-stack-creation" = [
-  #     "administrative",
-  #   ]
   #   "spacelift-policies-notify-tf-completed" = [
   #     "administrative",
   #   ]
   # }
 
   _administrative_labels = {
-    # Normalizing the value here is required due to TF not enforcing
-    # strict type-checking for `stacks = optional(any)` in var.root_modules
-    for stack_name, stack in local.stack_configs : stack_name => ["administrative"] if tobool(try(stack.administrative, false)) == true
+    for stack, configs in local.stack_configs : stack => ["administrative"] if tobool(try(configs.administrative, false)) == true
   }
 
   # Creates a map of `depends-on` labels for each stack based on the root module level dependency configuration.
@@ -295,9 +95,8 @@ locals {
   # }
 
   _dependency_labels = {
-    for dependency in local._dependency_list :
-    dependency.stack_id => [
-      "depends-on:${dependency.depends_on_stack_id}"
+    for stack in local.stacks : stack => [
+      "depends-on:spacelift-automation-${terraform.workspace}"
     ]
   }
 
@@ -305,9 +104,6 @@ locals {
   # https://docs.spacelift.io/concepts/stack/organizing-stacks#label-based-folders
   # Example:
   # {
-  #   "spacelift-spaces-clients" = [
-  #     "folder:spacelift-spaces/clients",
-  #   ]
   #   "spacelift-spaces-prod" = [
   #     "folder:spacelift-spaces/prod",
   #   ]
@@ -316,20 +112,18 @@ locals {
   #   ]
   # }
 
-  _folder_labels = merge([
-    for module, stacks in local._git_stack_configs : {
-      for stack_name, stack in stacks : stack_name => [
-        "folder:${stack.root_module}/${stack.terraform_workspace}"
-      ]
-    }
-  ]...)
+  _folder_labels = {
+    for stack in local.stacks : stack => [
+      "folder:${local.configs[stack].root_module}/${local.configs[stack].terraform_workspace}"
+    ]
+  }
 
-  # Merge all labels into a single map for each stack.
+  # Merge all the labels into a single map for each stack.
   # Example:
   # {
   #   "spacelift-spaces-clients" = [
   #     "folder:spacelift-spaces/clients",
-  #     "depends-on:spacelift-automation-mp-main",
+  #     "administrative",
   #   ]
   # }
 
@@ -352,8 +146,17 @@ locals {
       # It copies the tfvars file from the stack's workspace to the root module's directory
       # and renames it to `spacelift.auto.tfvars` to automatically load variable definitions for each run/task.
       ["cp tfvars/${local.configs[stack].terraform_workspace}.tfvars spacelift.auto.tfvars"],
-    )) if local.configs[stack].tfvars.enabled
+    )) if try(local.configs[stack].tfvars.enabled, false)
   }
+}
+
+# Perform deep merge for common configurations and stack configurations
+module "deep" {
+  source   = "cloudposse/config/yaml//modules/deepmerge"
+  version  = "1.0.2"
+  for_each = local.root_module_stack_configs
+  # Stack configuration will take precedence and overwrite the conflicting value from the common configuration (if any)
+  maps = [local.common_configs[each.value.root_module], each.value]
 }
 
 resource "spacelift_stack" "this" {
@@ -415,15 +218,8 @@ resource "spacelift_stack_destructor" "this" {
   ]
 }
 
-# resource "spacelift_aws_role" "this" {
-#   for_each = local.aws_role_enabled ? local.stacks : toset([])
-
-#   stack_id = spacelift_stack.this[each.key].id
-#   role_arn = var.aws_role_arn
-# }
-
 resource "spacelift_aws_integration_attachment" "this" {
-  for_each = local.aws_role_enabled ? local.stacks : toset([])
+  for_each       = local.enabled ? local.stacks : toset([])
   integration_id = try(local.stack_configs[each.key].aws_integration_id, var.aws_integration_id)
   stack_id       = spacelift_stack.this[each.key].id
   read           = var.aws_integration_attachment_read
@@ -432,7 +228,7 @@ resource "spacelift_aws_integration_attachment" "this" {
 
 resource "spacelift_drift_detection" "this" {
   for_each = local.enabled ? {
-    for key, value in local.stacks : key => value
+    for key, value in local.stack_configs : key => value
     if try(local.stack_configs[key].drift_detection_enabled, var.drift_detection_enabled)
   } : {}
 

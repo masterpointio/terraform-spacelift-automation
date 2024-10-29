@@ -6,11 +6,11 @@
 #
 # It handles the following:
 #
-# 1. Stack Configurations from Git (see ## Stack Configurations from Git)
+# 1. Stack Configurationst (see ## Stack Configurations)
 # Reads the Spacelift stack configurations strictly based on the root modules structure in Git and file names.
 # These are the configurations required to be set for a stack, e.g. project_root, terraform_workspace, root_module.
 #
-# 2. Common Stack configurations
+# 2. Common Stack configurations (see ## Common Stack configurations)
 # Some configurations are equal across the whole root module, and can be set it on a root module level:
 # * Space IDs: in the majority of cases all the workspaces in a root module belong to the same Spacelift space, so
 # we allow setting a "global" space_id for all stacks on a root module level.
@@ -28,6 +28,28 @@ locals {
   enabled = module.this.enabled
 
   # Read and decode Stack YAML files from the root directory
+  # Example:
+  # {
+  #   "random-pet" = {
+  #     "common.yaml" = {
+  #       "stack_settings" = {
+  #         "description" = "This stack generates random pet names"
+  #         "manage_state" = true
+  #       }
+  #       "tfvars" = {
+  #         "enabled" = false
+  #       }
+  #     }
+  #     "example.yaml" = {
+  #       "stack_settings" = {
+  #         "manage_state" = true
+  #       }
+  #       "tfvars" = {
+  #         "enabled" = true
+  #       }
+  #     }
+  #   }
+  # }
   root_module_yaml_decoded = {
     for module in var.enabled_root_modules : module => {
       for yaml_file in fileset("${path.root}/${var.root_modules_path}/${module}/stacks", "*.yaml") :
@@ -35,12 +57,40 @@ locals {
     }
   }
 
+  ## Common Stack configurations
   # Retrieve common Stack configurations for each root module
+  # Example:
+  # {
+  #   "random-pet" = {
+  #     "stack_settings" = {
+  #       "description" = "This stack generates random pet names"
+  #       "manage_state" = true
+  #     }
+  #     "tfvars" = {
+  #       "enabled" = false
+  #     }
+  #   }
+  # }
   common_configs = {
-    for module, file in local.root_module_yaml_decoded : module => lookup(file, var.common_config_file, {})
+    for module, files in local.root_module_yaml_decoded : module => lookup(files, var.common_config_file, {})
   }
 
-  # Merge all Stack configurations from the root modules into a single map
+  ## Stack Configurations
+  # Merge all Stack configurations from the root modules into a single map, and filter out the common config.
+  # Example:
+  # {
+  #   "random-pet-example" = {
+  #     "project_root" = "examples/complete/components/random-pet"
+  #     "root_module" = "random-pet"
+  #     "stack_settings" = {
+  #       "manage_state" = true
+  #     }
+  #     "terraform_workspace" = "example"
+  #     "tfvars" = {
+  #       "enabled" = true
+  #     }
+  #   }
+  # }
   root_module_stack_configs = merge([for module, files in local.root_module_yaml_decoded : {
     for file, content in files : "${module}-${trimsuffix(file, ".yaml")}" =>
     merge(
@@ -55,11 +105,31 @@ locals {
   ]...)
 
   # Get the configs for each stack, merged with the common configurations
+  # Example:
+  # {
+  #   "random-pet-example" = {
+  #     "project_root" = "examples/complete/components/random-pet"
+  #     "root_module" = "random-pet"
+  #     "stack_settings" = {
+  #       "manage_state" = true
+  #     }
+  #     "terraform_workspace" = "example"
+  #     "tfvars" = {
+  #       "enabled" = false
+  #     }
+  #   }
+  # }
   configs = {
     for key, value in module.deep : key => value.merged
   }
 
   # Get the Stacks configs, this is just to improve code readability
+  # Example:
+  # {
+  #   "random-pet-example" = {
+  #     "manage_state" = true
+  #   }
+  # }
   stack_configs = {
     for key, value in local.configs : key => value.stack_settings
   }
@@ -86,11 +156,8 @@ locals {
   # Creates a map of `depends-on` labels for each stack based on the root module level dependency configuration.
   # Example:
   # {
-  #   "spacelift-spaces-clients" = [
-  #     "depends-on:spacelift-automation-mp-main",
-  #   ]
-  #   "spacelift-webhooks-notify-tf-completed" = [
-  #     "depends-on:spacelift-automation-mp-main",
+  #   "random-pet-example" = [
+  #     "depends-on:spacelift-automation-default",
   #   ]
   # }
 
@@ -104,11 +171,8 @@ locals {
   # https://docs.spacelift.io/concepts/stack/organizing-stacks#label-based-folders
   # Example:
   # {
-  #   "spacelift-spaces-prod" = [
-  #     "folder:spacelift-spaces/prod",
-  #   ]
-  #   "spacelift-webhooks-notify-tf-completed" = [
-  #     "folder:spacelift-webhooks/notify-tf-completed",
+  #   "random-pet-example" = [
+  #     "folder:random-pet/example",
   #   ]
   # }
 
@@ -121,10 +185,10 @@ locals {
   # Merge all the labels into a single map for each stack.
   # Example:
   # {
-  #   "spacelift-spaces-clients" = [
-  #     "folder:spacelift-spaces/clients",
-  #     "administrative",
-  #   ]
+  #   "random-pet-example" = tolist([
+  #     "folder:random-pet/example",
+  #     "depends-on:spacelift-automation-default",
+  #   ])
   # }
 
   labels = {
@@ -159,7 +223,7 @@ module "deep" {
   maps = [local.common_configs[each.value.root_module], each.value]
 }
 
-resource "spacelift_stack" "this" {
+resource "spacelift_stack" "default" {
   for_each = local.enabled ? local.stacks : toset([])
 
   space_id                     = coalesce(try(local.stack_configs[each.key].space_id, null), var.space_id)
@@ -206,35 +270,42 @@ resource "spacelift_stack" "this" {
 # as it will delete all resources in the stack when toggled from 'true' to 'false'.
 # Use the 'deactivated' attribute to disable the stack destructor functionality instead.
 # https://github.com/spacelift-io/terraform-provider-spacelift/blob/master/spacelift/resource_stack_destructor.go
-resource "spacelift_stack_destructor" "this" {
+resource "spacelift_stack_destructor" "default" {
   for_each = local.enabled ? local.stacks : toset([])
 
-  stack_id    = spacelift_stack.this[each.key].id
+  stack_id    = spacelift_stack.default[each.key].id
   deactivated = !try(local.stack_configs[each.key].destructor_enabled, var.destructor_enabled)
 
   depends_on = [
-    spacelift_drift_detection.this,
-    spacelift_aws_integration_attachment.this
+    spacelift_drift_detection.default,
+    spacelift_aws_integration_attachment.default
   ]
 }
 
-resource "spacelift_aws_integration_attachment" "this" {
+resource "spacelift_aws_integration_attachment" "default" {
   for_each       = local.enabled ? local.stacks : toset([])
   integration_id = try(local.stack_configs[each.key].aws_integration_id, var.aws_integration_id)
-  stack_id       = spacelift_stack.this[each.key].id
+  stack_id       = spacelift_stack.default[each.key].id
   read           = var.aws_integration_attachment_read
   write          = var.aws_integration_attachment_write
 }
 
-resource "spacelift_drift_detection" "this" {
+resource "spacelift_drift_detection" "default" {
   for_each = local.enabled ? {
     for key, value in local.stack_configs : key => value
     if try(local.stack_configs[key].drift_detection_enabled, var.drift_detection_enabled)
   } : {}
 
-  stack_id     = spacelift_stack.this[each.key].id
+  stack_id     = spacelift_stack.default[each.key].id
   ignore_state = try(local.stack_configs[each.key].drift_detection_ignore_state, var.drift_detection_ignore_state)
   reconcile    = try(local.stack_configs[each.key].drift_detection_reconcile, var.drift_detection_reconcile)
   schedule     = try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule)
   timezone     = try(local.stack_configs[each.key].drift_detection_timezone, var.drift_detection_timezone)
+
+  lifecycle {
+    precondition {
+      condition     = can(regex("^([0-9,\\-\\*]+\\s+){4}[0-9,\\-\\*]+$", try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule)))
+      error_message = "Invalid cron schedule format for drift detection"
+    }
+  }
 }

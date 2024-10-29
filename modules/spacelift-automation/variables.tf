@@ -226,7 +226,7 @@ variable "terraform_smart_sanitization" {
   default     = false
 }
 
-variable "terraform_version" {
+variable "tf_version" {
   type        = string
   description = "Terraform version to use."
   default     = "1.7.2"

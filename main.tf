@@ -6,7 +6,7 @@
 #
 # It handles the following:
 #
-# 1. Stack Configurationst (see ## Stack Configurations)
+# 1. Stack Configurations (see ## Stack Configurations)
 # Reads the Spacelift stack configurations strictly based on the root modules structure in Git and file names.
 # These are the configurations required to be set for a stack, e.g. project_root, terraform_workspace, root_module.
 #
@@ -26,6 +26,8 @@
 
 locals {
   enabled = module.this.enabled
+
+  enabled_root_modules = var.enable_all_root_modules ? split(",", data.external.list_root_modules[0].result.root_modules) : var.enabled_root_modules
 
   # Read and decode Stack YAML files from the root directory
   # Example:
@@ -51,7 +53,7 @@ locals {
   #   }
   # }
   root_module_yaml_decoded = {
-    for module in var.enabled_root_modules : module => {
+    for module in local.enabled_root_modules : module => {
       for yaml_file in fileset("${path.root}/${var.root_modules_path}/${module}/stacks", "*.yaml") :
       yaml_file => yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stacks/${yaml_file}"))
     }

@@ -1,5 +1,5 @@
 module "automation" {
-  source = "../../modules/spacelift-automation/"
+  source = "../../"
 
   github_enterprise = {
     namespace = "masterpointio"

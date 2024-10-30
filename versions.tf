@@ -6,5 +6,9 @@ terraform {
       source  = "spacelift-io/spacelift"
       version = ">= 1.14"
     }
+    external = {
+      source  = "hashicorp/external"
+      version = ">= 2.0"
+    }
   }
 }

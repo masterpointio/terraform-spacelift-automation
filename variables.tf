@@ -26,8 +26,18 @@ variable "root_modules_path" {
 
 variable "enabled_root_modules" {
   type        = list(string)
-  description = "List of root modules where to look for stack config files."
+  description = <<-EOT
+    List of root modules where to look for stack config files.
+    Ignored when enable_all_root_modules is true.
+    Example: ["spacelift-automation", "k8s-cluster"]
+    EOT
   default     = []
+}
+
+variable "enable_all_root_modules" {
+  type        = bool
+  description = "When set to true, all subdirectories in root_modules_path will be treated as root modules."
+  default     = false
 }
 
 # Spacelift Backend
@@ -226,7 +236,7 @@ variable "terraform_smart_sanitization" {
   default     = false
 }
 
-variable "tf_version" {
+variable "terraform_version" {
   type        = string
   description = "Terraform version to use."
   default     = "1.7.2"

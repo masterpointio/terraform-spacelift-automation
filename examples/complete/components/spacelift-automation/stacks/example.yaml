@@ -1,0 +1,4 @@
+stack_settings:
+  description: This Automation stack is used for Masterpoint's testing purposes
+tfvars:
+  enabled: true

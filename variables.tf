@@ -28,13 +28,13 @@ variable "enabled_root_modules" {
   type        = list(string)
   description = <<-EOT
     List of root modules where to look for stack config files.
-    Ignored when enable_all_root_modules is true.
+    Ignored when all_root_modules_enabled is true.
     Example: ["spacelift-automation", "k8s-cluster"]
     EOT
   default     = []
 }
 
-variable "enable_all_root_modules" {
+variable "all_root_modules_enabled" {
   type        = bool
   description = "When set to true, all subdirectories in root_modules_path will be treated as root modules."
   default     = false
@@ -56,9 +56,16 @@ variable "terraform_workflow_tool" {
 }
 
 # Stack Cloud Integrations
+variable "aws_integration_enabled" {
+  type        = bool
+  description = "Indicates whether the AWS integration is enabled."
+  default     = false
+}
+
 variable "aws_integration_id" {
   type        = string
   description = "ID of the AWS integration to attach."
+  default     = null
 }
 
 variable "aws_integration_attachment_read" {

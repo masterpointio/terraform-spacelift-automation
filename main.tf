@@ -27,7 +27,9 @@
 locals {
   enabled = module.this.enabled
 
-  enabled_root_modules = var.enable_all_root_modules ? split(",", data.external.list_root_modules[0].result.root_modules) : var.enabled_root_modules
+  _all_stack_files     = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
+  _all_root_modules    = distinct([for file in local._all_stack_files : dirname(replace(replace(file, "../", ""), "stacks/", ""))])
+  enabled_root_modules = var.all_root_modules_enabled ? local._all_root_modules : var.enabled_root_modules
 
   # Read and decode Stack YAML files from the root directory
   # Example:
@@ -52,7 +54,8 @@ locals {
   #     }
   #   }
   # }
-  root_module_yaml_decoded = {
+
+  _root_module_yaml_decoded = {
     for module in local.enabled_root_modules : module => {
       for yaml_file in fileset("${path.root}/${var.root_modules_path}/${module}/stacks", "*.yaml") :
       yaml_file => yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stacks/${yaml_file}"))
@@ -73,8 +76,9 @@ locals {
   #     }
   #   }
   # }
-  common_configs = {
-    for module, files in local.root_module_yaml_decoded : module => lookup(files, var.common_config_file, {})
+
+  _common_configs = {
+    for module, files in local._root_module_yaml_decoded : module => lookup(files, var.common_config_file, {})
   }
 
   ## Stack Configurations
@@ -93,7 +97,8 @@ locals {
   #     }
   #   }
   # }
-  root_module_stack_configs = merge([for module, files in local.root_module_yaml_decoded : {
+
+  _root_module_stack_configs = merge([for module, files in local._root_module_yaml_decoded : {
     for file, content in files : "${module}-${trimsuffix(file, ".yaml")}" =>
     merge(
       {
@@ -220,9 +225,9 @@ locals {
 module "deep" {
   source   = "cloudposse/config/yaml//modules/deepmerge"
   version  = "1.0.2"
-  for_each = local.root_module_stack_configs
+  for_each = local._root_module_stack_configs
   # Stack configuration will take precedence and overwrite the conflicting value from the common configuration (if any)
-  maps = [local.common_configs[each.value.root_module], each.value]
+  maps = [local._common_configs[each.value.root_module], each.value]
 }
 
 resource "spacelift_stack" "default" {
@@ -278,6 +283,9 @@ resource "spacelift_stack_destructor" "default" {
   stack_id    = spacelift_stack.default[each.key].id
   deactivated = !try(local.stack_configs[each.key].destructor_enabled, var.destructor_enabled)
 
+  # `depends_on` should be used to make sure that all necessary resources (environment variables, roles, integrations, etc.)
+  # are still in place when the destruction run is executed.
+  # See https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack_destructor
   depends_on = [
     spacelift_drift_detection.default,
     spacelift_aws_integration_attachment.default
@@ -285,7 +293,10 @@ resource "spacelift_stack_destructor" "default" {
 }
 
 resource "spacelift_aws_integration_attachment" "default" {
-  for_each       = local.enabled ? local.stacks : toset([])
+  for_each = local.enabled ? {
+    for stack, configs in local.stack_configs : stack => configs
+    if try(configs.aws_integration_enabled, var.aws_integration_enabled)
+  } : {}
   integration_id = try(local.stack_configs[each.key].aws_integration_id, var.aws_integration_id)
   stack_id       = spacelift_stack.default[each.key].id
   read           = var.aws_integration_attachment_read
@@ -294,8 +305,8 @@ resource "spacelift_aws_integration_attachment" "default" {
 
 resource "spacelift_drift_detection" "default" {
   for_each = local.enabled ? {
-    for key, value in local.stack_configs : key => value
-    if try(local.stack_configs[key].drift_detection_enabled, var.drift_detection_enabled)
+    for stack, configs in local.stack_configs : stack => configs
+    if try(configs.drift_detection_enabled, var.drift_detection_enabled)
   } : {}
 
   stack_id     = spacelift_stack.default[each.key].id

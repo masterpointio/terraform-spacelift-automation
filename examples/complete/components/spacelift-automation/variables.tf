@@ -9,7 +9,7 @@ variable "branch" {
   default     = "main"
 }
 
-variable "enable_all_root_modules" {
+variable "all_root_modules_enabled" {
   type        = bool
   description = "When set to true, all subdirectories in root_modules_path will be treated as root modules."
   default     = false

@@ -95,17 +95,19 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 
 ### Can I create a Spacelift Stack for Spacelift Automation? (Recommended)
 
-Spacelift Automation can manage itself as a Stack as well and we recommend this so you can fully automate your Stack management on merge to your given branch. Follow these next steps to achieve that:
+Spacelift Automation can manage itself as a Stack as well, and we recommend this so you can fully automate your Stack management upon merging to your given branch. Follow these next steps to achieve that:
 
 1. Create a new vanilla OpenTofu/Terraform root module that consumes this child module and supplies the necessary configuration for your unique setup. In other words, it's a configuration that uses the default capabilities of either OpenTofu or Terraform without any customization, or third-party tools or plugins.
-2. Optionally, Create Terraform workspace that will be used for your Automation configuration, e.g.:
+2. Optionally, create a Terraform workspace that will be used for your Automation configuration, e.g.:
    ```sh
    tofu workspace new masterpoint
    ```
-   Remember, that Stack config and tfvars file name must be equal to the workspace, which can be `default`.
+   Remember that Stack config and tfvars file name must be equal to the workspace, which can be `default`.
 3. Apply the vanilla OpenTofu/Terraform configuration.
 4. Move the Automation configs to the `<root-modules>/spacelift-automation/stacks` directory and push the changes to the tracked repo and branch.
-5. From this moment Spacelift Automation is tracking the changes for its Stack configs and Terraform variables.
+5. From this moment, Spacelift Automation is tracking the changes to its Stack configs and Terraform variables.
+
+Check out an example of such a configuration in the [examples/complete](./examples/complete/components/spacelift-automation/tfvars/example.tfvars).
 
 NOTE to Masterpoint team: We might want to create a small wrapper to automatize this using Taskit. On hold for now.
 

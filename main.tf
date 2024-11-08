@@ -25,8 +25,6 @@
 # that are not directly used in the resource creation.
 
 locals {
-  enabled = module.this.enabled
-
   _all_stack_files     = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
   _all_root_modules    = distinct([for file in local._all_stack_files : dirname(replace(replace(file, "../", ""), "stacks/", ""))])
   enabled_root_modules = var.all_root_modules_enabled ? local._all_root_modules : var.enabled_root_modules
@@ -231,7 +229,7 @@ module "deep" {
 }
 
 resource "spacelift_stack" "default" {
-  for_each = local.enabled ? local.stacks : toset([])
+  for_each = local.stacks
 
   space_id                     = coalesce(try(local.stack_configs[each.key].space_id, null), var.space_id)
   name                         = each.key
@@ -278,7 +276,7 @@ resource "spacelift_stack" "default" {
 # Use the 'deactivated' attribute to disable the stack destructor functionality instead.
 # https://github.com/spacelift-io/terraform-provider-spacelift/blob/master/spacelift/resource_stack_destructor.go
 resource "spacelift_stack_destructor" "default" {
-  for_each = local.enabled ? local.stacks : toset([])
+  for_each = local.stacks
 
   stack_id    = spacelift_stack.default[each.key].id
   deactivated = !try(local.stack_configs[each.key].destructor_enabled, var.destructor_enabled)
@@ -293,10 +291,10 @@ resource "spacelift_stack_destructor" "default" {
 }
 
 resource "spacelift_aws_integration_attachment" "default" {
-  for_each = local.enabled ? {
+  for_each = {
     for stack, configs in local.stack_configs : stack => configs
     if try(configs.aws_integration_enabled, var.aws_integration_enabled)
-  } : {}
+  }
   integration_id = try(local.stack_configs[each.key].aws_integration_id, var.aws_integration_id)
   stack_id       = spacelift_stack.default[each.key].id
   read           = var.aws_integration_attachment_read
@@ -304,10 +302,10 @@ resource "spacelift_aws_integration_attachment" "default" {
 }
 
 resource "spacelift_drift_detection" "default" {
-  for_each = local.enabled ? {
+  for_each = {
     for stack, configs in local.stack_configs : stack => configs
     if try(configs.drift_detection_enabled, var.drift_detection_enabled)
-  } : {}
+  }
 
   stack_id     = spacelift_stack.default[each.key].id
   ignore_state = try(local.stack_configs[each.key].drift_detection_ignore_state, var.drift_detection_ignore_state)

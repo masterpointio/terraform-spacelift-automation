@@ -215,7 +215,7 @@ locals {
       # It copies the tfvars file from the stack's workspace to the root module's directory
       # and renames it to `spacelift.auto.tfvars` to automatically load variable definitions for each run/task.
       ["cp tfvars/${local.configs[stack].terraform_workspace}.tfvars spacelift.auto.tfvars"],
-    )) if try(local.configs[stack].tfvars.enabled, false)
+    )) if try(local.configs[stack].tfvars.enabled, true)
   }
 }
 

@@ -13,10 +13,11 @@ By doing this, we provide an example of how to set up Spacelift to automate the 
      - `backend.tf.json`: Configure your Terraform backend settings
      - `example.tfvars`: Set your Spacelift configuration variables
      - `example.yaml`: Define your stack configuration
-   > **Important:** These files may contain sensitive information. Ensure you:
-   > - Remove any hardcoded credentials or sensitive values
-   > - Have appropriate Spacelift and AWS permissions
-   > - Follow your organization's security practices
+       > **Important:** These files may contain sensitive information. Ensure you:
+       >
+       > - Remove any hardcoded credentials or sensitive values
+       > - Have appropriate Spacelift and AWS permissions
+       > - Follow your organization's security practices
 1. Navigate to the spacelift-automation component directory:
    ```sh
    cd ./components/spacelift-automation/

@@ -16,21 +16,21 @@ By doing this, we provide an example of how to set up Spacelift to automate the 
        > **Important:** These files may contain sensitive information. Ensure you:
        >
        > - Remove any hardcoded credentials or sensitive values
-       > - Have appropriate Spacelift and AWS permissions
+       > - Have appropriate Spacelift ([`SPACELIFT_API_KEY_*`](https://docs.spacelift.io/concepts/spacectl#spacelift-api-keys) environment variables) and AWS permissions
        > - Follow your organization's security practices
-1. Navigate to the spacelift-automation component directory:
+2. Navigate to the spacelift-automation component directory:
    ```sh
    cd ./components/spacelift-automation/
    ```
-1. Initialize Terraform:
+3. Initialize Terraform:
    ```sh
    tofu init
    ```
-1. Select the worspace:
+4. Select the worspace:
    ```sh
    tofu workspace select example
    ```
-1. Review the Terraform plan:
+5. Review the Terraform plan:
    ```sh
    tofu plan -var-file tfvars/example.tfvars
    ```

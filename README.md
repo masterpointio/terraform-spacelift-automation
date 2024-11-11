@@ -1,30 +1,194 @@
-# terraform-module-template
+# `spacelift-automation`
 
-[![Release](https://img.shields.io/github/release/masterpointio/terraform-module-template.svg)](https://github.com/masterpointio/terraform-module-template/releases/latest)
+[![Release](https://img.shields.io/github/release/masterpointio/terraform-spacelift-automation.svg)](https://github.com/masterpointio/terraform-spacelift-automation/releases/latest)
 
-This repository serves as a template for creating Terraform modules, providing a standardized structure and essential files for efficient module development. It's designed to ensure consistency and best practices across Terraform projects.
+This Terraform child module provides infrastructure automation for projects in [Spacelift](https://docs.spacelift.io/).
+
+## Overview
+
+The `spacelift-automation` root module is designed to streamline the deployment and management of all Spacelift infrastructure, including itself.
+
+It automates the creation of "child" stacks and all the required accompanying Spacelift resources. For each enabled root module it creates:
+
+1. [Spacelift Stack](https://docs.spacelift.io/concepts/stack/)
+   You can think about a stack as a combination of source code, state file and configuration in the form of environment variables and mounted files.
+2. [Spacelift Stack Destructor](https://docs.spacelift.io/concepts/stack/stack-dependencies.html#ordered-stack-creation-and-deletion)
+   Required to destroy the resources of a Stack before deleting it. Destroying this resource will delete the resources in the stack. If this resource needs to be deleted and the resources in the stacks are to be preserved, ensure that the deactivated attribute is set to true.
+3. [Spacelift AWS Integration Attachment](https://docs.spacelift.io/integrations/cloud-providers/aws#lets-explain)
+   Associates a specific AWS IAM role with a stack to allow it to assume that role. The IAM role typically has permissions to manage specific AWS resources, and Spacelift assumes this role to run the operations required by the stack.
+4. [Spacelift Initialization Hook](https://docs.spacelift.io/concepts/run#initializing)
+   Prepares your environment before executing infrastructure code. This custom script copies corresponding Terraform tfvars files into a working directory before either run or task as a `spacelift.auto.tfvars` file. It's [automatically loaded](https://opentofu.org/docs/v1.7/language/values/variables/#variable-definitions-tfvars-files) into the OpenTofu/Terraform execution environment.
 
 ## Usage
 
-TODO
+Spacelift Automation logic is opinionated and heavily relies on the Git repository structure.
+This module is configured to track all the files in the provided root module directory and create the stack based on the provided configuration (if any).
+
+Structure requirements are:
+
+- Stack configs are placed in `<root_module>/stacks` directory.
+- Terraform variables are placed in `<root_module>/tfvars` directory.
+- Stack config file and tfvars file must be equal to OpenTofu/Terraform workspace, e.g. `dev.yaml` and `dev.tfvars`.
+- Common configs are placed in `<root_module>/stacks/common.yaml` file. This is useful when you know that some values should be shared across all the stacks created for a root module, e.g. all stacks that manage Spacelift Policy must be Administrative. You can override this file name using Terraform variable.
+
+Let's check the example.
+Input repo structure:
+
+```sh
+├── root-modules
+│   ├── spacelift-aws-role
+│   │   ├── stacks
+│   │   │   └── dev.yaml
+│   │   │   └── stage.yaml
+│   │   │   └── common.yaml
+│   │   ├── tfvars
+│   │   │   └── dev.tfvars
+│   │   │   └── stage.tfvars
+│   │   ├── variables.tf
+│   │   └── versions.tf
+│   ├── k8s-cluster
+│   │   ├── stacks
+│   │   │   └── dev.yaml
+│   │   │   └── prod.yaml
+│   │   │   └── common.yaml
+│   │   ├── tfvars
+│   │   │   └── dev.tfvars
+│   │   │   └── prod.tfvars
+│   │   ├── variables.tf
+│   │   ├── main.tf
+│   │   └── versions.tf
+...
+```
+
+Root module inputs:
+
+```hcl
+aws_integration_id = "ZDPP8SKNVG0G27T4"
+
+# GitHub configuration
+github_enterprise = {
+  namespace = "masterpointio"
+}
+repository = "terraform-spacelift-automation"
+
+# Stacks configurations
+root_modules_path    = "root-modules"
+enabled_root_modules = ["spacelift-aws-role"]
+```
+
+The configuration above creates the following stacks:
+
+- `spacelift-aws-role-dev`
+- `spacelift-aws-role-stage`
+
+These stacks have the following configuration:
+
+- Stacks track changes in GitHub repo `github.com/masterpointio/terraform-spacelift-automation`, branch `main` (the default), and directrory `root-modules`.
+- Common configuration is defined in `root-modules/spacelift-aws-role/stacks/common.yaml` and applied to both Stacks. However, if there is an override in a Stack config (e.g. `root-modules/spacelift-aws-role/stacks/dev.yaml`), it takes precedence over common configs.
+- Corresponding Terraform variables are generated by an [Initialization Hook](https://docs.spacelift.io/concepts/run#initializing) and placed in the root of each Stack's working directory during each run or task. For example, the content of the file `root-modules/spacelift-aws-role/tfvars/dev.tfvars` will be copied to working directory of the Stack `spacelift-aws-role-dev` as file `spacelift.auto.tfvars` allowing the OpenTofu/Terraform inputs to be automatically loaded.
+  - If you would like to disable this functionality, you can set `tfvars.enabled` in the Stack's YAML file to `false`.
+
+## FAQs
+
+### Why are variable values provided separately in `tfvars/` and not in the `yaml` file?
+
+This is to support easy local and outside-spacelift operations. Keeping variable values in a `tfvars` file per workspace allows you to simply pass that file to the relevant CLI command locally via the `-var-file` option so that you don't need to provide values individually.
+
+### Can I create a Spacelift Stack for Spacelift Automation? (Recommended)
+
+Spacelift Automation can manage itself as a Stack as well, and we recommend this so you can fully automate your Stack management upon merging to your given branch. Follow these next steps to achieve that:
+
+1. Create a new vanilla OpenTofu/Terraform root module that consumes this child module and supplies the necessary configuration for your unique setup. In other words, it's a configuration that uses the default capabilities of either OpenTofu or Terraform without any customization, or third-party tools or plugins.
+2. Optionally, create a Terraform workspace that will be used for your Automation configuration, e.g.:
+   ```sh
+   tofu workspace new masterpoint
+   ```
+   Remember that Stack config and tfvars file name must be equal to the workspace, which can be `default`.
+3. Apply the vanilla OpenTofu/Terraform configuration.
+4. Move the Automation configs to the `<root-modules>/spacelift-automation/stacks` directory and push the changes to the tracked repo and branch.
+5. From this moment, Spacelift Automation is tracking the changes to its Stack configs and Terraform variables.
+
+Check out an example of such a configuration in the [examples/complete](./examples/complete/components/spacelift-automation/tfvars/example.tfvars).
+
+NOTE to Masterpoint team: We might want to create a small wrapper to automatize this using Taskit. On hold for now.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Requirements
 
-No requirements.
+| Name                                                                     | Version |
+| ------------------------------------------------------------------------ | ------- |
+| <a name="requirement_terraform"></a> [terraform](#requirement_terraform) | >= 1.6  |
+| <a name="requirement_spacelift"></a> [spacelift](#requirement_spacelift) | >= 1.14 |
 
 ## Providers
 
-No provider.
+| Name                                                               | Version |
+| ------------------------------------------------------------------ | ------- |
+| <a name="provider_spacelift"></a> [spacelift](#provider_spacelift) | 1.16.1  |
+
+## Modules
+
+| Name                                            | Source                                    | Version |
+| ----------------------------------------------- | ----------------------------------------- | ------- |
+| <a name="module_deep"></a> [deep](#module_deep) | cloudposse/config/yaml//modules/deepmerge | 1.0.2   |
+
+## Resources
+
+| Name                                                                                                                                                            | Type     |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| [spacelift_aws_integration_attachment.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/aws_integration_attachment) | resource |
+| [spacelift_drift_detection.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/drift_detection)                       | resource |
+| [spacelift_stack.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack)                                           | resource |
+| [spacelift_stack_destructor.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack_destructor)                     | resource |
 
 ## Inputs
 
-No input.
+| Name                                                                                                                              | Description                                                                                                                                                                       | Type                                                                        | Default                                                    | Required |
+| --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------- | :------: |
+| <a name="input_administrative"></a> [administrative](#input_administrative)                                                       | Flag to mark the stack as administrative                                                                                                                                          | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_after_apply"></a> [after_apply](#input_after_apply)                                                                | List of after-apply scripts                                                                                                                                                       | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_after_destroy"></a> [after_destroy](#input_after_destroy)                                                          | List of after-destroy scripts                                                                                                                                                     | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_after_init"></a> [after_init](#input_after_init)                                                                   | List of after-init scripts                                                                                                                                                        | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_after_perform"></a> [after_perform](#input_after_perform)                                                          | List of after-perform scripts                                                                                                                                                     | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_after_plan"></a> [after_plan](#input_after_plan)                                                                   | List of after-plan scripts                                                                                                                                                        | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_all_root_modules_enabled"></a> [all_root_modules_enabled](#input_all_root_modules_enabled)                         | When set to true, all subdirectories in root_modules_path will be treated as root modules.                                                                                        | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_autodeploy"></a> [autodeploy](#input_autodeploy)                                                                   | Flag to enable/disable automatic deployment of the stack                                                                                                                          | `bool`                                                                      | `true`                                                     |    no    |
+| <a name="input_autoretry"></a> [autoretry](#input_autoretry)                                                                      | Flag to enable/disable automatic retry of the stack                                                                                                                               | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_aws_integration_attachment_read"></a> [aws_integration_attachment_read](#input_aws_integration_attachment_read)    | Indicates whether this attachment is used for read operations.                                                                                                                    | `bool`                                                                      | `true`                                                     |    no    |
+| <a name="input_aws_integration_attachment_write"></a> [aws_integration_attachment_write](#input_aws_integration_attachment_write) | Indicates whether this attachment is used for write operations.                                                                                                                   | `bool`                                                                      | `true`                                                     |    no    |
+| <a name="input_aws_integration_enabled"></a> [aws_integration_enabled](#input_aws_integration_enabled)                            | Indicates whether the AWS integration is enabled.                                                                                                                                 | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_aws_integration_id"></a> [aws_integration_id](#input_aws_integration_id)                                           | ID of the AWS integration to attach.                                                                                                                                              | `string`                                                                    | `null`                                                     |    no    |
+| <a name="input_before_apply"></a> [before_apply](#input_before_apply)                                                             | List of before-apply scripts                                                                                                                                                      | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_before_destroy"></a> [before_destroy](#input_before_destroy)                                                       | List of before-destroy scripts                                                                                                                                                    | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_before_init"></a> [before_init](#input_before_init)                                                                | List of before-init scripts                                                                                                                                                       | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_before_perform"></a> [before_perform](#input_before_perform)                                                       | List of before-perform scripts                                                                                                                                                    | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_before_plan"></a> [before_plan](#input_before_plan)                                                                | List of before-plan scripts                                                                                                                                                       | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_branch"></a> [branch](#input_branch)                                                                               | Specify which branch to use within the infrastructure repository.                                                                                                                 | `string`                                                                    | `"main"`                                                   |    no    |
+| <a name="input_common_config_file"></a> [common_config_file](#input_common_config_file)                                           | Name of the common configuration file for the stack across a root module.                                                                                                         | `string`                                                                    | `"common.yaml"`                                            |    no    |
+| <a name="input_description"></a> [description](#input_description)                                                                | Description of the stack                                                                                                                                                          | `string`                                                                    | `"Managed by spacelift-automation Terraform root module."` |    no    |
+| <a name="input_destructor_enabled"></a> [destructor_enabled](#input_destructor_enabled)                                           | Flag to enable/disable the destructor for the Stack.                                                                                                                              | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_drift_detection_enabled"></a> [drift_detection_enabled](#input_drift_detection_enabled)                            | Flag to enable/disable Drift Detection configuration for a Stack.                                                                                                                 | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_drift_detection_ignore_state"></a> [drift_detection_ignore_state](#input_drift_detection_ignore_state)             | Controls whether drift detection should be performed on a stack<br>in any final state instead of just 'Finished'.                                                                 | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_drift_detection_reconcile"></a> [drift_detection_reconcile](#input_drift_detection_reconcile)                      | Flag to enable/disable automatic reconciliation of drifts.                                                                                                                        | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_drift_detection_schedule"></a> [drift_detection_schedule](#input_drift_detection_schedule)                         | The schedule for drift detection.                                                                                                                                                 | `list(string)`                                                              | <pre>[<br> "0 4 * * *"<br>]</pre>                          |    no    |
+| <a name="input_drift_detection_timezone"></a> [drift_detection_timezone](#input_drift_detection_timezone)                         | The timezone for drift detection.                                                                                                                                                 | `string`                                                                    | `"UTC"`                                                    |    no    |
+| <a name="input_enable_local_preview"></a> [enable_local_preview](#input_enable_local_preview)                                     | Indicates whether local preview runs can be triggered on this Stack.                                                                                                              | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_enabled_root_modules"></a> [enabled_root_modules](#input_enabled_root_modules)                                     | List of root modules where to look for stack config files.<br>Ignored when all_root_modules_enabled is true.<br>Example: ["spacelift-automation", "k8s-cluster"]                  | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_github_enterprise"></a> [github_enterprise](#input_github_enterprise)                                              | The GitHub VCS settings                                                                                                                                                           | <pre>object({<br> namespace = string<br> id = optional(string)<br> })</pre> | n/a                                                        |   yes    |
+| <a name="input_manage_state"></a> [manage_state](#input_manage_state)                                                             | Determines if Spacelift should manage state for this stack.                                                                                                                       | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_protect_from_deletion"></a> [protect_from_deletion](#input_protect_from_deletion)                                  | Protect this stack from accidental deletion. If set, attempts to delete this stack will fail.                                                                                     | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_repository"></a> [repository](#input_repository)                                                                   | The name of your infrastructure repo                                                                                                                                              | `string`                                                                    | n/a                                                        |   yes    |
+| <a name="input_root_modules_path"></a> [root_modules_path](#input_root_modules_path)                                              | The path, relative to the root of the repository, where the root module can be found.                                                                                             | `string`                                                                    | `"root-modules"`                                           |    no    |
+| <a name="input_space_id"></a> [space_id](#input_space_id)                                                                         | Place the stack in the specified space_id.                                                                                                                                        | `string`                                                                    | `"root"`                                                   |    no    |
+| <a name="input_terraform_smart_sanitization"></a> [terraform_smart_sanitization](#input_terraform_smart_sanitization)             | Indicates whether runs on this will use terraform's sensitive value system to sanitize<br>the outputs of Terraform state and plans in spacelift instead of sanitizing all fields. | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_terraform_version"></a> [terraform_version](#input_terraform_version)                                              | Terraform version to use.                                                                                                                                                         | `string`                                                                    | `"1.7.2"`                                                  |    no    |
+| <a name="input_terraform_workflow_tool"></a> [terraform_workflow_tool](#input_terraform_workflow_tool)                            | Defines the tool that will be used to execute the workflow.<br>This can be one of OPEN_TOFU, TERRAFORM_FOSS or CUSTOM.                                                            | `string`                                                                    | `"OPEN_TOFU"`                                              |    no    |
+| <a name="input_worker_pool_id"></a> [worker_pool_id](#input_worker_pool_id)                                                       | ID of the worker pool to use.<br>NOTE: worker_pool_id is required when using a self-hosted instance of Spacelift.                                                                 | `string`                                                                    | `null`                                                     |    no    |
 
 ## Outputs
 
-No output.
+No outputs.
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
@@ -32,7 +196,7 @@ No output.
 
 Contributions are welcome and appreciated!
 
-Found an issue or want to request a feature? [Open an issue](TODO)
+Found an issue or want to request a feature? [Open an issue](https://github.com/masterpointio/terraform-spacelift-automation/issues/new)
 
 Want to fix a bug you found or add some functionality? Fork, clone, commit, push, and PR and we'll check it out.
 

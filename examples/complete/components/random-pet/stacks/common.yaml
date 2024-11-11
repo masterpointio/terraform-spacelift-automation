@@ -1,0 +1,3 @@
+stack_settings:
+  manage_state: true
+  description: This stack generates random pet names

@@ -26,7 +26,6 @@
 
 # Output from other tools that might be used alongside Terraform/OpenTofu
 *.tfvars.json
-backend.tf.json
 
 # Taskit files
 .taskit/

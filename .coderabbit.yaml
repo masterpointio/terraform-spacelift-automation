@@ -1,0 +1,81 @@
+# Docs: https://docs.coderabbit.ai/configure-coderabbit
+# Schema: https://coderabbit.ai/integrations/schema.v2.json
+
+language: en
+
+tone_instructions: |
+  Provide feedback in a professional, friendly, constructive, and concise tone.
+  Offer clear, specific suggestions and best practices to help enhance the code quality and promote learning.
+
+early_access: true
+
+knowledge_base:
+  # The scope of learnings to use for the knowledge base.
+  # `local` uses the repository's learnings,
+  # `global` uses the organization's learnings,
+  # `auto` uses repository's learnings for public repositories and organization's learnings for private repositories.
+  # Default value: `auto`
+  learnings:
+    scope: global
+  issues:
+    scope: global
+  pull_requests:
+    scope: global
+
+reviews:
+  profile: chill
+  auto_review:
+    # Ignore reviewing if the title of the pull request contains any of these keywords (case-insensitive)
+    ignore_title_keywords:
+      - wip
+      - draft
+      - test
+  commit_status: false
+  review_status: false
+  tools:
+    # By default, all tools are enabled.
+    # We disable some tools here to avoid duplication with Trunk or we simply don't need to use them.
+    shellcheck:
+      enabled: false
+    ruff:
+      enabled: false
+    markdownlint:
+      enabled: false
+    github-checks:
+      enabled: false
+    languagetool:
+      enabled: false
+    biome:
+      enabled: false
+    hadolint:
+      enabled: false
+    swiftlint:
+      enabled: false
+    phpstan:
+      enabled: false
+    golangci-lint:
+      enabled: false
+    yamllint:
+      enabled: false
+    gitleaks:
+      enabled: false
+    checkov:
+      enabled: false
+    detekt:
+      enabled: false
+    eslint:
+      enabled: false
+    rubocop:
+      enabled: false
+    buf:
+      enabled: false
+    regal:
+      enabled: false
+    actionlint:
+      enabled: false
+    pmd:
+      enabled: false
+    cppcheck:
+      enabled: false
+    circleci:
+      enabled: false

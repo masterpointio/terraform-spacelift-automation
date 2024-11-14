@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.1.0...v0.2.0) (2024-11-14)
+
+
+### Features
+
+* adds CRabbit custom config ([e9b4889](https://github.com/masterpointio/terraform-spacelift-automation/commit/e9b4889f5d05e390903d01b4485a09c63c0f1af3))
+
 ## 0.1.0 (2024-11-11)
 
 ### Features

@@ -13,3 +13,4 @@ packages:
   - name: terraform-docs/terraform-docs@v0.18.0
   - name: hashicorp/terraform@v1.9.3
   - name: opentofu/opentofu@v1.8.0
+  - name: spacelift-io/spacectl@v1.8.0

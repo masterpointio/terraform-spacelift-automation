@@ -34,6 +34,9 @@ lint:
     - linters: [tofu]
       paths:
         - "**/backend.tf.json"
+    - linters: [prettier, markdownlint]
+      paths:
+        - CHANGELOG.md
 actions:
   enabled:
     - trunk-announce

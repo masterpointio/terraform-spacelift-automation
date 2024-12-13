@@ -226,6 +226,9 @@ module "deep" {
   for_each = local._root_module_stack_configs
   # Stack configuration will take precedence and overwrite the conflicting value from the common configuration (if any)
   maps = [local._common_configs[each.value.root_module], each.value]
+
+  # To support merging labels from common.yaml, we need lists to append instead of overwrite
+  append_list_enabled = true
 }
 
 resource "spacelift_stack" "default" {

@@ -2,3 +2,4 @@ stack_settings:
   description: This Automation stack is used for Masterpoint's testing purposes
   labels:
     - stack_specific_label
+  drift_detection_enabled: true

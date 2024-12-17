@@ -214,8 +214,20 @@ variable "enable_local_preview" {
   type        = bool
   description = "Indicates whether local preview runs can be triggered on this Stack."
   default     = false
-
 }
+
+variable "enable_well_known_secret_masking" {
+  type        = bool
+  description = "Indicates whether well-known secret masking is enabled."
+  default     = false
+}
+
+variable "github_action_deploy" {
+  type        = bool
+  description = "Indicates whether GitHub users can deploy from the Checks API."
+  default     = true
+}
+
 variable "manage_state" {
   type        = bool
   description = "Determines if Spacelift should manage state for this stack."

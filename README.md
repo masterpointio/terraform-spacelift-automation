@@ -125,7 +125,7 @@ NOTE to Masterpoint team: We might want to create a small wrapper to automatize 
 
 | Name                                                               | Version |
 | ------------------------------------------------------------------ | ------- |
-| <a name="provider_spacelift"></a> [spacelift](#provider_spacelift) | 1.16.1  |
+| <a name="provider_spacelift"></a> [spacelift](#provider_spacelift) | 1.19.0  |
 
 ## Modules
 
@@ -174,7 +174,9 @@ NOTE to Masterpoint team: We might want to create a small wrapper to automatize 
 | <a name="input_drift_detection_schedule"></a> [drift_detection_schedule](#input_drift_detection_schedule)                         | The schedule for drift detection.                                                                                                                                                 | `list(string)`                                                              | <pre>[<br> "0 4 * * *"<br>]</pre>                          |    no    |
 | <a name="input_drift_detection_timezone"></a> [drift_detection_timezone](#input_drift_detection_timezone)                         | The timezone for drift detection.                                                                                                                                                 | `string`                                                                    | `"UTC"`                                                    |    no    |
 | <a name="input_enable_local_preview"></a> [enable_local_preview](#input_enable_local_preview)                                     | Indicates whether local preview runs can be triggered on this Stack.                                                                                                              | `bool`                                                                      | `false`                                                    |    no    |
+| <a name="input_enable_well_known_secret_masking"></a> [enable_well_known_secret_masking](#input_enable_well_known_secret_masking) | Indicates whether well-known secret masking is enabled.                                                                                                                           | `bool`                                                                      | `false`                                                    |    no    |
 | <a name="input_enabled_root_modules"></a> [enabled_root_modules](#input_enabled_root_modules)                                     | List of root modules where to look for stack config files.<br>Ignored when all_root_modules_enabled is true.<br>Example: ["spacelift-automation", "k8s-cluster"]                  | `list(string)`                                                              | `[]`                                                       |    no    |
+| <a name="input_github_action_deploy"></a> [github_action_deploy](#input_github_action_deploy)                                     | Indicates whether GitHub users can deploy from the Checks API.                                                                                                                    | `bool`                                                                      | `true`                                                     |    no    |
 | <a name="input_github_enterprise"></a> [github_enterprise](#input_github_enterprise)                                              | The GitHub VCS settings                                                                                                                                                           | <pre>object({<br> namespace = string<br> id = optional(string)<br> })</pre> | n/a                                                        |   yes    |
 | <a name="input_manage_state"></a> [manage_state](#input_manage_state)                                                             | Determines if Spacelift should manage state for this stack.                                                                                                                       | `bool`                                                                      | `false`                                                    |    no    |
 | <a name="input_protect_from_deletion"></a> [protect_from_deletion](#input_protect_from_deletion)                                  | Protect this stack from accidental deletion. If set, attempts to delete this stack will fail.                                                                                     | `bool`                                                                      | `false`                                                    |    no    |
@@ -188,7 +190,9 @@ NOTE to Masterpoint team: We might want to create a small wrapper to automatize 
 
 ## Outputs
 
-No outputs.
+| Name                                                                                | Description                                                                                                                                                  |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| <a name="output_spacelift_stacks"></a> [spacelift_stacks](#output_spacelift_stacks) | A map of Spacelift stacks with selected attributes.<br>To reduce the risk of accidentally exporting sensitive data, only a subset of attributes is exported. |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 

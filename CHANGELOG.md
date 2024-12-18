@@ -5,12 +5,13 @@
 
 ### Features
 
-* allow  TF workspace usage ([8ccba9f](https://github.com/masterpointio/terraform-spacelift-automation/commit/8ccba9fb41791f0c8ba31b30fb20e89dd77360e4))
+* allow default TF workspace usage ([8ccba9f](https://github.com/masterpointio/terraform-spacelift-automation/commit/8ccba9fb41791f0c8ba31b30fb20e89dd77360e4))
 
+* support more spacelift settings: `enable_well_known_secret_masking` + `github_action_deploy`   ([df259b2](https://github.com/masterpointio/terraform-spacelift-automation/commit/df259b27fb6163e4d2dbc53f70624b6f6e80c2b5))
 
-### Bug Fixes
+## Fixes
 
-* support more attributes ([df259b2](https://github.com/masterpointio/terraform-spacelift-automation/commit/df259b27fb6163e4d2dbc53f70624b6f6e80c2b5))
+* Fixes drift detection precondition
 
 ## [0.2.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.2.0...v0.2.1) (2024-12-13)
 

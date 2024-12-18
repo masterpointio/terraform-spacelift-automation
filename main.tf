@@ -102,7 +102,10 @@ locals {
       {
         "project_root"        = replace(format("%s/%s", var.root_modules_path, module), "../", "")
         "root_module"         = module,
-        "terraform_workspace" = trimsuffix(file, ".yaml"),
+        "terraform_workspace" = try(content.default_tf_workspace_enabled, var.default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
+        # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally
+        # TODO: Add tests to ensure that the `tfvars` file is named the same as the Stack config file
+        "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
       content
     ) if file != var.common_config_file
@@ -183,7 +186,7 @@ locals {
 
   _folder_labels = {
     for stack in local.stacks : stack => [
-      "folder:${local.configs[stack].root_module}/${local.configs[stack].terraform_workspace}"
+      "folder:${local.configs[stack].root_module}/${local.configs[stack].tfvars_file_name}"
     ]
   }
 
@@ -214,7 +217,7 @@ locals {
       # This command is required for each stack.
       # It copies the tfvars file from the stack's workspace to the root module's directory
       # and renames it to `spacelift.auto.tfvars` to automatically load variable definitions for each run/task.
-      ["cp tfvars/${local.configs[stack].terraform_workspace}.tfvars spacelift.auto.tfvars"],
+      ["cp tfvars/${local.configs[stack].tfvars_file_name}.tfvars spacelift.auto.tfvars"],
     )) if try(local.configs[stack].tfvars.enabled, true)
   }
 }

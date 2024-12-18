@@ -1,2 +1,4 @@
 stack_settings:
   manage_state: true
+
+default_tf_workspace_enabled: true

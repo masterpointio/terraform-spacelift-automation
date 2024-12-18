@@ -165,6 +165,18 @@ variable "before_plan" {
   default     = []
 }
 
+variable "default_tf_workspace_enabled" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+  Enables the use of `default` Terraform workspace instead of managing multiple workspaces within a root module.
+
+  NOTE: We encourage the use of Terraform workspaces to manage multiple environments. However, in some cases,
+  you may want to disable this behavior. This is particularly useful when integrating this module
+  into an existing (brownfield) infrastructure setup.
+  EOT
+}
+
 variable "description" {
   type        = string
   description = "Description of the stack"

@@ -274,6 +274,21 @@ resource "spacelift_stack" "default" {
       namespace = github_enterprise.value["namespace"]
     }
   }
+
+  lifecycle {
+    # Expected `tfvars` file exists
+    precondition {
+      condition     = fileexists("${local.configs[each.key].project_root}/tfvars/${local.configs[each.key].tfvars_file_name}.tfvars")
+      error_message = <<-EOT
+      The required .tfvars file is missing for stack "${each.key}".
+
+      Expected location:
+      "${local.configs[each.key].project_root}/tfvars/${local.configs[each.key].tfvars_file_name}.tfvars"
+
+      Ensure that the specified .tfvars file exists in the expected path and try again.
+      EOT
+    }
+  }
 }
 
 # The Spacelift Destructor is a feature designed to automatically clean up the resources no longer managed by our IaC.

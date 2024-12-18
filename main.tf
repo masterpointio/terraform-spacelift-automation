@@ -102,7 +102,10 @@ locals {
       {
         "project_root"        = replace(format("%s/%s", var.root_modules_path, module), "../", "")
         "root_module"         = module,
-        "terraform_workspace" = trimsuffix(file, ".yaml"),
+        "terraform_workspace" = try(content.default_tf_workspace_enabled, var.default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
+        # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally
+        # TODO: Add tests to ensure that the `tfvars` file is named the same as the Stack config file
+        "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
       content
     ) if file != var.common_config_file
@@ -183,7 +186,7 @@ locals {
 
   _folder_labels = {
     for stack in local.stacks : stack => [
-      "folder:${local.configs[stack].root_module}/${local.configs[stack].terraform_workspace}"
+      "folder:${local.configs[stack].root_module}/${local.configs[stack].tfvars_file_name}"
     ]
   }
 
@@ -214,7 +217,7 @@ locals {
       # This command is required for each stack.
       # It copies the tfvars file from the stack's workspace to the root module's directory
       # and renames it to `spacelift.auto.tfvars` to automatically load variable definitions for each run/task.
-      ["cp tfvars/${local.configs[stack].terraform_workspace}.tfvars spacelift.auto.tfvars"],
+      ["cp tfvars/${local.configs[stack].tfvars_file_name}.tfvars spacelift.auto.tfvars"],
     )) if try(local.configs[stack].tfvars.enabled, true)
   }
 }
@@ -234,41 +237,56 @@ module "deep" {
 resource "spacelift_stack" "default" {
   for_each = local.stacks
 
-  space_id                     = coalesce(try(local.stack_configs[each.key].space_id, null), var.space_id)
-  name                         = each.key
-  administrative               = coalesce(try(local.stack_configs[each.key].administrative, null), var.administrative)
-  after_apply                  = compact(concat(try(local.stack_configs[each.key].after_apply, []), var.after_apply))
-  after_destroy                = compact(concat(try(local.stack_configs[each.key].after_destroy, []), var.after_destroy))
-  after_init                   = compact(concat(try(local.stack_configs[each.key].after_init, []), var.after_init))
-  after_perform                = compact(concat(try(local.stack_configs[each.key].after_perform, []), var.after_perform))
-  after_plan                   = compact(concat(try(local.stack_configs[each.key].after_plan, []), var.after_plan))
-  autodeploy                   = coalesce(try(local.stack_configs[each.key].autodeploy, null), var.autodeploy)
-  autoretry                    = try(local.stack_configs[each.key].autoretry, var.autoretry)
-  before_apply                 = compact(coalesce(try(local.stack_configs[each.key].before_apply, []), var.before_apply))
-  before_destroy               = compact(coalesce(try(local.stack_configs[each.key].before_destroy, []), var.before_destroy))
-  before_init                  = compact(coalesce(try(local.before_init[each.key], []), var.before_init))
-  before_perform               = compact(coalesce(try(local.stack_configs[each.key].before_perform, []), var.before_perform))
-  before_plan                  = compact(coalesce(try(local.stack_configs[each.key].before_plan, []), var.before_plan))
-  description                  = coalesce(try(local.stack_configs[each.key].description, null), var.description)
-  repository                   = try(local.stack_configs[each.key].repository, var.repository)
-  branch                       = try(local.stack_configs[each.key].branch, var.branch)
-  project_root                 = local.configs[each.key].project_root
-  manage_state                 = try(local.stack_configs[each.key].manage_state, var.manage_state)
-  labels                       = local.labels[each.key]
-  enable_local_preview         = try(local.stack_configs[each.key].enable_local_preview, var.enable_local_preview)
-  terraform_smart_sanitization = try(local.stack_configs[each.key].terraform_smart_sanitization, var.terraform_smart_sanitization)
-  terraform_version            = try(local.stack_configs[each.key].terraform_version, var.terraform_version)
-  terraform_workflow_tool      = var.terraform_workflow_tool
-  terraform_workspace          = local.configs[each.key].terraform_workspace
-
-  protect_from_deletion = try(local.stack_configs[each.key].protect_from_deletion, var.protect_from_deletion)
-
-  worker_pool_id = try(local.stack_configs[each.key].worker_pool_id, var.worker_pool_id)
+  administrative                   = coalesce(try(local.stack_configs[each.key].administrative, null), var.administrative)
+  after_apply                      = compact(concat(try(local.stack_configs[each.key].after_apply, []), var.after_apply))
+  after_destroy                    = compact(concat(try(local.stack_configs[each.key].after_destroy, []), var.after_destroy))
+  after_init                       = compact(concat(try(local.stack_configs[each.key].after_init, []), var.after_init))
+  after_perform                    = compact(concat(try(local.stack_configs[each.key].after_perform, []), var.after_perform))
+  after_plan                       = compact(concat(try(local.stack_configs[each.key].after_plan, []), var.after_plan))
+  autodeploy                       = coalesce(try(local.stack_configs[each.key].autodeploy, null), var.autodeploy)
+  autoretry                        = try(local.stack_configs[each.key].autoretry, var.autoretry)
+  before_apply                     = compact(coalesce(try(local.stack_configs[each.key].before_apply, []), var.before_apply))
+  before_destroy                   = compact(coalesce(try(local.stack_configs[each.key].before_destroy, []), var.before_destroy))
+  before_init                      = compact(coalesce(try(local.before_init[each.key], []), var.before_init))
+  before_perform                   = compact(coalesce(try(local.stack_configs[each.key].before_perform, []), var.before_perform))
+  before_plan                      = compact(coalesce(try(local.stack_configs[each.key].before_plan, []), var.before_plan))
+  branch                           = try(local.stack_configs[each.key].branch, var.branch)
+  description                      = coalesce(try(local.stack_configs[each.key].description, null), var.description)
+  enable_local_preview             = try(local.stack_configs[each.key].enable_local_preview, var.enable_local_preview)
+  enable_well_known_secret_masking = try(local.stack_configs[each.key].enable_well_known_secret_masking, var.enable_well_known_secret_masking)
+  github_action_deploy             = try(local.stack_configs[each.key].github_action_deploy, var.github_action_deploy)
+  labels                           = local.labels[each.key]
+  manage_state                     = try(local.stack_configs[each.key].manage_state, var.manage_state)
+  name                             = each.key
+  project_root                     = local.configs[each.key].project_root
+  protect_from_deletion            = try(local.stack_configs[each.key].protect_from_deletion, var.protect_from_deletion)
+  repository                       = try(local.stack_configs[each.key].repository, var.repository)
+  space_id                         = coalesce(try(local.stack_configs[each.key].space_id, null), var.space_id)
+  terraform_smart_sanitization     = try(local.stack_configs[each.key].terraform_smart_sanitization, var.terraform_smart_sanitization)
+  terraform_version                = try(local.stack_configs[each.key].terraform_version, var.terraform_version)
+  terraform_workflow_tool          = var.terraform_workflow_tool
+  terraform_workspace              = local.configs[each.key].terraform_workspace
+  worker_pool_id                   = try(local.stack_configs[each.key].worker_pool_id, var.worker_pool_id)
 
   dynamic "github_enterprise" {
     for_each = var.github_enterprise != null ? [var.github_enterprise] : []
     content {
       namespace = github_enterprise.value["namespace"]
+    }
+  }
+
+  lifecycle {
+    # Expected `tfvars` file exists
+    precondition {
+      condition     = fileexists("${local.configs[each.key].project_root}/tfvars/${local.configs[each.key].tfvars_file_name}.tfvars")
+      error_message = <<-EOT
+      The required .tfvars file is missing for stack "${each.key}".
+
+      Expected location:
+      "${local.configs[each.key].project_root}/tfvars/${local.configs[each.key].tfvars_file_name}.tfvars"
+
+      Ensure that the specified .tfvars file exists in the expected path and try again.
+      EOT
     }
   }
 }
@@ -318,7 +336,7 @@ resource "spacelift_drift_detection" "default" {
 
   lifecycle {
     precondition {
-      condition     = can(regex("^([0-9,\\-\\*]+\\s+){4}[0-9,\\-\\*]+$", try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule)))
+      condition     = alltrue([for schedule in try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule) : can(regex("^([0-9,\\-\\*]+\\s+){4}[0-9,\\-\\*]+$", schedule))])
       error_message = "Invalid cron schedule format for drift detection"
     }
   }

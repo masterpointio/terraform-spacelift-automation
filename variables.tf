@@ -165,6 +165,18 @@ variable "before_plan" {
   default     = []
 }
 
+variable "default_tf_workspace_enabled" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+  Enables the use of `default` Terraform workspace instead of managing multiple workspaces within a root module.
+
+  NOTE: We encourage the use of Terraform workspaces to manage multiple environments.
+  However, you will want to disable this behavior if you're utilizing different backends for each instance
+  of your root modules (we call this "Dynamic Backends").
+  EOT
+}
+
 variable "description" {
   type        = string
   description = "Description of the stack"
@@ -214,8 +226,20 @@ variable "enable_local_preview" {
   type        = bool
   description = "Indicates whether local preview runs can be triggered on this Stack."
   default     = false
-
 }
+
+variable "enable_well_known_secret_masking" {
+  type        = bool
+  description = "Indicates whether well-known secret masking is enabled."
+  default     = true
+}
+
+variable "github_action_deploy" {
+  type        = bool
+  description = "Indicates whether GitHub users can deploy from the Checks API."
+  default     = true
+}
+
 variable "manage_state" {
   type        = bool
   description = "Determines if Spacelift should manage state for this stack."

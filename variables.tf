@@ -219,7 +219,7 @@ variable "enable_local_preview" {
 variable "enable_well_known_secret_masking" {
   type        = bool
   description = "Indicates whether well-known secret masking is enabled."
-  default     = false
+  default     = true
 }
 
 variable "github_action_deploy" {

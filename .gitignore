@@ -9,6 +9,10 @@
 # Local .terraform directories
 **/.terraform/*
 
+# Ignore the root .terraform.lock.hcl file (Child modules don't want this)
+.terraform.lock.hcl
+!examples/**/.terraform.lock.hcl
+
 # IDE/Editor settings
 **/.idea
 **/*.iml

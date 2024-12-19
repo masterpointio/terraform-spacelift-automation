@@ -292,7 +292,7 @@ resource "spacelift_stack" "default" {
   lifecycle {
     # Expected `tfvars` file exists
     precondition {
-      condition     = fileexists("${local.configs[each.key].project_root}/tfvars/${local.configs[each.key].tfvars_file_name}.tfvars")
+      condition     = try(local.configs[each.key].tfvars.enabled, true) ? fileexists("${local.configs[each.key].project_root}/tfvars/${local.configs[each.key].tfvars_file_name}.tfvars") : true
       error_message = <<-EOT
       The required .tfvars file is missing for stack "${each.key}".
 

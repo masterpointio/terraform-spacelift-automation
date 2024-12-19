@@ -7,6 +7,9 @@ variables {
   repository = "terraform-spacelift-automation"
   all_root_modules_enabled = true
   aws_integration_enabled = false
+  before_init = [
+    "echo 'Hello'"
+  ]
 }
 
 # Test that the root module fileset is created correctly
@@ -96,5 +99,35 @@ run "test_depends_on_label_is_added_to_stack" {
   assert {
     condition = contains(local.labels["root-module-a-test"], "depends-on:spacelift-automation-default")
     error_message = "Depends-on label was not added to the stack: ${jsonencode(local.labels)}"
+  }
+}
+
+# Test before_init excludes the expected tfvars copy command when tfvars are not enabled
+run "test_before_init_excludes_the_expected_tfvars_copy_command_when_tfvars_are_not_enabled" {
+  command = plan
+
+  assert {
+    condition = !contains(local.before_init["root-module-a-default-example"], "cp tfvars/default-example.tfvars spacelift.auto.tfvars")
+    error_message = "Before_init was not created correctly: ${jsonencode(local.before_init)}"
+  }
+}
+
+# Test before_init includes the expected tfvars copy command
+run "test_before_init_includes_the_expected_tfvars_copy_command" {
+  command = plan
+
+  assert {
+    condition = contains(local.before_init["root-module-a-test"], "cp tfvars/test.tfvars spacelift.auto.tfvars")
+    error_message = "Before_init was not created correctly: ${jsonencode(local.before_init)}"
+  }
+}
+
+# Test before_init includes the include the default before_init and stack before_init
+run "test_before_init_includes_the_default_before_init_and_stack_before_init" {
+  command = plan
+
+  assert {
+    condition = contains(local.before_init["root-module-a-default-example"], "echo 'Hello'") && contains(local.before_init["root-module-a-default-example"], "echo 'World'")
+    error_message = "Before_init was not created correctly: ${jsonencode(local.before_init)}"
   }
 }

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.3.0...v0.3.1) (2024-12-19)
+
+
+### Bug Fixes
+
+* check if tfvars file exists only if when it's expected ([#16](https://github.com/masterpointio/terraform-spacelift-automation/issues/16)) ([72c5a77](https://github.com/masterpointio/terraform-spacelift-automation/commit/72c5a773ba00952359f49b828fe25777f98a2214))
+* include stack specific `before_init` even if tfvars disabled + adds initial tests 🎉 ([#13](https://github.com/masterpointio/terraform-spacelift-automation/issues/13)) ([9eb3cd4](https://github.com/masterpointio/terraform-spacelift-automation/commit/9eb3cd42e77e2c41307740142cc7c7b18b2b5b2e))
+* pass github_enterprise.id to stacks ([#14](https://github.com/masterpointio/terraform-spacelift-automation/issues/14)) ([f4c6c1b](https://github.com/masterpointio/terraform-spacelift-automation/commit/f4c6c1b2ffca87de178fb8db6a19c552b9a9fbe8))
+
 ## [0.3.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.2.1...v0.3.0) (2024-12-18)
 
 

@@ -105,11 +105,13 @@ locals {
     for file, content in files : "${module}-${trimsuffix(file, ".yaml")}" =>
     merge(
       {
-        "project_root"        = replace(format("%s/%s", var.root_modules_path, module), "../", "")
-        "root_module"         = module,
+        "project_root" = replace(format("%s/%s", var.root_modules_path, module), "../", "")
+        "root_module"  = module,
+
+        # If default_tf_workspace_enabled is true, use "default" workspace, otherwise our file name is the workspace name
         "terraform_workspace" = try(content.default_tf_workspace_enabled, var.default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
+
         # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally
-        # TODO: Add tests to ensure that the `tfvars` file is named the same as the Stack config file
         "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
       content

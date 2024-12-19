@@ -1,0 +1,4 @@
+stack_settings:
+  labels:
+    - default_example_label
+default_tf_workspace_enabled: true

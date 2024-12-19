@@ -10,7 +10,7 @@ variables {
 }
 
 # Test that the root module fileset is created correctly
-run "test_root_module_fileset" {
+run "test_root_module_fileset_collects_all_root_modules" {
   command = plan
 
   assert {
@@ -20,7 +20,7 @@ run "test_root_module_fileset" {
 }
 
 # Test that the configs are created correctly and common labels are merged
-run "test_configs" {
+run "test_common_labels_are_appended_to_stack_labels" {
   command = plan
 
   assert {
@@ -30,7 +30,7 @@ run "test_configs" {
 }
 
 # Test that the stack names are created correctly
-run "test_stacks" {
+run "test_stacks_include_expected" {
   command = plan
 
   assert {
@@ -40,11 +40,31 @@ run "test_stacks" {
 }
 
 # Test that the folder labels get created with correct format
-run "test_folder_labels" {
+run "test_folder_labels_are_correct_format" {
   command = plan
 
   assert {
     condition = contains(local._folder_labels["root-module-a-test"], "folder:root-module-a/test")
     error_message = "Folder label was not created correctly for root-module-a: ${jsonencode(local._folder_labels)}"
+  }
+}
+
+# Test terraform_workspace is set to stack file name when default_tf_workspace_enabled is false (the default)
+run "test_workspace_when_default_tf_workspace_enabled_is_false" {
+  command = plan
+
+  assert {
+    condition = local.configs["root-module-a-test"].terraform_workspace == "test"
+    error_message = "Terraform workspace was not set correctly when default_tf_workspace_enabled is false: ${jsonencode(local.configs)}"
+  }
+}
+
+# Test that the default_tf_workspace_enabled is used correctly
+run "test_workspace_when_default_tf_workspace_enabled" {
+  command = plan
+
+  assert {
+    condition = local.configs["root-module-a-default-example"].terraform_workspace == "default"
+    error_message = "Default Terraform workspace was not used correctly: ${jsonencode(local.configs)}"
   }
 }

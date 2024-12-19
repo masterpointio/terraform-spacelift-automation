@@ -1,4 +1,4 @@
 stack_settings:
-  administrative: true
+  administrative: false
   labels:
     - common_label

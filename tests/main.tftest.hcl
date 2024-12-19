@@ -68,3 +68,33 @@ run "test_workspace_when_default_tf_workspace_enabled" {
     error_message = "Default Terraform workspace was not used correctly: ${jsonencode(local.configs)}"
   }
 }
+
+# Test that the administrative label is added to the stack when the stack is set to administrative
+run "test_administrative_label_is_added_to_stack" {
+  command = plan
+
+  assert {
+    condition = contains(local.labels["root-module-a-default-example"], "administrative")
+    error_message = "Administrative label was not added to the stack: ${jsonencode(local.labels)}"
+  }
+}
+
+# Test that the administrative label is not added to the stack when the stack is not set to administrative
+run "test_administrative_label_is_not_added_to_stack_when_not_administrative" {
+  command = plan
+
+  assert {
+    condition = !contains(local.labels["root-module-a-test"], "administrative")
+    error_message = "Administrative label was added to the stack when it should not have been: ${jsonencode(local.labels)}"
+  }
+}
+
+# Test that the depends-on label is added to the stack
+run "test_depends_on_label_is_added_to_stack" {
+  command = plan
+
+  assert {
+    condition = contains(local.labels["root-module-a-test"], "depends-on:spacelift-automation-default")
+    error_message = "Depends-on label was not added to the stack: ${jsonencode(local.labels)}"
+  }
+}

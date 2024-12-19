@@ -1,0 +1,4 @@
+stack_settings:
+  administrative: false
+  labels:
+    - common_label

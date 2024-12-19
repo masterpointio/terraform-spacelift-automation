@@ -25,8 +25,13 @@
 # that are not directly used in the resource creation.
 
 locals {
-  _all_stack_files     = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
-  _all_root_modules    = distinct([for file in local._all_stack_files : dirname(replace(replace(file, "../", ""), "stacks/", ""))])
+  # Read all stack files following the convention of root-module-name/stacks/*.yaml
+  _all_stack_files = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
+
+  # Extract the root module name from the stack file path
+  _all_root_modules = distinct([for file in local._all_stack_files : dirname(replace(replace(file, "../", ""), "stacks/", ""))])
+
+  # If all root modules are enabled, use all root modules, otherwise use only those given to us
   enabled_root_modules = var.all_root_modules_enabled ? local._all_root_modules : var.enabled_root_modules
 
   # Read and decode Stack YAML files from the root directory
@@ -100,11 +105,13 @@ locals {
     for file, content in files : "${module}-${trimsuffix(file, ".yaml")}" =>
     merge(
       {
-        "project_root"        = replace(format("%s/%s", var.root_modules_path, module), "../", "")
-        "root_module"         = module,
+        "project_root" = replace(format("%s/%s", var.root_modules_path, module), "../", "")
+        "root_module"  = module,
+
+        # If default_tf_workspace_enabled is true, use "default" workspace, otherwise our file name is the workspace name
         "terraform_workspace" = try(content.default_tf_workspace_enabled, var.default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
+
         # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally
-        # TODO: Add tests to ensure that the `tfvars` file is named the same as the Stack config file
         "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
       content
@@ -211,14 +218,20 @@ locals {
 
   # Merge all before_init steps into a single map for each stack.
   before_init = {
-    for stack in local.stacks : stack => compact(concat(
+    for stack in local.stacks : stack =>
+    # tfvars are implicitly enabled, which means we include the tfvars copy command in before_init
+    try(local.configs[stack].tfvars.enabled, true) ?
+    compact(concat(
       var.before_init,
       try(local.stack_configs[stack].before_init, []),
       # This command is required for each stack.
       # It copies the tfvars file from the stack's workspace to the root module's directory
       # and renames it to `spacelift.auto.tfvars` to automatically load variable definitions for each run/task.
       ["cp tfvars/${local.configs[stack].tfvars_file_name}.tfvars spacelift.auto.tfvars"],
-    )) if try(local.configs[stack].tfvars.enabled, true)
+      )) : compact(concat(
+      var.before_init,
+      try(local.stack_configs[stack].before_init, []),
+    ))
   }
 }
 
@@ -247,7 +260,7 @@ resource "spacelift_stack" "default" {
   autoretry                        = try(local.stack_configs[each.key].autoretry, var.autoretry)
   before_apply                     = compact(coalesce(try(local.stack_configs[each.key].before_apply, []), var.before_apply))
   before_destroy                   = compact(coalesce(try(local.stack_configs[each.key].before_destroy, []), var.before_destroy))
-  before_init                      = compact(coalesce(try(local.before_init[each.key], []), var.before_init))
+  before_init                      = local.before_init[each.key]
   before_perform                   = compact(coalesce(try(local.stack_configs[each.key].before_perform, []), var.before_perform))
   before_plan                      = compact(coalesce(try(local.stack_configs[each.key].before_plan, []), var.before_plan))
   branch                           = try(local.stack_configs[each.key].branch, var.branch)

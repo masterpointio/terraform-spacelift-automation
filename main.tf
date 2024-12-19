@@ -218,14 +218,20 @@ locals {
 
   # Merge all before_init steps into a single map for each stack.
   before_init = {
-    for stack in local.stacks : stack => compact(concat(
+    for stack in local.stacks : stack =>
+    # tfvars are implicitly enabled, which means we include the tfvars copy command in before_init
+    try(local.configs[stack].tfvars.enabled, true) ?
+    compact(concat(
       var.before_init,
       try(local.stack_configs[stack].before_init, []),
       # This command is required for each stack.
       # It copies the tfvars file from the stack's workspace to the root module's directory
       # and renames it to `spacelift.auto.tfvars` to automatically load variable definitions for each run/task.
       ["cp tfvars/${local.configs[stack].tfvars_file_name}.tfvars spacelift.auto.tfvars"],
-    )) if try(local.configs[stack].tfvars.enabled, true)
+      )) : compact(concat(
+      var.before_init,
+      try(local.stack_configs[stack].before_init, []),
+    ))
   }
 }
 
@@ -254,7 +260,7 @@ resource "spacelift_stack" "default" {
   autoretry                        = try(local.stack_configs[each.key].autoretry, var.autoretry)
   before_apply                     = compact(coalesce(try(local.stack_configs[each.key].before_apply, []), var.before_apply))
   before_destroy                   = compact(coalesce(try(local.stack_configs[each.key].before_destroy, []), var.before_destroy))
-  before_init                      = compact(coalesce(try(local.before_init[each.key], []), var.before_init))
+  before_init                      = local.before_init[each.key]
   before_perform                   = compact(coalesce(try(local.stack_configs[each.key].before_perform, []), var.before_perform))
   before_plan                      = compact(coalesce(try(local.stack_configs[each.key].before_plan, []), var.before_plan))
   branch                           = try(local.stack_configs[each.key].branch, var.branch)

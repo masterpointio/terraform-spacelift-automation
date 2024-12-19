@@ -25,8 +25,13 @@
 # that are not directly used in the resource creation.
 
 locals {
-  _all_stack_files     = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
-  _all_root_modules    = distinct([for file in local._all_stack_files : dirname(replace(replace(file, "../", ""), "stacks/", ""))])
+  # Read all stack files following the convention of root-module-name/stacks/*.yaml
+  _all_stack_files = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
+
+  # Extract the root module name from the stack file path
+  _all_root_modules = distinct([for file in local._all_stack_files : dirname(replace(replace(file, "../", ""), "stacks/", ""))])
+
+  # If all root modules are enabled, use all root modules, otherwise use only those given to us
   enabled_root_modules = var.all_root_modules_enabled ? local._all_root_modules : var.enabled_root_modules
 
   # Read and decode Stack YAML files from the root directory

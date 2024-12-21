@@ -25,8 +25,22 @@
 # that are not directly used in the resource creation.
 
 locals {
-  # Read all stack files following the convention of root-module-name/stacks/*.yaml
-  _all_stack_files = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
+  # Read all stack files following the associated root_module_structue convention:
+  # MultiInstance: root-module-name/stacks/*.yaml
+  # SingleInstance: root-module-name/stack.yaml
+  # Example:
+  # [
+  #   "../root-module-a/stacks/example.yaml",
+  #   "../root-module-a/stacks/common.yaml",
+  #   "../root-module-b/stacks/example.yaml",
+  #   "../root-module-b/stacks/common.yaml",
+  # ] OR [
+  #   "../root-module-a/stack.yaml",
+  #   "../root-module-b/stack.yaml",
+  # ]
+  _multi_instance_stack_files  = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
+  _single_instance_stack_files = fileset("${path.root}/${var.root_modules_path}/*", "stack.yaml")
+  _all_stack_files             = var.root_module_structure == "MultiInstance" ? local._multi_instance_stack_files : local._single_instance_stack_files
 
   # Extract the root module name from the stack file path
   _all_root_modules = distinct([for file in local._all_stack_files : dirname(replace(replace(file, "../", ""), "stacks/", ""))])
@@ -36,37 +50,41 @@ locals {
 
   # Read and decode Stack YAML files from the root directory
   # Example:
-  # {
+  # MultiInstance: {
   #   "random-pet" = {
   #     "common.yaml" = {
-  #       "stack_settings" = {
-  #         "description" = "This stack generates random pet names"
-  #         "manage_state" = true
-  #       }
-  #       "tfvars" = {
-  #         "enabled" = false
-  #       }
+  #       "stack_settings" = { ... }
+  #       ...
   #     }
   #     "example.yaml" = {
-  #       "stack_settings" = {
-  #         "manage_state" = true
-  #       }
-  #       "tfvars" = {
-  #         "enabled" = true
-  #       }
+  #       "stack_settings" = { ... }
+  #       ...
   #     }
   #   }
   # }
-
-  _root_module_yaml_decoded = {
+  # SingleInstance: {
+  #   "random-pet" = {
+  #     "default" = { stack_settings = { ... }, ... }
+  #   }
+  # }
+  _multi_instance_root_module_yaml_decoded = var.root_module_structure == "MultiInstance" ? {
     for module in local.enabled_root_modules : module => {
       for yaml_file in fileset("${path.root}/${var.root_modules_path}/${module}/stacks", "*.yaml") :
       yaml_file => yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stacks/${yaml_file}"))
     }
-  }
+  } : {}
+
+  _single_instance_root_module_yaml_decoded = var.root_module_structure == "SingleInstance" ? {
+    for module in local.enabled_root_modules : module => {
+      "default" = yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stack.yaml"))
+    }
+  } : {}
+
+  _root_module_yaml_decoded = merge(local._multi_instance_root_module_yaml_decoded, local._single_instance_root_module_yaml_decoded)
 
   ## Common Stack configurations
-  # Retrieve common Stack configurations for each root module
+  # Retrieve common Stack configurations for each root module.
+  # SingleInstance root_module_structure does not support common configs today.
   # Example:
   # {
   #   "random-pet" = {
@@ -79,10 +97,12 @@ locals {
   #     }
   #   }
   # }
-
   _common_configs = {
     for module, files in local._root_module_yaml_decoded : module => lookup(files, var.common_config_file, {})
   }
+
+  # If we're SingleInstance, then default_tf_workspace_enabled is true. Otherwise, use given value.
+  default_tf_workspace_enabled = var.root_module_structure == "SingleInstance" ? true : var.default_tf_workspace_enabled
 
   ## Stack Configurations
   # Merge all Stack configurations from the root modules into a single map, and filter out the common config.
@@ -100,17 +120,18 @@ locals {
   #     }
   #   }
   # }
-
   _root_module_stack_configs = merge([for module, files in local._root_module_yaml_decoded : {
-    for file, content in files : "${module}-${trimsuffix(file, ".yaml")}" =>
+    for file, content in files :
+    var.root_module_structure == "MultiInstance" ? "${module}-${trimsuffix(file, ".yaml")}" : module =>
     merge(
       {
         "project_root" = replace(format("%s/%s", var.root_modules_path, module), "../", "")
         "root_module"  = module,
 
         # If default_tf_workspace_enabled is true, use "default" workspace, otherwise our file name is the workspace name
-        "terraform_workspace" = try(content.default_tf_workspace_enabled, var.default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
+        "terraform_workspace" = try(content.default_tf_workspace_enabled, local.default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
 
+        # tfvars_file_name only pertains to MultiInstance, as SingleInstance expects consumers to use an auto.tfvars file.
         # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally
         "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
@@ -286,21 +307,6 @@ resource "spacelift_stack" "default" {
     content {
       namespace = github_enterprise.value["namespace"]
       id        = github_enterprise.value["id"]
-    }
-  }
-
-  lifecycle {
-    # Expected `tfvars` file exists
-    precondition {
-      condition     = try(local.configs[each.key].tfvars.enabled, true) ? fileexists("${local.configs[each.key].project_root}/tfvars/${local.configs[each.key].tfvars_file_name}.tfvars") : true
-      error_message = <<-EOT
-      The required .tfvars file is missing for stack "${each.key}".
-
-      Expected location:
-      "${local.configs[each.key].project_root}/tfvars/${local.configs[each.key].tfvars_file_name}.tfvars"
-
-      Ensure that the specified .tfvars file exists in the expected path and try again.
-      EOT
     }
   }
 }

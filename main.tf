@@ -102,7 +102,7 @@ locals {
   }
 
   # If we're SingleInstance, then default_tf_workspace_enabled is true. Otherwise, use given value.
-  default_tf_workspace_enabled = var.root_module_structure == "SingleInstance" ? true : var.default_tf_workspace_enabled
+  _default_tf_workspace_enabled = var.root_module_structure == "SingleInstance" ? true : var.default_tf_workspace_enabled
 
   ## Stack Configurations
   # Merge all Stack configurations from the root modules into a single map, and filter out the common config.
@@ -129,7 +129,7 @@ locals {
         "root_module"  = module,
 
         # If default_tf_workspace_enabled is true, use "default" workspace, otherwise our file name is the workspace name
-        "terraform_workspace" = try(content.default_tf_workspace_enabled, local.default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
+        "terraform_workspace" = try(content.default_tf_workspace_enabled, local._default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
 
         # tfvars_file_name only pertains to MultiInstance, as SingleInstance expects consumers to use an auto.tfvars file.
         # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally
@@ -196,7 +196,6 @@ locals {
   #     "depends-on:spacelift-automation-default",
   #   ]
   # }
-
   _dependency_labels = {
     for stack in local.stacks : stack => [
       "depends-on:spacelift-automation-${terraform.workspace}"
@@ -211,10 +210,9 @@ locals {
   #     "folder:random-pet/example",
   #   ]
   # }
-
   _folder_labels = {
     for stack in local.stacks : stack => [
-      "folder:${local.configs[stack].root_module}/${local.configs[stack].tfvars_file_name}"
+      var.root_module_structure == "MultiInstance" ? "folder:${local.configs[stack].root_module}/${local.configs[stack].tfvars_file_name}" : "folder:${local.configs[stack].root_module}"
     ]
   }
 
@@ -226,7 +224,6 @@ locals {
   #     "depends-on:spacelift-automation-default",
   #   ])
   # }
-
   labels = {
     for stack in local.stacks :
     stack => compact(flatten([
@@ -240,8 +237,9 @@ locals {
   # Merge all before_init steps into a single map for each stack.
   before_init = {
     for stack in local.stacks : stack =>
-    # tfvars are implicitly enabled, which means we include the tfvars copy command in before_init
-    try(local.configs[stack].tfvars.enabled, true) ?
+    # tfvars are implicitly enabled in MultiInstance, which means we include the tfvars copy command in before_init
+    # In SingleInstance, we expect the consumer to use an auto.tfvars file, so we don't include the tfvars copy command in before_init
+    try(local.configs[stack].tfvars.enabled, var.root_module_structure == "MultiInstance") ?
     compact(concat(
       var.before_init,
       try(local.stack_configs[stack].before_init, []),

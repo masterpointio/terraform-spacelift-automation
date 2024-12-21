@@ -25,6 +25,8 @@
 # that are not directly used in the resource creation.
 
 locals {
+  _multi_instance_structure = var.root_module_structure == "MultiInstance"
+
   # Read all stack files following the associated root_module_structue convention:
   # MultiInstance: root-module-name/stacks/*.yaml
   # SingleInstance: root-module-name/stack.yaml
@@ -40,7 +42,7 @@ locals {
   # ]
   _multi_instance_stack_files  = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
   _single_instance_stack_files = fileset("${path.root}/${var.root_modules_path}/*", "stack.yaml")
-  _all_stack_files             = var.root_module_structure == "MultiInstance" ? local._multi_instance_stack_files : local._single_instance_stack_files
+  _all_stack_files             = local._multi_instance_structure ? local._multi_instance_stack_files : local._single_instance_stack_files
 
   # Extract the root module name from the stack file path
   _all_root_modules = distinct([for file in local._all_stack_files : dirname(replace(replace(file, "../", ""), "stacks/", ""))])
@@ -67,14 +69,14 @@ locals {
   #     "default" = { stack_settings = { ... }, ... }
   #   }
   # }
-  _multi_instance_root_module_yaml_decoded = var.root_module_structure == "MultiInstance" ? {
+  _multi_instance_root_module_yaml_decoded = local._multi_instance_structure ? {
     for module in local.enabled_root_modules : module => {
       for yaml_file in fileset("${path.root}/${var.root_modules_path}/${module}/stacks", "*.yaml") :
       yaml_file => yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stacks/${yaml_file}"))
     }
   } : {}
 
-  _single_instance_root_module_yaml_decoded = var.root_module_structure == "SingleInstance" ? {
+  _single_instance_root_module_yaml_decoded = !local._multi_instance_structure ? {
     for module in local.enabled_root_modules : module => {
       "default" = yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stack.yaml"))
     }
@@ -102,7 +104,7 @@ locals {
   }
 
   # If we're SingleInstance, then default_tf_workspace_enabled is true. Otherwise, use given value.
-  _default_tf_workspace_enabled = var.root_module_structure == "SingleInstance" ? true : var.default_tf_workspace_enabled
+  _default_tf_workspace_enabled = !local._multi_instance_structure ? true : var.default_tf_workspace_enabled
 
   ## Stack Configurations
   # Merge all Stack configurations from the root modules into a single map, and filter out the common config.
@@ -122,7 +124,7 @@ locals {
   # }
   _root_module_stack_configs = merge([for module, files in local._root_module_yaml_decoded : {
     for file, content in files :
-    var.root_module_structure == "MultiInstance" ? "${module}-${trimsuffix(file, ".yaml")}" : module =>
+    local._multi_instance_structure ? "${module}-${trimsuffix(file, ".yaml")}" : module =>
     merge(
       {
         "project_root" = replace(format("%s/%s", var.root_modules_path, module), "../", "")
@@ -212,7 +214,7 @@ locals {
   # }
   _folder_labels = {
     for stack in local.stacks : stack => [
-      var.root_module_structure == "MultiInstance" ? "folder:${local.configs[stack].root_module}/${local.configs[stack].tfvars_file_name}" : "folder:${local.configs[stack].root_module}"
+      local._multi_instance_structure ? "folder:${local.configs[stack].root_module}/${local.configs[stack].tfvars_file_name}" : "folder:${local.configs[stack].root_module}"
     ]
   }
 
@@ -239,7 +241,7 @@ locals {
     for stack in local.stacks : stack =>
     # tfvars are implicitly enabled in MultiInstance, which means we include the tfvars copy command in before_init
     # In SingleInstance, we expect the consumer to use an auto.tfvars file, so we don't include the tfvars copy command in before_init
-    try(local.configs[stack].tfvars.enabled, var.root_module_structure == "MultiInstance") ?
+    try(local.configs[stack].tfvars.enabled, local._multi_instance_structure) ?
     compact(concat(
       var.before_init,
       try(local.stack_configs[stack].before_init, []),

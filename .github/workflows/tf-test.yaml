@@ -1,10 +1,9 @@
-name: Terraform + OpenTofu Tests
+name: TF Test
 
 on:
   push:
     branches:
       - main
-      - chore/add-test-pipeline
   pull_request:
 
 env:

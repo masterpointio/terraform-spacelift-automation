@@ -3,7 +3,8 @@
     "config:recommended",
     "github>aquaproj/aqua-renovate-config#2.6.0"
   ],
-  "schedule": ["before 5am on Monday"],
+  // Schedule once a month on the first day of the month before 4 AM.
+  "schedule": ["* 0-3 1 * *"],
   "baseBranches": ["main", "master"],
   "labels": ["auto-upgrade"],
   "dependencyDashboardAutoclose": true,

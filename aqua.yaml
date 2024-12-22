@@ -12,5 +12,5 @@ registries:
 packages:
   - name: terraform-docs/terraform-docs@v0.19.0
   - name: hashicorp/terraform@v1.9.3
-  - name: opentofu/opentofu@v1.8.0
+  - name: opentofu/opentofu@v1.8.7
   - name: spacelift-io/spacectl@v1.8.0

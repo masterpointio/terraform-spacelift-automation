@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "config:recommended",
+    "github>aquaproj/aqua-renovate-config#2.6.0"
+  ],
+  "schedule": ["before 5am on Monday"],
+  "baseBranches": ["main", "master"],
+  "labels": ["auto-upgrade"],
+  "dependencyDashboardAutoclose": true,
+  "terraform": {
+    "ignorePaths": [
+      "**/context.tf",
+    ]
+  },
+}

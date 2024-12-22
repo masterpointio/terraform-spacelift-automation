@@ -11,6 +11,6 @@ registries:
     ref: v4.210.0 # renovate: depName=aquaproj/aqua-registry
 packages:
   - name: terraform-docs/terraform-docs@v0.19.0
-  - name: hashicorp/terraform@v1.9.3
+  - name: hashicorp/terraform@v1.10.3
   - name: opentofu/opentofu@v1.8.7
   - name: spacelift-io/spacectl@v1.8.0

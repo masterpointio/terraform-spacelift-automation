@@ -18,8 +18,12 @@ permissions:
   pull-requests: read
 
 jobs:
-  terraform-test:
+  tf-test:
+    name: ${{ matrix.tf }} Test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tf: [tofu, terraform]
     steps:
       - uses: actions/checkout@v4
 
@@ -39,33 +43,7 @@ jobs:
 
       - name: Aqua Install
         shell: bash
-        run: aqua install --tags terraform
+        run: aqua install --tags ${{ matrix.tf }}
 
-      - run: terraform init
-      - run: terraform test
-
-  tofu-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Aqua Cache
-        uses: actions/cache@v4.0.2
-        if: ${{ !github.event.act }} # Don't enable the cache step if we're using act for testing
-        with:
-          path: ~/.local/share/aquaproj-aqua
-          key: v1-aqua-installer-${{runner.os}}-${{runner.arch}}-${{hashFiles('aqua.yaml')}}
-          restore-keys: |
-            v1-aqua-installer-${{runner.os}}-${{runner.arch}}-
-
-      - name: Install Aqua
-        uses: aquaproj/aqua-installer@4551ec64e21bf0f557c2525135ff0bd2cba40ec7 # v3.0.0
-        with:
-          aqua_version: v2.25.2
-
-      - name: Aqua Install
-        shell: bash
-        run: aqua install --tags tofu
-
-      - run: tofu init
-      - run: tofu test
+      - run: ${{ matrix.tf }} init
+      - run: ${{ matrix.tf }} test

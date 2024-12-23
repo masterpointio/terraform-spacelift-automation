@@ -1,3 +1,7 @@
+provider "spacelift" {
+  api_key_endpoint = "https://masterpointio.app.spacelift.io"
+}
+
 variables {
   root_modules_path = "./tests/fixtures/single-instance"
   github_enterprise = {

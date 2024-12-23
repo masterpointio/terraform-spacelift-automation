@@ -183,7 +183,7 @@ Check out an example configuration in the [examples/complete](./examples/complet
 
 <!-- NOTE to Masterpoint team: We might want to create a small wrapper to automatize this using Taskit. On hold for now. -->
 
-### What goes in a Stack config file? e.g. `stacks/dev.yaml`, `stacks/common.yaml`, `stack.yaml`, etc.
+### What goes in a Stack config file? e.g. `stacks/dev.yaml`, `stacks/common.yaml`, `stack.yaml`, etc
 
 Most settings that you would set on [the Spacelift Stack resource](https://search.opentofu.org/provider/spacelift-io/spacelift/latest/docs/resources/stack) are supported. Additionally, you can include certain Stack specific settings that will override this module's defaults like `default_tf_workspace_enabled`, `tfvars.enabled`, and similar. See the code for full details.
 

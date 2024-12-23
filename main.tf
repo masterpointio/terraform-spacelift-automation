@@ -69,18 +69,18 @@ locals {
   #     "default" = { stack_settings = { ... }, ... }
   #   }
   # }
-  _multi_instance_root_module_yaml_decoded = local._multi_instance_structure ? {
+  _multi_instance_root_module_yaml_decoded = {
     for module in local.enabled_root_modules : module => {
       for yaml_file in fileset("${path.root}/${var.root_modules_path}/${module}/stacks", "*.yaml") :
       yaml_file => yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stacks/${yaml_file}"))
-    }
-  } : {}
+    } if local._multi_instance_structure
+  }
 
-  _single_instance_root_module_yaml_decoded = !local._multi_instance_structure ? {
+  _single_instance_root_module_yaml_decoded = {
     for module in local.enabled_root_modules : module => {
       "default" = yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stack.yaml"))
-    }
-  } : {}
+    } if !local._multi_instance_structure
+  }
 
   _root_module_yaml_decoded = merge(local._multi_instance_root_module_yaml_decoded, local._single_instance_root_module_yaml_decoded)
 

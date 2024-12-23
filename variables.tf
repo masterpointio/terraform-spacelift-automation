@@ -269,7 +269,7 @@ variable "protect_from_deletion" {
 
 variable "space_id" {
   type        = string
-  description = "Place the stack in the specified space_id."
+  description = "Place the created stacks in the specified space_id."
   default     = "root"
 }
 

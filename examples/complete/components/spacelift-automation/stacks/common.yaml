@@ -1,5 +1,4 @@
 stack_settings:
   administrative: true
-  aws_integration_enabled: true
   labels:
     - common_label

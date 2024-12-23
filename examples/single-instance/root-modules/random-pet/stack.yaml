@@ -1,0 +1,7 @@
+stack_settings:
+  manage_state: true
+  description: This stack generates random pet names
+  labels:
+    - common_label
+    - stack_specific_label
+default_tf_workspace_enabled: true

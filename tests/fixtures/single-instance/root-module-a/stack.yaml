@@ -1,0 +1,6 @@
+stack_settings:
+  administrative: false
+  before_init:
+    - echo 'World'
+  labels:
+    - stack_label

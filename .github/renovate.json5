@@ -8,6 +8,11 @@
   "baseBranches": ["main", "master"],
   "labels": ["auto-upgrade"],
   "dependencyDashboardAutoclose": true,
+  "packageRules": [{
+      // Allow auto merge if it's not a major version update
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+  }],
   "terraform": {
     "ignorePaths": [
       "**/context.tf",

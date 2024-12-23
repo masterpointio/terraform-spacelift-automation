@@ -7,6 +7,4 @@ module "automation" {
 
   root_modules_path        = var.root_modules_path
   all_root_modules_enabled = var.all_root_modules_enabled
-
-  aws_integration_id = var.aws_integration_id
 }

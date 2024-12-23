@@ -6,7 +6,7 @@ This Terraform child module provides infrastructure automation for projects in [
 
 ## Overview
 
-The `spacelift-automation` root module is designed to streamline the deployment and management of all Spacelift infrastructure, including itself.
+The `spacelift-automation` root module is designed to streamline the deployment and management of all Spacelift infrastructure, including creating a Spacelift Stack to manage itself.
 
 It automates the creation of "child" stacks and all the required accompanying Spacelift resources. For each enabled root module it creates:
 
@@ -17,22 +17,27 @@ It automates the creation of "child" stacks and all the required accompanying Sp
 3. [Spacelift AWS Integration Attachment](https://docs.spacelift.io/integrations/cloud-providers/aws#lets-explain)
    Associates a specific AWS IAM role with a stack to allow it to assume that role. The IAM role typically has permissions to manage specific AWS resources, and Spacelift assumes this role to run the operations required by the stack.
 4. [Spacelift Initialization Hook](https://docs.spacelift.io/concepts/run#initializing)
-   Prepares your environment before executing infrastructure code. This custom script copies corresponding Terraform tfvars files into a working directory before either run or task as a `spacelift.auto.tfvars` file. It's [automatically loaded](https://opentofu.org/docs/v1.7/language/values/variables/#variable-definitions-tfvars-files) into the OpenTofu/Terraform execution environment.
+   Prepares your environment before executing infrastructure code. This custom script copies corresponding Terraform tfvars files into a working directory before any Spacelift run or task as a `spacelift.auto.tfvars` file. This ensures your tfvars are [automatically loaded](https://opentofu.org/docs/v1.7/language/values/variables/#variable-definitions-tfvars-files) into the OpenTofu/Terraform execution environment.
 
 ## Usage
 
-Spacelift Automation logic is opinionated and heavily relies on the Git repository structure.
-This module is configured to track all the files in the provided root module directory and create the stack based on the provided configuration (if any).
+Spacelift Automation logic is opinionated and heavily relies on certain repository structures.
+This module is configured to track all the files in the given root module directory and create Spacelift Stacks based on the provided configuration.
 
-Structure requirements are:
+We support the following root module directory structures, which are controlled by the `var.root_modules_structure` variable:
 
-- Stack configs are placed in `<root_module>/stacks` directory.
-- Terraform variables are placed in `<root_module>/tfvars` directory.
-- Stack config file and tfvars file must be equal to OpenTofu/Terraform workspace, e.g. `dev.yaml` and `dev.tfvars`.
-- Common configs are placed in `<root_module>/stacks/common.yaml` file. This is useful when you know that some values should be shared across all the stacks created for a root module, e.g. all stacks that manage Spacelift Policy must be Administrative. You can override this file name using Terraform variable.
+### `MultiInstance` (the default)
 
-Let's check the example.
-Input repo structure:
+This is the default structure that we expect and recommend. This is intended for root modules that manage multiple state files (instances) through [workspaces](https://opentofu.org/docs/cli/workspaces/) or [Dynamic Backend configurations](https://opentofu.org/docs/intro/whats-new/#early-variablelocals-evaluation).
+
+Structure requirements:
+
+- Stack configs are placed in `<root_modules_path>/<root_module>/stacks` directory for each workspace / instance of that stack. e.g. `stacks/dev.yaml` and `stacks/stage.yaml`
+- Terraform variables are placed in `<root_modules_path>/<root_module>/tfvars` directory for each workspace / instance of that stack. e.g. `tfvars/dev.tfvars` and `tfvars/stage.tfvars`
+- Stack config files and tfvars files must be equal to OpenTofu/Terraform workspace, e.g. `stacks/dev.yaml` and `tfvars/dev.tfvars` for a workspace named `dev`.
+- Common configs are placed in `<root_modules_path>/<root_module>/stacks/common.yaml` file (or `var.common_config_file` value). This is useful when you know that some values should be shared across all the stacks created for a root module, e.g. all stacks that manage Spacelift Policies must be use the `adminstrative: true` setting or all stacks must share the same labels.
+
+We have an example of this structure in the [examples/complete](./examples/complete/components/), which looks like the following:
 
 ```sh
 ├── root-modules
@@ -45,6 +50,7 @@ Input repo structure:
 │   │   │   └── dev.tfvars
 │   │   │   └── stage.tfvars
 │   │   ├── variables.tf
+│   │   ├── main.tf
 │   │   └── versions.tf
 │   ├── k8s-cluster
 │   │   ├── stacks
@@ -60,26 +66,27 @@ Input repo structure:
 ...
 ```
 
-Root module inputs:
+The `spacelift-automation/main.tf` file looks something like this:
 
 ```hcl
-aws_integration_id = "ZDPP8SKNVG0G27T4"
-
-# GitHub configuration
 github_enterprise = {
   namespace = "masterpointio"
 }
 repository = "terraform-spacelift-automation"
 
 # Stacks configurations
-root_modules_path    = "root-modules"
-enabled_root_modules = ["spacelift-aws-role"]
+root_modules_path        = "root-modules"
+all_root_modules_enabled = true
+
+aws_integration_id = "ZDPP8SKNVG0G27T4"
 ```
 
 The configuration above creates the following stacks:
 
 - `spacelift-aws-role-dev`
 - `spacelift-aws-role-stage`
+- `k8s-cluster-dev`
+- `k8s-cluster-prod`
 
 These stacks have the following configuration:
 
@@ -88,29 +95,103 @@ These stacks have the following configuration:
 - Corresponding Terraform variables are generated by an [Initialization Hook](https://docs.spacelift.io/concepts/run#initializing) and placed in the root of each Stack's working directory during each run or task. For example, the content of the file `root-modules/spacelift-aws-role/tfvars/dev.tfvars` will be copied to working directory of the Stack `spacelift-aws-role-dev` as file `spacelift.auto.tfvars` allowing the OpenTofu/Terraform inputs to be automatically loaded.
   - If you would like to disable this functionality, you can set `tfvars.enabled` in the Stack's YAML file to `false`.
 
+### `SingleInstance`
+
+This is a special case where each root module directory only manages one state file (instance). Each time you want to create a new instance of a root module, you need to create a new directory with the same code and change your inputs. **We do not recommend this structure** as it is less flexible and easily leads to anti-patterns, but it is supported.
+
+Structure requirements:
+
+- Stack configs are placed in `<root_modules_path>/<root_module>/stack.yaml` directory. e.g. `root-modules/rds-cluster/stack.yaml`
+- Tfvars values are not supported in this structure. In this structure, we suggest you just add your tfvars as `***.auto.tfvars` or hardcode your values directly in root module code.
+
+Here is an example of this structure that we have in the [examples/single-instance](./examples/single-instance/) directory:
+
+```sh
+├── root-modules
+│   ├── spacelift-automation
+│   │   ├── stack.yaml
+│   │   ├── variables.tf
+│   │   ├── main.tf
+│   │   └── versions.tf
+│   ├── rds-cluster-dev
+│   │   ├── stack.yaml
+│   │   ├── main.tf
+│   │   └── versions.tf
+│   ├── rds-cluster-prod
+│   │   ├── stack.yaml
+│   │   ├── main.tf
+│   │   └── versions.tf
+│   ├── random-pet
+│   │   ├── stack.yaml
+│   │   ├── variables.tf
+│   │   ├── main.tf
+│   │   └── versions.tf
+...
+```
+
+The configuration above creates the following Spacelift Stacks:
+
+- `spacelift-automation`
+- `rds-cluster-dev`
+- `rds-cluster-prod`
+- `random-pet`
+
+These stacks will be configured using the settings in the `stack.yaml` file.
+
 ## FAQs
+
+### Can I create a Spacelift Stack for Spacelift Automation? (Recommended)
+
+Spacelift Automation can manage itself as a Stack as well, and we recommend this so you can fully automate your Stack management upon merging to your given branch. Follow these steps to achieve that:
+
+1. Create a new vanilla OpenTofu/Terraform root module in `<root_modules_path>/spacelift-automation` that consumes this child module and supplies the necessary configuration for your unique setup. e.g.
+
+   ```hcl
+   # root-modules/spacelift-automation/main.tf
+
+   module "spacelift-automation" {
+     source  = "github.com/masterpointio/terraform-spacelift-automation"
+     version = "x.x.x" # Always pin a version, use the latest version from the release page.
+
+     # GitHub configuration
+     github_enterprise = {
+       namespace = "masterpointio"
+     }
+     repository = "your-infrastructure-repo"
+
+     # Stacks configurations
+     root_modules_path        = "../../root-modules"
+     all_root_modules_enabled = true
+
+     aws_integration_id = "ZDPP8SKNVG0G27T4"
+   }
+   ```
+
+2. Optionally, create a Terraform workspace that will be used for your Automation configuration, e.g.:
+
+   ```sh
+   tofu workspace new main
+   ```
+
+   Remember that Stack config and tfvars file name must be equal to the workspace e.g. `main.yaml` and `main.tfvars`. If you choose not to create a new workspace, this can be `default.yaml` and `default.tfvars`.
+
+3. Apply the `spacelift-automation` root module.
+4. Move the Automation configs to the `<root-modules>/spacelift-automation/stacks` directory and push the changes to the tracked repo and branch.
+5. After pushed to your repo's tracked branch, Spacelift Automation will track the addition of new root modules and create Stacks for them.
+
+Check out an example configuration in the [examples/complete](./examples/complete/components/spacelift-automation/tfvars/example.tfvars).
+
+<!-- NOTE to Masterpoint team: We might want to create a small wrapper to automatize this using Taskit. On hold for now. -->
+
+### What goes in a Stack config file? e.g. `stacks/dev.yaml`, `stacks/common.yaml`, `stack.yaml`, etc.
+
+Most settings that you would set on [the Spacelift Stack resource](https://search.opentofu.org/provider/spacelift-io/spacelift/latest/docs/resources/stack) are supported. Additionally, you can include certain Stack specific settings that will override this module's defaults like `default_tf_workspace_enabled`, `tfvars.enabled`, and similar. See the code for full details.
 
 ### Why are variable values provided separately in `tfvars/` and not in the `yaml` file?
 
 This is to support easy local and outside-spacelift operations. Keeping variable values in a `tfvars` file per workspace allows you to simply pass that file to the relevant CLI command locally via the `-var-file` option so that you don't need to provide values individually.
 
-### Can I create a Spacelift Stack for Spacelift Automation? (Recommended)
-
-Spacelift Automation can manage itself as a Stack as well, and we recommend this so you can fully automate your Stack management upon merging to your given branch. Follow these next steps to achieve that:
-
-1. Create a new vanilla OpenTofu/Terraform root module that consumes this child module and supplies the necessary configuration for your unique setup. In other words, it's a configuration that uses the default capabilities of either OpenTofu or Terraform without any customization, or third-party tools or plugins.
-2. Optionally, create a Terraform workspace that will be used for your Automation configuration, e.g.:
-   ```sh
-   tofu workspace new masterpoint
-   ```
-   Remember that Stack config and tfvars file name must be equal to the workspace, which can be `default`.
-3. Apply the vanilla OpenTofu/Terraform configuration.
-4. Move the Automation configs to the `<root-modules>/spacelift-automation/stacks` directory and push the changes to the tracked repo and branch.
-5. From this moment, Spacelift Automation is tracking the changes to its Stack configs and Terraform variables.
-
-Check out an example of such a configuration in the [examples/complete](./examples/complete/components/spacelift-automation/tfvars/example.tfvars).
-
-NOTE to Masterpoint team: We might want to create a small wrapper to automatize this using Taskit. On hold for now.
+e.g. `tofu plan -var-file=tfvars/dev.tfvars`
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 

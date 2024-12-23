@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Aqua Cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.0
         if: ${{ !github.event.act }} # Don't enable the cache step if we're using act for testing
         with:
           path: ~/.local/share/aquaproj-aqua

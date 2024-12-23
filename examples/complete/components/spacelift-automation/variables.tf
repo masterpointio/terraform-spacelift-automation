@@ -1,3 +1,8 @@
+variable "aws_integration_id" {
+  type        = string
+  description = "ID of the AWS integration to attach."
+}
+
 variable "branch" {
   type        = string
   description = "Specify which branch to use within the infrastructure repository."

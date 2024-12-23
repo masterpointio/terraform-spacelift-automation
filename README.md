@@ -32,10 +32,10 @@ This is the default structure that we expect and recommend. This is intended for
 
 Structure requirements:
 
-- Stack configs are placed in `<root_modules_path>/<root_module>/stacks` directory for each workspace / instance of that stack. e.g. `stacks/dev.yaml` and `stacks/stage.yaml`
-- Terraform variables are placed in `<root_modules_path>/<root_module>/tfvars` directory for each workspace / instance of that stack. e.g. `tfvars/dev.tfvars` and `tfvars/stage.tfvars`
+- Stack configs are placed in `<root_modules_path>/<root_module>/stacks` directory for each workspace / instance of that stack. e.g. `root-modules/k8s-cluster/stacks/dev.yaml` and `root-modules/k8s-cluster/stacks/stage.yaml`
+- Terraform variables are placed in `<root_modules_path>/<root_module>/tfvars` directory for each workspace / instance of that stack. e.g. `root-modules/k8s-cluster/tfvars/dev.tfvars` and `root-modules/k8s-cluster/tfvars/stage.tfvars`
 - Stack config files and tfvars files must be equal to OpenTofu/Terraform workspace, e.g. `stacks/dev.yaml` and `tfvars/dev.tfvars` for a workspace named `dev`.
-- Common configs are placed in `<root_modules_path>/<root_module>/stacks/common.yaml` file (or `var.common_config_file` value). This is useful when you know that some values should be shared across all the stacks created for a root module, e.g. all stacks that manage Spacelift Policies must be use the `adminstrative: true` setting or all stacks must share the same labels.
+- Common configs are placed in `<root_modules_path>/<root_module>/stacks/common.yaml` file (or `var.common_config_file` value). This is useful when you know that some values should be shared across all the stacks created for a root module. For example, all stacks that manage Spacelift Policies must use the `administrative: true` setting or all stacks must share the same labels.
 
 We have an example of this structure in the [examples/complete](./examples/complete/components/), which looks like the following:
 
@@ -150,7 +150,7 @@ Spacelift Automation can manage itself as a Stack as well, and we recommend this
    # root-modules/spacelift-automation/main.tf
 
    module "spacelift-automation" {
-     source  = "github.com/masterpointio/terraform-spacelift-automation"
+     source  = "masterpointio/automation/spacelift"
      version = "x.x.x" # Always pin a version, use the latest version from the release page.
 
      # GitHub configuration

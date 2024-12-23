@@ -32,6 +32,16 @@ locals {
   # SingleInstance: root-module-name/stack.yaml
   # Example:
   # [
+  # MultiInstance:
+  #   "../root-module-a/stacks/example.yaml",
+  #   "../root-module-a/stacks/common.yaml",
+  #   "../root-module-b/stacks/example.yaml",
+  #   "../root-module-b/stacks/common.yaml",
+  # ] OR [
+  # SingleInstance:
+  #   "../root-module-a/stack.yaml",
+  #   "../root-module-b/stack.yaml",
+  # ]
   #   "../root-module-a/stacks/example.yaml",
   #   "../root-module-a/stacks/common.yaml",
   #   "../root-module-b/stacks/example.yaml",
@@ -104,7 +114,7 @@ locals {
   }
 
   # If we're SingleInstance, then default_tf_workspace_enabled is true. Otherwise, use given value.
-  _default_tf_workspace_enabled = !local._multi_instance_structure ? true : var.default_tf_workspace_enabled
+  _default_tf_workspace_enabled = local._multi_instance_structure ? var.default_tf_workspace_enabled : true
 
   ## Stack Configurations
   # Merge all Stack configurations from the root modules into a single map, and filter out the common config.

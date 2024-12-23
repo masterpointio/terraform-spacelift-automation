@@ -189,9 +189,7 @@ Most settings that you would set on [the Spacelift Stack resource](https://searc
 
 ### Why are variable values provided separately in `tfvars/` and not in the `yaml` file?
 
-This is to support easy local and outside-spacelift operations. Keeping variable values in a `tfvars` file per workspace allows you to simply pass that file to the relevant CLI command locally via the `-var-file` option so that you don't need to provide values individually.
-
-e.g. `tofu plan -var-file=tfvars/dev.tfvars`
+This is to support easy local and outside-spacelift operations. Keeping variable values in a `tfvars` file per workspace allows you to simply pass that file to the relevant CLI command locally via the `-var-file` option so that you don't need to provide values individually. e.g. `tofu plan -var-file=tfvars/dev.tfvars`
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 

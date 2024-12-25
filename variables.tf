@@ -5,6 +5,7 @@ variable "github_enterprise" {
     id        = optional(string)
   })
   description = "The GitHub VCS settings"
+  default     = null
 }
 
 variable "repository" {

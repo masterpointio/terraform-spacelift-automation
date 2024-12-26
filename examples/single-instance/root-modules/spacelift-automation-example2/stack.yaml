@@ -1,0 +1,8 @@
+stack_settings:
+  description: This Automation stack is used for Masterpoint's testing purposes
+  administrative: true
+  aws_integration_enabled: false
+  labels:
+    - common_label
+    - stack_specific_label
+  default_tf_workspace_enabled: true

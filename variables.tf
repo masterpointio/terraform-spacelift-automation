@@ -1,4 +1,19 @@
-# GitHub
+variable "root_module_structure" {
+  type        = string
+  description = <<-EOT
+  The root module structure of the Stacks that you're reading in. See README for full details.
+
+  MultiInstance - You're using Workspaces or Dynamic Backend configuration to create multiple instances of the same root module code.
+  SingleInstance - You're using copies of a root module and your directory structure to create multiple instances of the same Terraform code.
+  EOT
+  default     = "MultiInstance"
+
+  validation {
+    condition     = contains(["MultiInstance", "SingleInstance"], var.root_module_structure)
+    error_message = "Valid values for root_module_structure are (MultiInstance, SingleInstance)."
+  }
+}
+
 variable "github_enterprise" {
   type = object({
     namespace = string
@@ -255,7 +270,7 @@ variable "protect_from_deletion" {
 
 variable "space_id" {
   type        = string
-  description = "Place the stack in the specified space_id."
+  description = "Place the created stacks in the specified space_id."
   default     = "root"
 }
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.3.1...v0.4.0) (2024-12-26)
+
+
+### Features
+
+* begins the work to support single vs multi root_module_structure ([#17](https://github.com/masterpointio/terraform-spacelift-automation/issues/17)) ([598f0c7](https://github.com/masterpointio/terraform-spacelift-automation/commit/598f0c7be4fd69de0b598bd83db28ca8960cf715))
+
 ## [0.3.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.3.0...v0.3.1) (2024-12-19)
 
 

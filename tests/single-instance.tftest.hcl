@@ -69,6 +69,16 @@ run "test_single_instance_stack_configs_project_root_is_correct" {
   }
 }
 
+run "test_single_instance_stack_configs_custom_project_root_is_used_when_specified" {
+  command = plan
+
+  assert {
+    # root-module-b's stack.yaml specifies `project_root` as "" to indicate root directory of project as source
+    condition = local._root_module_stack_configs["root-module-b"].project_root == ""
+    error_message = "Custom project_root not used: ${jsonencode(local._root_module_stack_configs)}"
+  }
+}
+
 # Test that the administrative label is not added to the stack when the stack is not set to administrative
 run "test_single_instance_administrative_label_is_not_added_to_stack_when_not_administrative" {
   command = plan

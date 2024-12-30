@@ -46,7 +46,7 @@ run "test_single_instance_stack_configs_stack_name_is_correct" {
   command = plan
 
   assert {
-    condition = length(local._root_module_stack_configs) == 1 && local._root_module_stack_configs["root-module-a"] != null
+    condition = length(local._root_module_stack_configs) == 2 && local._root_module_stack_configs["root-module-a"] != null && local._root_module_stack_configs["root-module-b"] != null
     error_message = "_root_module_stack_configs is not expected structure: ${jsonencode(local._root_module_stack_configs)}"
   }
 }
@@ -73,7 +73,7 @@ run "test_single_instance_stack_configs_custom_project_root_is_used_when_specifi
   command = plan
 
   assert {
-    # root-module-b's stack.yaml specifies `project_root` as "" to indicate root directory of project as source
+    # `tests/fixtures/single-instance/root-module-b/stack.yaml` specifies `project_root` as "" to indicate root directory of project as source.
     condition = local._root_module_stack_configs["root-module-b"].project_root == ""
     error_message = "Custom project_root not used: ${jsonencode(local._root_module_stack_configs)}"
   }

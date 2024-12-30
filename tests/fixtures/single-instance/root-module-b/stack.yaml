@@ -1,0 +1,7 @@
+stack_settings:
+  administrative: false
+  before_init:
+    - echo 'World'
+  labels:
+    - stack_label
+  project_root: "" # Root directory of the project. This means that Spacelift will pull the entire repository and run the stack from the root of the repository.

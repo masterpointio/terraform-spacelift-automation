@@ -137,7 +137,8 @@ locals {
     local._multi_instance_structure ? "${module}-${trimsuffix(file, ".yaml")}" : module =>
     merge(
       {
-        "project_root" = replace(format("%s/%s", var.root_modules_path, module), "../", "")
+        # Use specified project_root, if not, build it using the root_modules_path and module name
+        "project_root" = try(content.stack_settings.project_root, replace(format("%s/%s", var.root_modules_path, module), "../", "")),
         "root_module"  = module,
 
         # If default_tf_workspace_enabled is true, use "default" workspace, otherwise our file name is the workspace name

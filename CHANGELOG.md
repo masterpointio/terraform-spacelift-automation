@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.4.0...v0.5.0) (2024-12-30)
+
+
+### Features
+
+* allow project root to be customized for stack ([#32](https://github.com/masterpointio/terraform-spacelift-automation/issues/32)) ([3eb9027](https://github.com/masterpointio/terraform-spacelift-automation/commit/3eb9027dfb0cb6bfeb01153ea56fc3f1126fa9c9))
+
 ## [0.4.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.3.1...v0.4.0) (2024-12-26)
 
 

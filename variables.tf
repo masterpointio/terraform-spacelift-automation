@@ -28,12 +28,6 @@ variable "repository" {
   description = "The name of your infrastructure repo"
 }
 
-variable "runner_image" {
-  type        = string
-  description = "URL of the Docker image used to process Runs. Defaults to `null` which is Spacelift's standard (Alpine) runner image."
-  default     = "null"
-}
-
 variable "branch" {
   type        = string
   description = "Specify which branch to use within the infrastructure repository."

@@ -283,6 +283,7 @@ resource "spacelift_stack" "default" {
   for_each = local.stacks
 
   administrative                   = coalesce(try(local.stack_configs[each.key].administrative, null), var.administrative)
+  additional_project_globs         = try(local.stack_configs[each.key].additional_project_globs, var.additional_project_globs)
   after_apply                      = compact(concat(try(local.stack_configs[each.key].after_apply, []), var.after_apply))
   after_destroy                    = compact(concat(try(local.stack_configs[each.key].after_destroy, []), var.after_destroy))
   after_init                       = compact(concat(try(local.stack_configs[each.key].after_init, []), var.after_init))

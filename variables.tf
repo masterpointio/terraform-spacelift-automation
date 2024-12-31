@@ -28,6 +28,12 @@ variable "repository" {
   description = "The name of your infrastructure repo"
 }
 
+variable "runner_image" {
+  type        = string
+  description = "URL of the Docker image used to process Runs. Defaults to `null` which is Spacelift's standard (Alpine) runner image."
+  default     = null
+}
+
 variable "branch" {
   type        = string
   description = "Specify which branch to use within the infrastructure repository."
@@ -107,6 +113,12 @@ variable "administrative" {
   type        = bool
   description = "Flag to mark the stack as administrative"
   default     = false
+}
+
+variable "additional_project_globs" {
+  type        = set(string)
+  description = "Project globs is an optional list of paths to track stack changes of outside of the project root. Push policies are another alternative to track changes in additional paths."
+  default     = []
 }
 
 variable "after_apply" {

@@ -283,6 +283,7 @@ resource "spacelift_stack" "default" {
   for_each = local.stacks
 
   administrative                   = coalesce(try(local.stack_configs[each.key].administrative, null), var.administrative)
+  additional_project_globs         = try(local.stack_configs[each.key].additional_project_globs, var.additional_project_globs)
   after_apply                      = compact(concat(try(local.stack_configs[each.key].after_apply, []), var.after_apply))
   after_destroy                    = compact(concat(try(local.stack_configs[each.key].after_destroy, []), var.after_destroy))
   after_init                       = compact(concat(try(local.stack_configs[each.key].after_init, []), var.after_init))
@@ -306,6 +307,7 @@ resource "spacelift_stack" "default" {
   project_root                     = local.configs[each.key].project_root
   protect_from_deletion            = try(local.stack_configs[each.key].protect_from_deletion, var.protect_from_deletion)
   repository                       = try(local.stack_configs[each.key].repository, var.repository)
+  runner_image                     = try(local.stack_configs[each.key].runner_image, var.runner_image)
   space_id                         = coalesce(try(local.stack_configs[each.key].space_id, null), var.space_id)
   terraform_smart_sanitization     = try(local.stack_configs[each.key].terraform_smart_sanitization, var.terraform_smart_sanitization)
   terraform_version                = try(local.stack_configs[each.key].terraform_version, var.terraform_version)

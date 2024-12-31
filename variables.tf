@@ -31,7 +31,7 @@ variable "repository" {
 variable "runner_image" {
   type        = string
   description = "URL of the Docker image used to process Runs. Defaults to `null` which is Spacelift's standard (Alpine) runner image."
-  default     = "null"
+  default     = null
 }
 
 variable "branch" {

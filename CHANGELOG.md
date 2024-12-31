@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.5.0...v0.6.0) (2024-12-31)
+
+
+### Features
+
+* runner image and globs paths for stacks ([#34](https://github.com/masterpointio/terraform-spacelift-automation/issues/34)) ([074dae8](https://github.com/masterpointio/terraform-spacelift-automation/commit/074dae8b5ee4f8e07ff7ec484a79f5c2156dac19))
+
 ## [0.5.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.4.0...v0.5.0) (2024-12-30)
 
 

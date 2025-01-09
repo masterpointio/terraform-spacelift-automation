@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.6.0...v0.7.0) (2025-01-09)
+
+
+### Features
+
+* adds a variable to support labels on a root module level ([#39](https://github.com/masterpointio/terraform-spacelift-automation/issues/39)) ([f84d9ac](https://github.com/masterpointio/terraform-spacelift-automation/commit/f84d9ac639664ded004d00796dea3c14c07cc9b2))
+
 ## [0.6.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.5.0...v0.6.0) (2024-12-31)
 
 

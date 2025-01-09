@@ -268,6 +268,12 @@ variable "github_action_deploy" {
   default     = true
 }
 
+variable "labels" {
+  type        = list(string)
+  description = "List of labels to apply to the stacks."
+  default     = []
+}
+
 variable "manage_state" {
   type        = bool
   description = "Determines if Spacelift should manage state for this stack."

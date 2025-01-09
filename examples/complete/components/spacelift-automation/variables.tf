@@ -23,6 +23,12 @@ variable "github_enterprise" {
   description = "The GitHub VCS settings"
 }
 
+variable "labels" {
+  type        = list(string)
+  description = "List of labels to apply to the stacks."
+  default     = []
+}
+
 variable "repository" {
   type        = string
   description = "The name of your infrastructure repo"

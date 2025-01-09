@@ -10,4 +10,6 @@ module "automation" {
 
   aws_integration_id      = var.aws_integration_id
   aws_integration_enabled = true
+
+  labels = var.labels
 }

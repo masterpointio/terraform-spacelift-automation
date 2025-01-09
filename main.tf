@@ -244,6 +244,7 @@ locals {
       lookup(local._folder_labels, stack, []),
       lookup(local._dependency_labels, stack, []),
       try(local.stack_configs[stack].labels, []),
+      var.labels,
     ]))
   }
 

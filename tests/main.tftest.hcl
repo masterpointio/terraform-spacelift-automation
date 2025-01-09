@@ -10,6 +10,19 @@ variables {
   before_init = [
     "echo 'Hello'"
   ]
+  labels = [
+    "nobackend"
+  ]
+}
+
+#Test that the global labels are created correctly
+run "test_labels_are_created_correctly" {
+  command = plan
+
+  assert {
+    condition = contains(local.labels["root-module-a-test"], "nobackend")
+    error_message = "Global labels were not created correctly: ${jsonencode(local.labels)}"
+  }
 }
 
 # Test that the root module fileset is created correctly

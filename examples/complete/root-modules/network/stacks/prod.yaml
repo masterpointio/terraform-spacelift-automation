@@ -1,0 +1,6 @@
+stack_settings:
+  description: Create the VPC + Subnets for the Prod environment
+  labels:
+    - prod_stack_specific_label
+  protect_from_deletion: true
+  autoretry: true

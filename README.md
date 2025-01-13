@@ -37,7 +37,7 @@ Structure requirements:
 - Stack config files and tfvars files must be equal to OpenTofu/Terraform workspace, e.g. `stacks/dev.yaml` and `tfvars/dev.tfvars` for a workspace named `dev`.
 - Common configs are placed in `<root_modules_path>/<root_module>/stacks/common.yaml` file (or `var.common_config_file` value). This is useful when you know that some values should be shared across all the stacks created for a root module. For example, all stacks that manage Spacelift Policies must use the `administrative: true` setting or all stacks must share the same labels.
 
-We have an example of this structure in the [examples/complete](./examples/complete/components/), which looks like the following:
+We have an example of this structure in the [examples/complete](./examples/complete/root-modules/), which looks like the following:
 
 ```sh
 ├── root-modules
@@ -179,7 +179,7 @@ Spacelift Automation can manage itself as a Stack as well, and we recommend this
 4. Move the Automation configs to the `<root-modules>/spacelift-automation/stacks` directory and push the changes to the tracked repo and branch.
 5. After pushed to your repo's tracked branch, Spacelift Automation will track the addition of new root modules and create Stacks for them.
 
-Check out an example configuration in the [examples/complete](./examples/complete/components/spacelift-automation/tfvars/example.tfvars).
+Check out an example configuration in the [examples/complete](./examples/complete/root-modules/spacelift-automation/tfvars/example.tfvars).
 
 <!-- NOTE to Masterpoint team: We might want to create a small wrapper to automatize this using Taskit. On hold for now. -->
 

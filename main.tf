@@ -121,7 +121,7 @@ locals {
   # Example:
   # {
   #   "random-pet-example" = {
-  #     "project_root" = "examples/complete/components/random-pet"
+  #     "project_root" = "examples/complete/root-modules/random-pet"
   #     "root_module" = "random-pet"
   #     "stack_settings" = {
   #       "manage_state" = true
@@ -157,7 +157,7 @@ locals {
   # Example:
   # {
   #   "random-pet-example" = {
-  #     "project_root" = "examples/complete/components/random-pet"
+  #     "project_root" = "examples/complete/root-modules/random-pet"
   #     "root_module" = "random-pet"
   #     "stack_settings" = {
   #       "manage_state" = true

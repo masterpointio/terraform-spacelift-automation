@@ -6,7 +6,9 @@ This Terraform child module provides infrastructure automation for projects in [
 
 ## Overview
 
-The `spacelift-automation` root module is designed to streamline the deployment and management of all Spacelift infrastructure, including creating a Spacelift Stack to manage itself.
+This `spacelift-automation` child module is designed to streamline the deployment and management of all Spacelift infrastructure, including creating a Spacelift Stack to manage itself.
+
+Check out our quick introduction to this child module here: [![[External] terraform-spacelift-automation quick intro - Watch Video](https://cdn.loom.com/sessions/thumbnails/8de21afb732048a58fdee90042b4840f-11908d1d42de3247-full-play.gif)](https://www.loom.com/share/8de21afb732048a58fdee90042b4840f)
 
 It automates the creation of "child" stacks and all the required accompanying Spacelift resources. For each enabled root module it creates:
 

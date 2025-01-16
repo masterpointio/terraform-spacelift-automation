@@ -5,4 +5,4 @@ stack_settings:
   labels:
     - common_label
     - stack_specific_label
-  default_tf_workspace_enabled: true
+default_tf_workspace_enabled: true

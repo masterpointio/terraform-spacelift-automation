@@ -121,7 +121,7 @@ locals {
   # Example:
   # {
   #   "random-pet-example" = {
-  #     "project_root" = "examples/complete/components/random-pet"
+  #     "project_root" = "examples/complete/root-modules/random-pet"
   #     "root_module" = "random-pet"
   #     "stack_settings" = {
   #       "manage_state" = true
@@ -157,7 +157,7 @@ locals {
   # Example:
   # {
   #   "random-pet-example" = {
-  #     "project_root" = "examples/complete/components/random-pet"
+  #     "project_root" = "examples/complete/root-modules/random-pet"
   #     "root_module" = "random-pet"
   #     "stack_settings" = {
   #       "manage_state" = true
@@ -370,7 +370,7 @@ resource "spacelift_drift_detection" "default" {
 
   lifecycle {
     precondition {
-      condition     = alltrue([for schedule in try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule) : can(regex("^([0-9,\\-\\*]+\\s+){4}[0-9,\\-\\*]+$", schedule))])
+      condition     = alltrue([for schedule in try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule) : can(regex("^\\s*\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s*$", schedule))])
       error_message = "Invalid cron schedule format for drift detection"
     }
   }

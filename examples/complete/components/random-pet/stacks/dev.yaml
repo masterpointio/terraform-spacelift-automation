@@ -1,5 +1,0 @@
-stack_settings:
-  manage_state: true
-  labels:
-    - stack_specific_label
-default_tf_workspace_enabled: true

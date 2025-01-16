@@ -46,7 +46,7 @@ track_spacelift_policies {
 }
 
 track_child_modules {
-  some i
+  some i, j
   startswith(affected_files[i], "child-modules")
   endswith(affected_files[i], tracked_extensions[j])
 }

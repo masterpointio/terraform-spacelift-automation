@@ -1,2 +1,3 @@
+kind: StackConfigV1
 stack_settings:
   description: This is a mock root module for Prod

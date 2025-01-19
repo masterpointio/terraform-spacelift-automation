@@ -1,3 +1,4 @@
+kind: StackConfigV1
 stack_settings:
   description: This stack is used to create a random pet name for Prod!
   labels:

@@ -144,3 +144,35 @@ run "test_before_init_includes_the_default_before_init_and_stack_before_init" {
     error_message = "Before_init was not created correctly: ${jsonencode(local.before_init)}"
   }
 }
+
+# Test that the description is created correctly
+run "test_description_is_created_correctly" {
+  command = plan
+
+  assert {
+    condition = spacelift_stack.default["root-module-a-test"].description == "Root Module: root-module-a\nProject Root: ./tests/fixtures/multi-instance/root-module-a\nWorkspace: test\nManaged by spacelift-automation Terraform root module."
+    error_message = "Description was not created correctly: ${jsonencode(local.configs)}"
+  }
+}
+
+# Test that the description is created correctly when non-default template string is used
+run "test_description_is_created_correctly_when_non_default_template_string_is_used" {
+  command = plan
+  variables {
+    description = "Space ID: $${stack_settings.space_id}"
+  }
+
+  assert {
+    condition = spacelift_stack.default["root-module-a-test"].description == "Space ID: 123"
+    error_message = "Description was not created correctly: ${jsonencode(local.configs)}"
+  }
+}
+
+run "test_description_is_created_correctly_when_passed_from_stack_config" {
+  command = plan
+
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].description == "This is a test of the emergency broadcast system"
+    error_message = "Description was not created correctly: ${jsonencode(local.configs)}"
+  }
+}

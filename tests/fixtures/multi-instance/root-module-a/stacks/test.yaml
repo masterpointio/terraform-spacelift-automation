@@ -1,3 +1,4 @@
 stack_settings:
+  space_id: 123
   labels:
     - test_label

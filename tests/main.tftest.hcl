@@ -55,6 +55,16 @@ run "test_stacks_include_expected" {
   }
 }
 
+# Test that the stack resource is created with the correct name
+run "test_stack_resource_is_created_with_correct_name" {
+  command = plan
+
+  assert {
+    condition = spacelift_stack.default["root-module-a-test"].name == "root-module-a-test"
+    error_message = "Stack resource was not created correctly: ${jsonencode(spacelift_stack.default)}"
+  }
+}
+
 # Test that the folder labels get created with correct format
 run "test_folder_labels_are_correct_format" {
   command = plan

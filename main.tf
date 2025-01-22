@@ -303,7 +303,7 @@ resource "spacelift_stack" "default" {
   github_action_deploy             = try(local.stack_configs[each.key].github_action_deploy, var.github_action_deploy)
   labels                           = local.labels[each.key]
   manage_state                     = try(local.stack_configs[each.key].manage_state, var.manage_state)
-  name                             = local.configs[each.key].root_module
+  name                             = each.key
   project_root                     = local.configs[each.key].project_root
   protect_from_deletion            = try(local.stack_configs[each.key].protect_from_deletion, var.protect_from_deletion)
   repository                       = try(local.stack_configs[each.key].repository, var.repository)

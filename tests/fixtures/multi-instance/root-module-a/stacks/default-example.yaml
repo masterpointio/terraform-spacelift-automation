@@ -1,5 +1,6 @@
 stack_settings:
   administrative: true
+  description: This is a test of the emergency broadcast system
   before_init:
     - echo 'World'
   labels:

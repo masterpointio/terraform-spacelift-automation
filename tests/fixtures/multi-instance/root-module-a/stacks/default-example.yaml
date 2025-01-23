@@ -1,11 +1,46 @@
 kind: StackConfigV1
 stack_settings:
   administrative: true
+  additional_project_globs: [glob/*]
+  after_apply: [echo 'after_apply']
+  after_destroy: [echo 'after_destroy']
+  after_init: [echo 'after_init']
+  after_perform: [echo 'after_perform']
+  after_plan: [echo 'after_plan']
+  autodeploy: false
+  autoretry: true
+  before_apply: [echo 'before_apply']
+  before_destroy: [echo 'before_destroy']
+  before_init: [echo 'before_init']
+  before_perform: [echo 'before_perform']
+  before_plan: [echo 'before_plan']
+  branch: prod
   description: This is a test of the emergency broadcast system
-  before_init:
-    - echo 'World'
+  enable_local_preview: true
+  enable_well_known_secret_masking: false
+  github_action_deploy: false
+  manage_state: true
+  protect_from_deletion: true
+  runner_image: masterpointio/spacelift-runner:latest
+  space_id: "1234567890"
+  terraform_smart_sanitization: true
+  terraform_version: 1.9.0
+  worker_pool_id: "1234567890"
+
+  destructor_enabled: true
+
+  aws_integration_enabled: true
+  aws_integration_id: "1234567890"
+
+  drift_detection_enabled: true
+  drift_detection_ignore_state: true
+  drift_detection_reconcile: true
+  drift_detection_schedule: [0 0 * * *]
+  drift_detection_timezone: America/Denver
+
   labels:
     - default_example_label
+
 automation_settings:
   default_tf_workspace_enabled: true
   tfvars_enabled: false

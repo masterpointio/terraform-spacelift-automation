@@ -148,7 +148,8 @@ locals {
         # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally
         "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
-      content
+      content,
+      try(var.runtime_overrides[module], {}),
     ) if file != var.common_config_file
     }
   ]...)
@@ -266,6 +267,16 @@ locals {
       try(local.stack_configs[stack].before_init, []),
     ))
   }
+
+  aws_integration_stacks = {
+    for stack, config in local.stack_configs :
+    stack => config if try(config.aws_integration_enabled, var.aws_integration_enabled)
+  }
+
+  drift_detection_stacks = {
+    for stack, config in local.stack_configs :
+    stack => config if try(config.drift_detection_enabled, var.drift_detection_enabled)
+  }
 }
 
 # Perform deep merge for common configurations and stack configurations
@@ -352,10 +363,8 @@ resource "spacelift_stack_destructor" "default" {
 }
 
 resource "spacelift_aws_integration_attachment" "default" {
-  for_each = {
-    for stack, configs in local.stack_configs : stack => configs
-    if try(configs.aws_integration_enabled, var.aws_integration_enabled)
-  }
+  for_each = local.aws_integration_stacks
+
   integration_id = try(local.stack_configs[each.key].aws_integration_id, var.aws_integration_id)
   stack_id       = spacelift_stack.default[each.key].id
   read           = var.aws_integration_attachment_read
@@ -363,10 +372,7 @@ resource "spacelift_aws_integration_attachment" "default" {
 }
 
 resource "spacelift_drift_detection" "default" {
-  for_each = {
-    for stack, configs in local.stack_configs : stack => configs
-    if try(configs.drift_detection_enabled, var.drift_detection_enabled)
-  }
+  for_each = local.drift_detection_stacks
 
   stack_id     = spacelift_stack.default[each.key].id
   ignore_state = try(local.stack_configs[each.key].drift_detection_ignore_state, var.drift_detection_ignore_state)

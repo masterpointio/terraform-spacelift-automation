@@ -39,7 +39,13 @@ lint:
         - CHANGELOG.md
 actions:
   enabled:
+    - terraform-docs
     - trunk-announce
     - trunk-check-pre-push
     - trunk-fmt-pre-commit
     - trunk-upgrade-available
+  definitions:
+    - id: terraform-docs
+      triggers:
+        - git_hooks: [pre-push, pre-commit]
+      run: terraform-docs markdown --output-file=README.md .

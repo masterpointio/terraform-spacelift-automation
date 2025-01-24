@@ -79,7 +79,7 @@ variable "github_enterprise" {
     namespace = string
     id        = optional(string)
   })
-  description = "The GitHub VCS"
+  description = "The GitHub VCS TEST"
   default     = null
 }
 

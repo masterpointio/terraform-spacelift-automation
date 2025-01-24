@@ -1,3 +1,5 @@
+formatter: markdown
+
 recursive:
   enabled: false
   path: examples

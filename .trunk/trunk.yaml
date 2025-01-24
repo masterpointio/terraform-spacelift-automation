@@ -48,4 +48,4 @@ actions:
     - id: terraform-docs
       triggers:
         - git_hooks: [pre-push, pre-commit]
-      run: terraform-docs . --recursive && terraform-docs . --recursive --output-check
+      run: terraform-docs . --recursive --output-check

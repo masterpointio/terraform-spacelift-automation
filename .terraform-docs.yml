@@ -1,5 +1,5 @@
 recursive:
-  enabled: true
+  enabled: false
   path: examples
   include-main: true
 

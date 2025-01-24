@@ -48,4 +48,4 @@ actions:
     - id: terraform-docs
       triggers:
         - git_hooks: [pre-push, pre-commit]
-      run: terraform-docs markdown --output-file=README.md .
+      run: terraform-docs markdown --recursive . > log.txt 2>&1

@@ -193,7 +193,7 @@ Most settings that you would set on [the Spacelift Stack resource](https://searc
 
 This is to support easy local and outside-spacelift operations. Keeping variable values in a `tfvars` file per workspace allows you to simply pass that file to the relevant CLI command locally via the `-var-file` option so that you don't need to provide values individually. e.g. `tofu plan -var-file=tfvars/dev.tfvars`
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 
 ## Requirements
 
@@ -280,7 +280,7 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | <a name="output_spacelift_stacks"></a> [spacelift_stacks](#output_spacelift_stacks) | A map of Spacelift stacks with selected attributes.<br/>To reduce the risk of accidentally exporting sensitive data, only a subset of attributes is exported. |
 
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 ## Contributing
 

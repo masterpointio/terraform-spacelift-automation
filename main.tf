@@ -267,19 +267,20 @@ locals {
     ))
   }
 
-  # Create a map of space names to space IDs
+  # Allow usage of space_name along with space_id.
+  # A space_id is long and hard to look at in the stack.yaml file, so pass in the space_name and it will be resolved to the space_id, which will be consumed by the `spacelife_stack` resource.
   space_name_to_id = {
     for space in data.spacelift_spaces.all.spaces :
     space.name => space.space_id
   }
 
-  # Function to get space ID either directly or via name lookup
   resolved_space_ids = {
     for stack in local.stacks : stack => coalesce(
-      try(local.stack_configs[stack].space_id, null),                           # Try direct space_id first
-      try(local.space_name_to_id[local.stack_configs[stack].space_name], null), # Try looking up by space_name
-      try(local.space_name_to_id[var.space_name], null),                        # Try variable space_name
-      var.space_name, var.space_id, "root"
+      try(local.stack_configs[stack].space_id, null),                           # space_id always takes precedence since it's the most explicit
+      try(local.space_name_to_id[local.stack_configs[stack].space_name], null), # Then try to look up space_name from the stack.yaml to ID
+      var.space_id,
+      try(local.space_name_to_id[var.space_name], null), # Then try to look up the space_name global variable to ID
+      "root"                                             # If no space_id or space_name is provided, default to the root space
     )
   }
 }

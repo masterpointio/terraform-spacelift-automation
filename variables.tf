@@ -15,61 +15,14 @@ variable "root_module_structure" {
 }
 
 variable "runtime_overrides" {
-  type = map(object({
-    stack_settings = optional(object({
-      administrative                   = optional(bool)
-      additional_project_globs         = optional(list(string))
-      after_apply                      = optional(list(string))
-      after_destroy                    = optional(list(string))
-      after_init                       = optional(list(string))
-      after_perform                    = optional(list(string))
-      after_plan                       = optional(list(string))
-      autodeploy                       = optional(bool)
-      autoretry                        = optional(bool)
-      before_apply                     = optional(list(string))
-      before_destroy                   = optional(list(string))
-      before_perform                   = optional(list(string))
-      before_plan                      = optional(list(string))
-      branch                           = optional(string)
-      description                      = optional(string)
-      enable_local_preview             = optional(bool)
-      enable_well_known_secret_masking = optional(bool)
-      github_action_deploy             = optional(bool)
-      labels                           = optional(list(string))
-      manage_state                     = optional(bool)
-      protect_from_deletion            = optional(bool)
-      repository                       = optional(string)
-      runner_image                     = optional(string)
-      space_id                         = optional(string)
-      terraform_smart_sanitization     = optional(bool)
-      terraform_version                = optional(string)
-      worker_pool_id                   = optional(string)
-
-      # AWS Integration
-      aws_integration_enabled = optional(bool)
-      aws_integration_id      = optional(string)
-
-      # Destructor
-      destructor_enabled = optional(bool)
-
-      # Drift Detection
-      drift_detection_enabled      = optional(bool)
-      drift_detection_ignore_state = optional(bool)
-      drift_detection_reconcile    = optional(bool)
-      drift_detection_schedule     = optional(list(string))
-      drift_detection_timezone     = optional(string)
-    }))
-    automation_settings = optional(object({
-      default_tf_workspace_enabled = optional(bool)
-      tfvars_enabled               = optional(bool)
-    }))
-  }))
-
+  type        = any
   description = <<EOT
   Runtime overrides that are merged into the stack config.
   This allows for per-root-module overrides of the stack resources at runtime
   so you have more flexibility beyond the variable defaults and the static stack config files.
   Keys are the root module names and values match the StackConfig schema.
+  See `stack-config.schema.json` for full details on the schema and
+  `tests/fixtures/multi-instance/root-module-a/stacks/default-example.yaml` for a complete example.
   EOT
   default     = {}
 }

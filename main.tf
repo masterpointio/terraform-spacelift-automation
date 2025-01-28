@@ -149,7 +149,7 @@ locals {
         "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
       content,
-      try(var.runtime_overrides[module], {}),
+      try(jsondecode(data.jsonschema_validator.runtime_overrides[module].validated), {}),
     ) if file != var.common_config_file
     }
   ]...)
@@ -277,6 +277,17 @@ locals {
     for stack, config in local.stack_configs :
     stack => config if try(config.drift_detection_enabled, var.drift_detection_enabled)
   }
+}
+
+# Validate the runtime overrides against the schema
+# Frustrating that we have to do this, but this successfully validates the typing
+# of the given runtime overrides since we need to use `any` for the variable type :(
+# See https://github.com/masterpointio/terraform-spacelift-automation/pull/44 for full details
+data "jsonschema_validator" "runtime_overrides" {
+  for_each = var.runtime_overrides
+
+  document = jsonencode(each.value)
+  schema   = "${path.module}/stack-config.schema.json"
 }
 
 # Perform deep merge for common configurations and stack configurations

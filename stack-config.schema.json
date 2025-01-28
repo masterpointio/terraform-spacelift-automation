@@ -9,7 +9,7 @@
   "title": "Masterpoint Stack Config schema. Version 1.0. https://masterpoint.io",
   "description": "Schema for Masterpoint's spacelift-automation stack configuration files. This is used to override stack configurations for the https://github.com/masterpointio/terraform-spacelift-automation module.",
   "type": "object",
-  "required": ["kind", "stack_settings"],
+  "required": [],
   "properties": {
     "kind": {
       "type": "string",

@@ -298,13 +298,6 @@ variable "space_name" {
   default     = null
 }
 
-check "spaces_enforce_mutual_exclusivity" {
-  assert {
-    condition     = var.space_id == null || var.space_name == null
-    error_message = "space_id and space_name are mutually exclusive."
-  }
-}
-
 variable "terraform_smart_sanitization" {
   type        = bool
   description = <<-EOT

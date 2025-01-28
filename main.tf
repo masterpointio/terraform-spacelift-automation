@@ -370,7 +370,7 @@ resource "spacelift_drift_detection" "default" {
 
   lifecycle {
     precondition {
-      condition = alltrue([for schedule in try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule) : can(regex("^([0-9,\\-*/]+\\s+){4}[0-9,\\-*/]+$", schedule))])
+      condition     = alltrue([for schedule in try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule) : can(regex("^([0-9,\\-*/]+\\s+){4}[0-9,\\-*/]+$", schedule))])
       error_message = "Invalid cron schedule format for drift detection"
     }
   }

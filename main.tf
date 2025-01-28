@@ -266,6 +266,22 @@ locals {
       try(local.stack_configs[stack].before_init, []),
     ))
   }
+
+  # Create a map of space names to space IDs
+  space_name_to_id = {
+    for space in data.spacelift_spaces.all.spaces :
+    space.name => space.space_id
+  }
+
+  # Function to get space ID either directly or via name lookup
+  resolved_space_ids = {
+    for stack in local.stacks : stack => coalesce(
+      try(local.stack_configs[stack].space_id, null),                           # Try direct space_id first
+      try(local.space_name_to_id[local.stack_configs[stack].space_name], null), # Try looking up by space_name
+      try(local.space_name_to_id[var.space_name], null),                        # Try variable space_name
+      var.space_name, var.space_id, "root"
+    )
+  }
 }
 
 # Perform deep merge for common configurations and stack configurations
@@ -309,7 +325,7 @@ resource "spacelift_stack" "default" {
   protect_from_deletion            = try(local.stack_configs[each.key].protect_from_deletion, var.protect_from_deletion)
   repository                       = try(local.stack_configs[each.key].repository, var.repository)
   runner_image                     = try(local.stack_configs[each.key].runner_image, var.runner_image)
-  space_id                         = coalesce(try(local.stack_configs[each.key].space_id, null), var.space_id)
+  space_id                         = local.resolved_space_ids[each.key]
   terraform_smart_sanitization     = try(local.stack_configs[each.key].terraform_smart_sanitization, var.terraform_smart_sanitization)
   terraform_version                = try(local.stack_configs[each.key].terraform_version, var.terraform_version)
   terraform_workflow_tool          = var.terraform_workflow_tool

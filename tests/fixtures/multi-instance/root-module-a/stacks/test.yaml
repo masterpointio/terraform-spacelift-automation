@@ -1,3 +1,4 @@
 stack_settings:
   labels:
     - test_label
+  space_id: "direct-space-id" # Tests direct space_id precedence over space_name

@@ -288,8 +288,14 @@ variable "protect_from_deletion" {
 
 variable "space_id" {
   type        = string
-  description = "Place the created stacks in the specified space_id."
-  default     = "root"
+  description = "Place the created stacks in the specified space_id. Mutually exclusive with space_name."
+  default     = null
+}
+
+variable "space_name" {
+  type        = string
+  description = "Place the created stacks in the specified space_name. Mutually exclusive with space_id."
+  default     = null
 }
 
 variable "terraform_smart_sanitization" {

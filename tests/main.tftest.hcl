@@ -155,17 +155,16 @@ run "test_space_name_resolves_to_correct_id" {
   }
 }
 
-# Test that space_id from stack settings takes precedence over space_name when both provided
-run "test_space_id_takes_precedence_over_space_name" {
+# Test that space_id from stack settings takes precedence over space_id global variable
+run "test_space_id_takes_precedence_over_space_id_global_variable" {
   command = plan
 
   variables {
-    space_id   = "default-space-id"
-    space_name = "mp-automation"
+    space_id = "default-space-id-global"
   }
 
   assert {
-    condition     = local.resolved_space_ids["root-module-a-test"] == local.configs["root-module-a-test"].stack_settings.space_id
-    error_message = "Space ID from stack settings not taking precedence when both provided: ${jsonencode(local.resolved_space_ids)}"
+    condition     = local.resolved_space_ids["root-module-a-test"] == "direct-space-id-stack-yaml"
+    error_message = "Space ID from stack settings not taking precedence over global variable space ID: ${jsonencode(local.resolved_space_ids)}"
   }
 }

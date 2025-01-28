@@ -1,4 +1,4 @@
 stack_settings:
   labels:
     - test_label
-  space_id: "direct-space-id" # Tests direct space_id precedence over space_name
+  space_id: "direct-space-id-stack-yaml" # Tests direct space_id precedence over global variable space_id

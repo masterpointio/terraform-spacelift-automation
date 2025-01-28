@@ -4,6 +4,7 @@ stack_settings:
     - echo 'World'
   labels:
     - default_example_label
+  space_name: mp-automation # Tests space_name gets translated to space_id (the Terraform resource attribute that is accepted)
 
 default_tf_workspace_enabled: true
 

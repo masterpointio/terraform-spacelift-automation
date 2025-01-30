@@ -60,7 +60,7 @@ run "test_stack_resource_is_created_with_correct_name" {
   command = plan
 
   assert {
-    condition = spacelift_stack.default["root-module-a-test"].name == "root-module-a-test"
+    condition     = spacelift_stack.default["root-module-a-test"].name == "root-module-a-test"
     error_message = "Stack resource was not created correctly: ${jsonencode(spacelift_stack.default)}"
   }
 }
@@ -160,7 +160,7 @@ run "test_description_is_created_correctly" {
   command = plan
 
   assert {
-    condition = spacelift_stack.default["root-module-a-test"].description == "Root Module: root-module-a\nProject Root: ./tests/fixtures/multi-instance/root-module-a\nWorkspace: test\nManaged by spacelift-automation Terraform root module."
+    condition     = spacelift_stack.default["root-module-a-test"].description == "Root Module: root-module-a\nProject Root: ./tests/fixtures/multi-instance/root-module-a\nWorkspace: test\nManaged by spacelift-automation Terraform root module."
     error_message = "Description was not created correctly: ${jsonencode(local.configs)}"
   }
 }
@@ -173,7 +173,7 @@ run "test_description_is_created_correctly_when_non_default_template_string_is_u
   }
 
   assert {
-    condition = spacelift_stack.default["root-module-a-test"].description == "Space ID: 123"
+    condition     = spacelift_stack.default["root-module-a-test"].description == "Space ID: direct-space-id-stack-yaml"
     error_message = "Description was not created correctly: ${jsonencode(local.configs)}"
   }
 }
@@ -182,7 +182,7 @@ run "test_description_is_created_correctly_when_passed_from_stack_config" {
   command = plan
 
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].description == "This is a test of the emergency broadcast system"
+    condition     = spacelift_stack.default["root-module-a-default-example"].description == "This is a test of the emergency broadcast system"
     error_message = "Description was not created correctly: ${jsonencode(local.configs)}"
   }
 }

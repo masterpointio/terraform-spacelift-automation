@@ -256,6 +256,7 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 | [spacelift_stack.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack) | resource |
 | [spacelift_stack_destructor.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack_destructor) | resource |
 | [jsonschema_validator.runtime_overrides](https://registry.terraform.io/providers/bpedman/jsonschema/latest/docs/data-sources/validator) | data source |
+| [spacelift_spaces.all](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/spaces) | data source |
 
 ## Inputs
 
@@ -303,7 +304,8 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 | <a name="input_root_modules_path"></a> [root\_modules\_path](#input\_root\_modules\_path) | The path, relative to the root of the repository, where the root module can be found. | `string` | `"root-modules"` | no |
 | <a name="input_runner_image"></a> [runner\_image](#input\_runner\_image) | URL of the Docker image used to process Runs. Defaults to `null` which is Spacelift's standard (Alpine) runner image. | `string` | `null` | no |
 | <a name="input_runtime_overrides"></a> [runtime\_overrides](#input\_runtime\_overrides) | Runtime overrides that are merged into the stack config.<br/>  This allows for per-root-module overrides of the stack resources at runtime<br/>  so you have more flexibility beyond the variable defaults and the static stack config files.<br/>  Keys are the root module names and values match the StackConfig schema.<br/>  See `stack-config.schema.json` for full details on the schema and<br/>  `tests/fixtures/multi-instance/root-module-a/stacks/default-example.yaml` for a complete example. | `any` | `{}` | no |
-| <a name="input_space_id"></a> [space\_id](#input\_space\_id) | Place the created stacks in the specified space\_id. | `string` | `"root"` | no |
+| <a name="input_space_id"></a> [space\_id](#input\_space\_id) | Place the created stacks in the specified space\_id. Mutually exclusive with space\_name. | `string` | `null` | no |
+| <a name="input_space_name"></a> [space\_name](#input\_space\_name) | Place the created stacks in the specified space\_name. Mutually exclusive with space\_id. | `string` | `null` | no |
 | <a name="input_terraform_smart_sanitization"></a> [terraform\_smart\_sanitization](#input\_terraform\_smart\_sanitization) | Indicates whether runs on this will use terraform's sensitive value system to sanitize<br/>the outputs of Terraform state and plans in spacelift instead of sanitizing all fields. | `bool` | `false` | no |
 | <a name="input_terraform_version"></a> [terraform\_version](#input\_terraform\_version) | Terraform version to use. | `string` | `"1.7.2"` | no |
 | <a name="input_terraform_workflow_tool"></a> [terraform\_workflow\_tool](#input\_terraform\_workflow\_tool) | Defines the tool that will be used to execute the workflow.<br/>This can be one of OPEN\_TOFU, TERRAFORM\_FOSS or CUSTOM. | `string` | `"OPEN_TOFU"` | no |

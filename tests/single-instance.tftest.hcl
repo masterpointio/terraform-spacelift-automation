@@ -1,3 +1,4 @@
+
 variables {
   root_modules_path = "./tests/fixtures/single-instance"
   github_enterprise = {
@@ -136,5 +137,25 @@ run "test_single_instance_before_init_tfvar_cp_command_is_not_added_to_stack" {
   assert {
     condition     = !contains(local.before_init["root-module-a"], "cp tfvars/")
     error_message = "Before_init tfvar cp command was added to the stack: ${jsonencode(local.before_init)}"
+  }
+}
+
+# Test that default space_id of `root` is used when no other values are provided
+run "test_default_space_id_is_used" {
+  command = plan
+
+  assert {
+    condition     = local.resolved_space_ids["root-module-a"] == "root"
+    error_message = "Default space_id (root) was not used when no other values provided: ${jsonencode(local.resolved_space_ids)}"
+  }
+}
+
+# Test that root-module-b using space_id from stack.yaml
+run "test_space_id_is_used_from_stack_yaml" {
+  command = plan
+
+  assert {
+    condition     = local.resolved_space_ids["root-module-b"] == "some-space-id"
+    error_message = "Space ID from stack.yaml is not being used: ${jsonencode(local.resolved_space_ids)}"
   }
 }

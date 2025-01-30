@@ -22,7 +22,7 @@ stack_settings:
   manage_state: true
   protect_from_deletion: true
   runner_image: masterpointio/spacelift-runner:latest
-  space_id: "1234567890"
+  space_name: mp-automation # Tests space_name gets translated to space_id (the Terraform resource attribute that is accepted)
   terraform_smart_sanitization: true
   terraform_version: 1.9.0
   worker_pool_id: "1234567890"

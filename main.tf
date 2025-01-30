@@ -268,6 +268,27 @@ locals {
     ))
   }
 
+  ## Handle space lookups
+
+  # Allow usage of space_name along with space_id.
+  # A space_id is long and hard to look at in the stack.yaml file, so pass in the space_name and it will be resolved to the space_id, which will be consumed by the `spacelife_stack` resource.
+  space_name_to_id = {
+    for space in data.spacelift_spaces.all.spaces :
+    space.name => space.space_id
+  }
+
+  resolved_space_ids = {
+    for stack in local.stacks : stack => coalesce(
+      try(local.stack_configs[stack].space_id, null),                           # space_id always takes precedence since it's the most explicit
+      try(local.space_name_to_id[local.stack_configs[stack].space_name], null), # Then try to look up space_name from the stack.yaml to ID
+      var.space_id,
+      try(local.space_name_to_id[var.space_name], null), # Then try to look up the space_name global variable to ID
+      "root"                                             # If no space_id or space_name is provided, default to the root space
+    )
+  }
+
+  ## Filter integration + drift detection stacks
+
   aws_integration_stacks = {
     for stack, config in local.stack_configs :
     stack => config if try(config.aws_integration_enabled, var.aws_integration_enabled)
@@ -279,15 +300,11 @@ locals {
   }
 }
 
-# Validate the runtime overrides against the schema
-# Frustrating that we have to do this, but this successfully validates the typing
-# of the given runtime overrides since we need to use `any` for the variable type :(
-# See https://github.com/masterpointio/terraform-spacelift-automation/pull/44 for full details
-data "jsonschema_validator" "runtime_overrides" {
-  for_each = var.runtime_overrides
-
-  document = jsonencode(each.value)
-  schema   = "${path.module}/stack-config.schema.json"
+check "spaces_enforce_mutual_exclusivity" {
+  assert {
+    condition     = var.space_id == null || var.space_name == null
+    error_message = "space_id and space_name are mutually exclusive."
+  }
 }
 
 # Perform deep merge for common configurations and stack configurations
@@ -330,7 +347,7 @@ resource "spacelift_stack" "default" {
   protect_from_deletion            = try(local.stack_configs[each.key].protect_from_deletion, var.protect_from_deletion)
   repository                       = try(local.stack_configs[each.key].repository, var.repository)
   runner_image                     = try(local.stack_configs[each.key].runner_image, var.runner_image)
-  space_id                         = coalesce(try(local.stack_configs[each.key].space_id, null), var.space_id)
+  space_id                         = local.resolved_space_ids[each.key]
   terraform_smart_sanitization     = try(local.stack_configs[each.key].terraform_smart_sanitization, var.terraform_smart_sanitization)
   terraform_version                = try(local.stack_configs[each.key].terraform_version, var.terraform_version)
   terraform_workflow_tool          = var.terraform_workflow_tool
@@ -393,7 +410,7 @@ resource "spacelift_drift_detection" "default" {
 
   lifecycle {
     precondition {
-      condition     = alltrue([for schedule in try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule) : can(regex("^([0-9,\\-\\*]+\\s+){4}[0-9,\\-\\*]+$", schedule))])
+      condition     = alltrue([for schedule in try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule) : can(regex("^([0-9,\\-*/]+\\s+){4}[0-9,\\-*/]+$", schedule))])
       error_message = "Invalid cron schedule format for drift detection"
     }
   }

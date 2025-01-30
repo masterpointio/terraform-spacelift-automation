@@ -142,7 +142,7 @@ locals {
         "root_module"  = module,
 
         # If default_tf_workspace_enabled is true, use "default" workspace, otherwise our file name is the workspace name
-        "terraform_workspace" = try(content.default_tf_workspace_enabled, local._default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
+        "terraform_workspace" = try(content.automation_settings.default_tf_workspace_enabled, local._default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
 
         # tfvars_file_name only pertains to MultiInstance, as SingleInstance expects consumers to use an auto.tfvars file.
         # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally
@@ -253,7 +253,7 @@ locals {
     for stack in local.stacks : stack =>
     # tfvars are implicitly enabled in MultiInstance, which means we include the tfvars copy command in before_init
     # In SingleInstance, we expect the consumer to use an auto.tfvars file, so we don't include the tfvars copy command in before_init
-    try(local.configs[stack].tfvars.enabled, local._multi_instance_structure) ?
+    try(local.configs[stack].automation_settings.tfvars_enabled, local._multi_instance_structure) ?
     compact(concat(
       var.before_init,
       try(local.stack_configs[stack].before_init, []),
@@ -322,7 +322,6 @@ resource "spacelift_stack" "default" {
   before_perform                   = compact(coalesce(try(local.stack_configs[each.key].before_perform, []), var.before_perform))
   before_plan                      = compact(coalesce(try(local.stack_configs[each.key].before_plan, []), var.before_plan))
   branch                           = try(local.stack_configs[each.key].branch, var.branch)
-  description                      = coalesce(try(local.stack_configs[each.key].description, null), var.description)
   enable_local_preview             = try(local.stack_configs[each.key].enable_local_preview, var.enable_local_preview)
   enable_well_known_secret_masking = try(local.stack_configs[each.key].enable_well_known_secret_masking, var.enable_well_known_secret_masking)
   github_action_deploy             = try(local.stack_configs[each.key].github_action_deploy, var.github_action_deploy)
@@ -339,6 +338,13 @@ resource "spacelift_stack" "default" {
   terraform_workflow_tool          = var.terraform_workflow_tool
   terraform_workspace              = local.configs[each.key].terraform_workspace
   worker_pool_id                   = try(local.stack_configs[each.key].worker_pool_id, var.worker_pool_id)
+
+  # Usage of `templatestring` requires OpenTofu 1.7 and Terraform 1.9 or later.
+  description = coalesce(
+    try(local.stack_configs[each.key].description, null),
+    try(templatestring(var.description, local.configs[each.key]), null),
+    "Managed by spacelift-automation Terraform root module."
+  )
 
   dynamic "github_enterprise" {
     for_each = var.github_enterprise != null ? [var.github_enterprise] : []
@@ -394,7 +400,7 @@ resource "spacelift_drift_detection" "default" {
 
   lifecycle {
     precondition {
-      condition     = alltrue([for schedule in try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule) : can(regex("^([0-9,\\-\\*]+\\s+){4}[0-9,\\-\\*]+$", schedule))])
+      condition     = alltrue([for schedule in try(local.stack_configs[each.key].drift_detection_schedule, var.drift_detection_schedule) : can(regex("^([0-9,\\-*/]+\\s+){4}[0-9,\\-*/]+$", schedule))])
       error_message = "Invalid cron schedule format for drift detection"
     }
   }

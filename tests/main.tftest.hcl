@@ -55,6 +55,16 @@ run "test_stacks_include_expected" {
   }
 }
 
+# Test that the stack resource is created with the correct name
+run "test_stack_resource_is_created_with_correct_name" {
+  command = plan
+
+  assert {
+    condition = spacelift_stack.default["root-module-a-test"].name == "root-module-a-test"
+    error_message = "Stack resource was not created correctly: ${jsonencode(spacelift_stack.default)}"
+  }
+}
+
 # Test that the folder labels get created with correct format
 run "test_folder_labels_are_correct_format" {
   command = plan
@@ -145,26 +155,34 @@ run "test_before_init_includes_the_default_before_init_and_stack_before_init" {
   }
 }
 
-# Test that space_name from stack settings resolves to correct ID
-run "test_space_name_resolves_to_correct_id" {
+# Test that the description is created correctly
+run "test_description_is_created_correctly" {
   command = plan
 
   assert {
-    condition     = local.resolved_space_ids["root-module-a-default-example"] == "mp-automation-01JEC2D4K2Q2V1AJQ0Y6BFGJJ3" # For the `masterpointio.app.spacelift.io`
-    error_message = "Space name not resolving to correct ID: ${jsonencode(local.resolved_space_ids)}"
+    condition = spacelift_stack.default["root-module-a-test"].description == "Root Module: root-module-a\nProject Root: ./tests/fixtures/multi-instance/root-module-a\nWorkspace: test\nManaged by spacelift-automation Terraform root module."
+    error_message = "Description was not created correctly: ${jsonencode(local.configs)}"
   }
 }
 
-# Test that space_id from stack settings takes precedence over space_id global variable
-run "test_space_id_takes_precedence_over_space_id_global_variable" {
+# Test that the description is created correctly when non-default template string is used
+run "test_description_is_created_correctly_when_non_default_template_string_is_used" {
   command = plan
-
   variables {
-    space_id = "default-space-id-global"
+    description = "Space ID: $${stack_settings.space_id}"
   }
 
   assert {
-    condition     = local.resolved_space_ids["root-module-a-test"] == "direct-space-id-stack-yaml"
-    error_message = "Space ID from stack settings not taking precedence over global variable space ID: ${jsonencode(local.resolved_space_ids)}"
+    condition = spacelift_stack.default["root-module-a-test"].description == "Space ID: 123"
+    error_message = "Description was not created correctly: ${jsonencode(local.configs)}"
+  }
+}
+
+run "test_description_is_created_correctly_when_passed_from_stack_config" {
+  command = plan
+
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].description == "This is a test of the emergency broadcast system"
+    error_message = "Description was not created correctly: ${jsonencode(local.configs)}"
   }
 }

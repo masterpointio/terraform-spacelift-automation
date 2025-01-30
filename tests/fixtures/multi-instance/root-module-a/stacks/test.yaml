@@ -1,5 +1,5 @@
 kind: StackConfigV1
 stack_settings:
-  space_id: 123
+  space_id: "123"
   labels:
     - test_label

@@ -186,3 +186,28 @@ run "test_description_is_created_correctly_when_passed_from_stack_config" {
     error_message = "Description was not created correctly: ${jsonencode(local.configs)}"
   }
 }
+
+
+# Test that space_name from stack settings resolves to correct ID
+run "test_space_name_resolves_to_correct_id" {
+  command = plan
+
+  assert {
+    condition     = local.resolved_space_ids["root-module-a-default-example"] == "mp-automation-01JEC2D4K2Q2V1AJQ0Y6BFGJJ3" # For the `masterpointio.app.spacelift.io`
+    error_message = "Space name not resolving to correct ID: ${jsonencode(local.resolved_space_ids)}"
+  }
+}
+
+# Test that space_id from stack settings takes precedence over space_id global variable
+run "test_space_id_takes_precedence_over_space_id_global_variable" {
+  command = plan
+
+  variables {
+    space_id = "default-space-id-global"
+  }
+
+  assert {
+    condition     = local.resolved_space_ids["root-module-a-test"] == "direct-space-id-stack-yaml"
+    error_message = "Space ID from stack settings not taking precedence over global variable space ID: ${jsonencode(local.resolved_space_ids)}"
+  }
+}

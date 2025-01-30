@@ -223,7 +223,8 @@ automation_settings:
 
 This is to support easy local and outside-spacelift operations. Keeping variable values in a `tfvars` file per workspace allows you to simply pass that file to the relevant CLI command locally via the `-var-file` option so that you don't need to provide values individually. e.g. `tofu plan -var-file=tfvars/dev.tfvars`
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-enable -->
+<!-- BEGIN_TF_DOCS -->
 
 ## Requirements
 
@@ -246,12 +247,13 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 
 ## Resources
 
-| Name                                                                                                                                                            | Type     |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| [spacelift_aws_integration_attachment.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/aws_integration_attachment) | resource |
-| [spacelift_drift_detection.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/drift_detection)                       | resource |
-| [spacelift_stack.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack)                                           | resource |
-| [spacelift_stack_destructor.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack_destructor)                     | resource |
+| Name                                                                                                                                                            | Type        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| [spacelift_aws_integration_attachment.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/aws_integration_attachment) | resource    |
+| [spacelift_drift_detection.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/drift_detection)                       | resource    |
+| [spacelift_stack.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack)                                           | resource    |
+| [spacelift_stack_destructor.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack_destructor)                     | resource    |
+| [jsonschema_validator.runtime_overrides](https://registry.terraform.io/providers/bpedman/jsonschema/latest/docs/data-sources/validator)                         | data source |
 
 ## Inputs
 
@@ -310,7 +312,8 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | <a name="output_spacelift_stacks"></a> [spacelift_stacks](#output_spacelift_stacks) | A map of Spacelift stacks with selected attributes.<br>To reduce the risk of accidentally exporting sensitive data, only a subset of attributes is exported. |
 
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
+<!-- markdownlint-disable -->
 
 ## Contributing
 

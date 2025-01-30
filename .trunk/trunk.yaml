@@ -7,7 +7,7 @@ cli:
 plugins:
   sources:
     - id: trunk
-      ref: v1.6.6
+      ref: v1.6.7
       uri: https://github.com/trunk-io/plugins
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
 runtimes:
@@ -39,6 +39,7 @@ lint:
         - CHANGELOG.md
 actions:
   enabled:
+    - terraform-docs
     - trunk-announce
     - trunk-check-pre-push
     - trunk-fmt-pre-commit

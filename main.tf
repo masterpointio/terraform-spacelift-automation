@@ -142,7 +142,7 @@ locals {
         "root_module"  = module,
 
         # If default_tf_workspace_enabled is true, use "default" workspace, otherwise our file name is the workspace name
-        "terraform_workspace" = try(content.default_tf_workspace_enabled, local._default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
+        "terraform_workspace" = try(content.automation_settings.default_tf_workspace_enabled, local._default_tf_workspace_enabled) ? "default" : trimsuffix(file, ".yaml"),
 
         # tfvars_file_name only pertains to MultiInstance, as SingleInstance expects consumers to use an auto.tfvars file.
         # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally
@@ -253,7 +253,7 @@ locals {
     for stack in local.stacks : stack =>
     # tfvars are implicitly enabled in MultiInstance, which means we include the tfvars copy command in before_init
     # In SingleInstance, we expect the consumer to use an auto.tfvars file, so we don't include the tfvars copy command in before_init
-    try(local.configs[stack].tfvars.enabled, local._multi_instance_structure) ?
+    try(local.configs[stack].automation_settings.tfvars_enabled, local._multi_instance_structure) ?
     compact(concat(
       var.before_init,
       try(local.stack_configs[stack].before_init, []),

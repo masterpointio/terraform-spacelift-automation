@@ -1,3 +1,4 @@
+kind: StackConfigV1
 stack_settings:
   administrative: true
   description: This Automation stack is used for Masterpoint's testing purposes
@@ -5,8 +6,9 @@ stack_settings:
     - common_label
   drift_detection_enabled: true
 
-# There is only one instance of this spacelift-automation stack, so we can use the default TF workspace instead of creating a new one.
-default_tf_workspace_enabled: true
+automation_settings:
+  # There is only one instance of this spacelift-automation stack, so we can use the default TF workspace instead of creating a new one.
+  default_tf_workspace_enabled: true
 
-tfvars:
-  enabled: false
+  # We don't need to load tfvars for this stack.
+  tfvars_enabled: false

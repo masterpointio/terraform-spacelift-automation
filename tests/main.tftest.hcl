@@ -154,7 +154,7 @@ run "test_default_example_stack_final_values" {
 
   # space_id
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].space_id == "1234567890"
+    condition = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-automation-01JEC2D4K2Q2V1AJQ0Y6BFGJJ3"
     error_message = "space_id was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 

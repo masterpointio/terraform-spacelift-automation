@@ -1,3 +1,4 @@
+kind: StackConfigV1
 stack_settings:
   administrative: false
   labels:

@@ -1,11 +1,11 @@
+kind: StackConfigV1
 stack_settings:
   administrative: true
+  description: This is a test of the emergency broadcast system
   before_init:
     - echo 'World'
   labels:
     - default_example_label
-
-default_tf_workspace_enabled: true
-
-tfvars:
-  enabled: false
+automation_settings:
+  default_tf_workspace_enabled: true
+  tfvars_enabled: false

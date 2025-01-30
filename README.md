@@ -185,9 +185,39 @@ Check out an example configuration in the [examples/complete](./examples/complet
 
 <!-- NOTE to Masterpoint team: We might want to create a small wrapper to automatize this using Taskit. On hold for now. -->
 
-### What goes in a Stack config file? e.g. `stacks/dev.yaml`, `stacks/common.yaml`, `stack.yaml`, etc
+### What goes in a Stack config file? e.g. `stacks/dev.yaml`, `stacks/common.yaml`, `stack.yaml`, and similar
 
-Most settings that you would set on [the Spacelift Stack resource](https://search.opentofu.org/provider/spacelift-io/spacelift/latest/docs/resources/stack) are supported. Additionally, you can include certain Stack specific settings that will override this module's defaults like `default_tf_workspace_enabled`, `tfvars.enabled`, and similar. See the code for full details.
+Most settings that you would set on [the Spacelift Stack resource](https://search.opentofu.org/provider/spacelift-io/spacelift/latest/docs/resources/stack) are supported. Additionally, you can include certain automation settings that will override this module's defaults like `automation_settings.default_tf_workspace_enabled`, `automation_settings.tfvars_enabled`, and similar.
+
+Below is a brief example. You can also see the full schema in our [JSON Schema file](./stack-config.schema.json).
+
+```yaml
+kind: StackConfigV1
+stack_settings:
+  administrative: true
+  autodeploy: true
+  autoretry: true
+  description: "Production EKS cluster configuration"
+  labels:
+    - "prod"
+
+  terraform_version: "1.9.0"
+  terraform_workflow_tool: "OPEN_TOFU"
+
+  # Security and protection
+  protect_from_deletion: true
+  enable_local_preview: false
+
+  # Hooks and scripts
+  before_init:
+    - "echo hello-world"
+  after_apply:
+    - "./scripts/notify-slack.sh"
+
+automation_settings:
+  default_tf_workspace_enabled: true
+  tfvars_enabled: false
+```
 
 ### Why are variable values provided separately in `tfvars/` and not in the `yaml` file?
 

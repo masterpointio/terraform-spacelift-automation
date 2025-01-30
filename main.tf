@@ -298,7 +298,6 @@ resource "spacelift_stack" "default" {
   before_perform                   = compact(coalesce(try(local.stack_configs[each.key].before_perform, []), var.before_perform))
   before_plan                      = compact(coalesce(try(local.stack_configs[each.key].before_plan, []), var.before_plan))
   branch                           = try(local.stack_configs[each.key].branch, var.branch)
-  description                      = coalesce(try(local.stack_configs[each.key].description, null), var.description)
   enable_local_preview             = try(local.stack_configs[each.key].enable_local_preview, var.enable_local_preview)
   enable_well_known_secret_masking = try(local.stack_configs[each.key].enable_well_known_secret_masking, var.enable_well_known_secret_masking)
   github_action_deploy             = try(local.stack_configs[each.key].github_action_deploy, var.github_action_deploy)
@@ -315,6 +314,13 @@ resource "spacelift_stack" "default" {
   terraform_workflow_tool          = var.terraform_workflow_tool
   terraform_workspace              = local.configs[each.key].terraform_workspace
   worker_pool_id                   = try(local.stack_configs[each.key].worker_pool_id, var.worker_pool_id)
+
+  # Usage of `templatestring` requires OpenTofu 1.7 and Terraform 1.9 or later.
+  description = coalesce(
+    try(local.stack_configs[each.key].description, null),
+    try(templatestring(var.description, local.configs[each.key]), null),
+    "Managed by spacelift-automation Terraform root module."
+  )
 
   dynamic "github_enterprise" {
     for_each = var.github_enterprise != null ? [var.github_enterprise] : []

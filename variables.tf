@@ -207,8 +207,12 @@ variable "default_tf_workspace_enabled" {
 
 variable "description" {
   type        = string
-  description = "Description of the stack"
-  default     = "Managed by spacelift-automation Terraform root module."
+  description = <<EOT
+    A description for the created Stacks. This is a template string that will be rendered with the final config object for the stack.
+    See the main.tf for full internals of that object and the documentation on templatestring for usage.
+    https://opentofu.org/docs/language/functions/templatestring/
+  EOT
+  default     = "Root Module: $${root_module}\nProject Root: $${project_root}\nWorkspace: $${terraform_workspace}\nManaged by spacelift-automation Terraform root module."
 }
 
 variable "destructor_enabled" {

@@ -457,7 +457,7 @@ run "test_default_example_stack_runtime_overrides" {
 }
 
 # Test the default-example stack with only 1 runtime override
-run "test_ default_example_stack_partial_runtime_overrides" {
+run "test_default_example_stack_partial_runtime_overrides" {
   command = plan
 
   variables {

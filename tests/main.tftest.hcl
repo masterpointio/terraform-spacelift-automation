@@ -295,6 +295,193 @@ run "test_default_example_stack_runtime_overrides" {
     condition = spacelift_stack.default["root-module-a-default-example"].administrative == false
     error_message = "Administrative override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
+
+
+  # additional_project_globs
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].additional_project_globs, "changed/*")
+    error_message = "additional_project_globs override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # after_apply
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_apply, "echo 'changed_after_apply'")
+    error_message = "after_apply override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # after_destroy
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_destroy, "echo 'changed_after_destroy'")
+    error_message = "after_destroy override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # after_init
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_init, "echo 'changed_after_init'")
+    error_message = "after_init override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # after_perform
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_perform, "echo 'changed_after_perform'")
+    error_message = "after_perform override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # after_plan
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_plan, "echo 'changed_after_plan'")
+    error_message = "after_plan override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # autodeploy
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].autodeploy == true
+    error_message = "autodeploy override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # autoretry
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].autoretry == false
+    error_message = "autoretry override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # before_apply
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_apply, "echo 'changed_before_apply'")
+    error_message = "before_apply override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # before_destroy
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_destroy, "echo 'changed_before_destroy'")
+    error_message = "before_destroy override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # before_init
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_init, "echo 'changed_before_init'")
+    error_message = "before_init override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # before_perform
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_perform, "echo 'changed_before_perform'")
+    error_message = "before_perform override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # before_plan
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_plan, "echo 'changed_before_plan'")
+    error_message = "before_plan override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # branch
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].branch == "dev"
+    error_message = "branch override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # description
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].description == "This is a changed test of the emergency broadcast system"
+    error_message = "description override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # enable_local_preview
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].enable_local_preview == false
+    error_message = "enable_local_preview override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # enable_well_known_secret_masking
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].enable_well_known_secret_masking == true
+    error_message = "enable_well_known_secret_masking override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # github_action_deploy
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == true
+    error_message = "github_action_deploy override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # manage_state
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].manage_state == false
+    error_message = "manage_state override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # protect_from_deletion
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].protect_from_deletion == false
+    error_message = "protect_from_deletion override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # runner_image
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].runner_image == "masterpointio/spacelift-runner:dev"
+    error_message = "runner_image override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # space_id
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].space_id == "555"
+    error_message = "space_id override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # terraform_smart_sanitization
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].terraform_smart_sanitization == false
+    error_message = "terraform_smart_sanitization override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # terraform_version
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].terraform_version == "1.9.1"
+    error_message = "terraform_version override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # worker_pool_id
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].worker_pool_id == "555"
+    error_message = "worker_pool_id override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # destructor_enabled
+  assert {
+    condition = spacelift_stack_destructor.default["root-module-a-default-example"].deactivated == true
+    error_message = "destructor_enabled override was not applied correctly: ${jsonencode(spacelift_stack_destructor.default["root-module-a-default-example"])}"
+  }
+
+  # aws_integration_id
+  assert {
+    condition = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "999"
+    error_message = "aws_integration_id override was not applied correctly: ${jsonencode(spacelift_aws_integration_attachment.default["root-module-a-default-example"])}"
+  }
+
+  # drift_detection_ignore_state
+  assert {
+    condition = spacelift_drift_detection.default["root-module-a-default-example"].ignore_state == false
+    error_message = "drift_detection_ignore_state override was not applied correctly: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
+  }
+
+  # drift_detection_reconcile
+  assert {
+    condition = spacelift_drift_detection.default["root-module-a-default-example"].reconcile == false
+    error_message = "drift_detection_reconcile override was not applied correctly: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
+  }
+
+  # drift_detection_schedule
+  assert {
+    condition = contains(spacelift_drift_detection.default["root-module-a-default-example"].schedule, "0 7 * * *")
+    error_message = "drift_detection_schedule override was not applied correctly: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
+  }
+
+  # drift_detection_timezone
+  assert {
+    condition = spacelift_drift_detection.default["root-module-a-default-example"].timezone == "America/Denver"
+    error_message = "drift_detection_timezone override was not applied correctly: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
+  }
 }
 
 # Test that the global labels are created correctly

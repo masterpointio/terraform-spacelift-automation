@@ -296,7 +296,6 @@ run "test_default_example_stack_runtime_overrides" {
     error_message = "Administrative override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
-
   # additional_project_globs
   assert {
     condition = contains(spacelift_stack.default["root-module-a-default-example"].additional_project_globs, "changed/*")

@@ -464,7 +464,7 @@ run "test_ default_example_stack_partial_runtime_overrides" {
     runtime_overrides = {
       root-module-a = {
         stack_settings = {
-          administrator = true
+          administrative = true
         }
       }
     }

@@ -456,6 +456,34 @@ run "test_default_example_stack_runtime_overrides" {
   }
 }
 
+# Test the default-example stack with only 1 runtime override
+run "test_default_example_stack_partial_runtime_overrides" {
+  command = plan
+
+  variables {
+    runtime_overrides = {
+      root-module-a = {
+        stack_settings = {
+          administrative = true
+        }
+      }
+    }
+  }
+
+  # administrative
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].administrative == true
+    error_message = "Administrative is true because it's an override: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+
+  }
+
+  # common_label
+  assert {
+    condition     = contains(local.configs["root-module-a-default-example"].stack_settings.labels, "common_label")
+    error_message = "labels include 'common_label' because it's set in the common.yaml file: ${jsonencode(local.configs)}"
+  }
+}
+
 # Test that the global labels are created correctly
 run "test_labels_are_created_correctly" {
   command = plan

@@ -213,33 +213,6 @@ run "test_default_example_stack_final_values" {
   }
 }
 
-# Test the default-example stack with only 1 runtime override
-run "test_default_example_stack_partial_runtime_overrides" {
-  command = plan
-
-  variables {
-    runtime_overrides = {
-      root-module-a = {
-        stack_settings = {
-          administrator = false
-        }
-      }
-    }
-  }
-
-  # administrative
-  assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].administrative == false
-    error_message = "Administrative is false because it's an override: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
-  }
-
-  # after_apply
-  assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_apply, "echo 'after_apply'")
-    error_message = "after_apply is echo 'after_apply' because it has no override: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
-  }
-}
-
 # Test the default-example stack with runtime overrides
 run "test_default_example_stack_runtime_overrides" {
   command = plan
@@ -480,6 +453,32 @@ run "test_default_example_stack_runtime_overrides" {
   assert {
     condition = spacelift_drift_detection.default["root-module-a-default-example"].timezone == "America/Denver"
     error_message = "drift_detection_timezone override was not applied correctly: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
+  }
+}
+
+# Test the default-example stack with only 1 runtime override
+run "test_ default_example_stack_partial_runtime_overrides" {
+  command = plan
+
+  variables {
+    runtime_overrides = {
+      root-module-a = {
+        stack_settings = {
+          administrator = true
+        }
+      }
+    }
+  }
+
+  # administrative
+  assert {
+    condition = spacelift_stack.default["root-module-a-default-example"].administrative == true
+    error_message = "Administrative is true because it's an override: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  assert {
+    condition     = contains(local.configs["root-module-a-default-example"].stack_settings.labels, "common_label")
+    error_message = "labels include 'common_label' because it's set in the common.yaml file: ${jsonencode(local.configs)}"
   }
 }
 

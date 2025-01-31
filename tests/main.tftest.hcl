@@ -474,8 +474,10 @@ run "test_default_example_stack_partial_runtime_overrides" {
   assert {
     condition = spacelift_stack.default["root-module-a-default-example"].administrative == true
     error_message = "Administrative is true because it's an override: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+
   }
 
+  # common_label
   assert {
     condition     = contains(local.configs["root-module-a-default-example"].stack_settings.labels, "common_label")
     error_message = "labels include 'common_label' because it's set in the common.yaml file: ${jsonencode(local.configs)}"

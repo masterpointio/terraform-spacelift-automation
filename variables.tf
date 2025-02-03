@@ -14,6 +14,19 @@ variable "root_module_structure" {
   }
 }
 
+variable "runtime_overrides" {
+  type        = any
+  description = <<EOT
+  Runtime overrides that are merged into the stack config.
+  This allows for per-root-module overrides of the stack resources at runtime
+  so you have more flexibility beyond the variable defaults and the static stack config files.
+  Keys are the root module names and values match the StackConfig schema.
+  See `stack-config.schema.json` for full details on the schema and
+  `tests/fixtures/multi-instance/root-module-a/stacks/default-example.yaml` for a complete example.
+  EOT
+  default     = {}
+}
+
 variable "github_enterprise" {
   type = object({
     namespace = string

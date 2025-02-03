@@ -148,7 +148,8 @@ locals {
         # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally
         "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
-      content
+      content,
+      try(jsondecode(data.jsonschema_validator.runtime_overrides[module].validated), {}),
     ) if file != var.common_config_file
     }
   ]...)
@@ -267,6 +268,8 @@ locals {
     ))
   }
 
+  ## Handle space lookups
+
   # Allow usage of space_name along with space_id.
   # A space_id is long and hard to look at in the stack.yaml file, so pass in the space_name and it will be resolved to the space_id, which will be consumed by the `spacelife_stack` resource.
   space_name_to_id = {
@@ -282,6 +285,18 @@ locals {
       try(local.space_name_to_id[var.space_name], null), # Then try to look up the space_name global variable to ID
       "root"                                             # If no space_id or space_name is provided, default to the root space
     )
+  }
+
+  ## Filter integration + drift detection stacks
+
+  aws_integration_stacks = {
+    for stack, config in local.stack_configs :
+    stack => config if try(config.aws_integration_enabled, var.aws_integration_enabled)
+  }
+
+  drift_detection_stacks = {
+    for stack, config in local.stack_configs :
+    stack => config if try(config.drift_detection_enabled, var.drift_detection_enabled)
   }
 }
 
@@ -376,10 +391,8 @@ resource "spacelift_stack_destructor" "default" {
 }
 
 resource "spacelift_aws_integration_attachment" "default" {
-  for_each = {
-    for stack, configs in local.stack_configs : stack => configs
-    if try(configs.aws_integration_enabled, var.aws_integration_enabled)
-  }
+  for_each = local.aws_integration_stacks
+
   integration_id = try(local.stack_configs[each.key].aws_integration_id, var.aws_integration_id)
   stack_id       = spacelift_stack.default[each.key].id
   read           = var.aws_integration_attachment_read
@@ -387,10 +400,7 @@ resource "spacelift_aws_integration_attachment" "default" {
 }
 
 resource "spacelift_drift_detection" "default" {
-  for_each = {
-    for stack, configs in local.stack_configs : stack => configs
-    if try(configs.drift_detection_enabled, var.drift_detection_enabled)
-  }
+  for_each = local.drift_detection_stacks
 
   stack_id     = spacelift_stack.default[each.key].id
   ignore_state = try(local.stack_configs[each.key].drift_detection_ignore_state, var.drift_detection_ignore_state)

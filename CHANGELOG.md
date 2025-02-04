@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.0.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.7.0...v1.0.0) (2025-02-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* TF Version pinning has been updated to require terraform v1.9+ and OpenTofu v1.7+. Please update the consuming root module accordingly. (#43)
+* Scopes `tfvars` + `default_tf_workspace_enabled` settings under `automation_settings` object in StackConfig schema. [See README](https://github.com/masterpointio/terraform-spacelift-automation?tab=readme-ov-file#what-goes-in-a-stack-config-file-eg-stacksdevyaml-stackscommonyaml-stackyaml-and-similar) for example of StackConfig schema. (#42)
+
+### Features
+
+* adds support for description as a templatestring ([#43](https://github.com/masterpointio/terraform-spacelift-automation/issues/43)) ([1bbb74f](https://github.com/masterpointio/terraform-spacelift-automation/commit/1bbb74f46ef92d643ec560a6aea2aaf3b7a62e02))
+* adds the runtime_overrides variable + tests ([#44](https://github.com/masterpointio/terraform-spacelift-automation/issues/44)) ([6030f94](https://github.com/masterpointio/terraform-spacelift-automation/commit/6030f94436a703b2d6a53851f95f9c4d74a00ddf))
+* feat: allow specifying `space_name` that maps to space_id #46
+* **schema:** adds initial JSON schema + StackConfig changes ([#42](https://github.com/masterpointio/terraform-spacelift-automation/issues/42)) ([f247b5e](https://github.com/masterpointio/terraform-spacelift-automation/commit/f247b5ee371f0c436f97b6a9f5a90bb83c802fec))
+
+
+### Bug Fixes
+
+* cron validator regex escape characters ([#45](https://github.com/masterpointio/terraform-spacelift-automation/issues/45)) ([81a386b](https://github.com/masterpointio/terraform-spacelift-automation/commit/81a386bf5eb20be7e28ee0fcd24d51d21113de55))
+* dont clobber static config with overrides ([#50](https://github.com/masterpointio/terraform-spacelift-automation/issues/50)) ([b352674](https://github.com/masterpointio/terraform-spacelift-automation/commit/b352674bbd53f03be798d256eb5ba541e4940709))
+* external space changed so update test data ([#51](https://github.com/masterpointio/terraform-spacelift-automation/issues/51)) ([569d8d4](https://github.com/masterpointio/terraform-spacelift-automation/commit/569d8d4ff438954cc546cbe5221d94fc19445037))
 ## [0.7.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.6.0...v0.7.0) (2025-01-09)
 
 

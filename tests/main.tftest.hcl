@@ -154,7 +154,7 @@ run "test_default_example_stack_final_values" {
 
   # space_id
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-automation-01JEC2D4K2Q2V1AJQ0Y6BFGJJ3"
+    condition = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
     error_message = "space_id was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
@@ -604,7 +604,7 @@ run "test_default_example_stack_partial_runtime_overrides" {
 
   # space_id
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-automation-01JEC2D4K2Q2V1AJQ0Y6BFGJJ3"
+    condition = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
     error_message = "space_id was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
@@ -841,7 +841,7 @@ run "test_space_name_resolves_to_correct_id" {
   command = plan
 
   assert {
-    condition     = local.resolved_space_ids["root-module-a-default-example"] == "mp-automation-01JEC2D4K2Q2V1AJQ0Y6BFGJJ3" # For the `masterpointio.app.spacelift.io`
+    condition     = local.resolved_space_ids["root-module-a-default-example"] == "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9" # For the `masterpointio.app.spacelift.io`
     error_message = "Space name not resolving to correct ID: ${jsonencode(local.resolved_space_ids)}"
   }
 }

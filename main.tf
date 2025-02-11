@@ -149,7 +149,6 @@ locals {
         "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
       content,
-      try(jsondecode(data.jsonschema_validator.runtime_overrides[module].validated), {}),
     ) if file != var.common_config_file
     }
   ]...)
@@ -312,8 +311,15 @@ module "deep" {
   source   = "cloudposse/config/yaml//modules/deepmerge"
   version  = "1.0.2"
   for_each = local._root_module_stack_configs
-  # Stack configuration will take precedence and overwrite the conflicting value from the common configuration (if any)
-  maps = [local._common_configs[each.value.root_module], each.value]
+
+  # Here is where some magic happens...
+  # The common config is the base config, it is overridden by the static StackConfig
+  # Runtime overrides are applied last (should be used sparingly), they overwrite all values for the Stack
+  maps = [
+    local._common_configs[each.value.root_module],
+    each.value,
+    try(jsondecode(data.jsonschema_validator.runtime_overrides[each.value.root_module].validated), {}),
+  ]
 
   # To support merging labels from common.yaml, we need lists to append instead of overwrite
   append_list_enabled = true

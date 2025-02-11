@@ -62,6 +62,12 @@ run "test_default_example_stack_final_values" {
     error_message = "after_plan was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
+  # after_run
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_run, "echo 'after_run'")
+    error_message = "after_run was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
   # autodeploy
   assert {
     condition = spacelift_stack.default["root-module-a-default-example"].autodeploy == false
@@ -228,6 +234,7 @@ run "test_default_example_stack_runtime_overrides" {
           after_init = ["echo 'changed_after_init'"]
           after_perform = ["echo 'changed_after_perform'"]
           after_plan = ["echo 'changed_after_plan'"]
+          after_run = ["echo 'changed_after_run'"]
           autodeploy = true
           autoretry = false
           before_apply = ["echo 'changed_before_apply'"]
@@ -303,6 +310,12 @@ run "test_default_example_stack_runtime_overrides" {
   assert {
     condition = contains(spacelift_stack.default["root-module-a-default-example"].after_plan, "echo 'changed_after_plan'")
     error_message = "after_plan override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+  }
+
+  # after_run
+  assert {
+    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_run, "echo 'changed_after_run'")
+    error_message = "after_run override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # autodeploy

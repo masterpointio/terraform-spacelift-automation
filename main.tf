@@ -329,6 +329,7 @@ resource "spacelift_stack" "default" {
   after_init                       = compact(concat(try(local.stack_configs[each.key].after_init, []), var.after_init))
   after_perform                    = compact(concat(try(local.stack_configs[each.key].after_perform, []), var.after_perform))
   after_plan                       = compact(concat(try(local.stack_configs[each.key].after_plan, []), var.after_plan))
+  after_run                        = compact(concat(try(local.stack_configs[each.key].after_run, []), var.after_run))
   autodeploy                       = coalesce(try(local.stack_configs[each.key].autodeploy, null), var.autodeploy)
   autoretry                        = try(local.stack_configs[each.key].autoretry, var.autoretry)
   before_apply                     = compact(coalesce(try(local.stack_configs[each.key].before_apply, []), var.before_apply))

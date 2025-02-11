@@ -7,6 +7,7 @@ stack_settings:
   after_init: [echo 'after_init']
   after_perform: [echo 'after_perform']
   after_plan: [echo 'after_plan']
+  after_run: [echo 'after_run']
   autodeploy: false
   autoretry: true
   before_apply: [echo 'before_apply']

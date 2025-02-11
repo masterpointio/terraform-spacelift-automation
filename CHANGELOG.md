@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.0.0...v1.1.0) (2025-02-11)
+
+
+### Features
+
+* add spacelift stack's `after_run` config, FINALLY hook ([#52](https://github.com/masterpointio/terraform-spacelift-automation/issues/52)) ([5ad3902](https://github.com/masterpointio/terraform-spacelift-automation/commit/5ad3902cd884648d9ef98c727fd36b707c692b26))
+
 ## [1.0.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.7.0...v1.0.0) (2025-02-04)
 
 

@@ -80,6 +80,13 @@
           },
           "description": "Commands to run after plan"
         },
+        "after_run": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Commands to run after run (aka `finally` hook)."
+        },
         "autodeploy": {
           "type": "boolean",
           "description": "Whether to automatically deploy changes"

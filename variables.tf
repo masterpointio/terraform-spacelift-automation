@@ -164,6 +164,12 @@ variable "after_plan" {
   default     = []
 }
 
+variable "after_run" {
+  type        = list(string)
+  description = "List of after-run (aka `finally` hook) scripts"
+  default     = []
+}
+
 variable "autodeploy" {
   type        = bool
   description = "Flag to enable/disable automatic deployment of the stack"

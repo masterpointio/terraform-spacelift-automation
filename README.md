@@ -269,6 +269,7 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 | <a name="input_after_init"></a> [after\_init](#input\_after\_init) | List of after-init scripts | `list(string)` | `[]` | no |
 | <a name="input_after_perform"></a> [after\_perform](#input\_after\_perform) | List of after-perform scripts | `list(string)` | `[]` | no |
 | <a name="input_after_plan"></a> [after\_plan](#input\_after\_plan) | List of after-plan scripts | `list(string)` | `[]` | no |
+| <a name="input_after_run"></a> [after\_run](#input\_after\_run) | List of after-run (aka `finally` hook) scripts | `list(string)` | `[]` | no |
 | <a name="input_all_root_modules_enabled"></a> [all\_root\_modules\_enabled](#input\_all\_root\_modules\_enabled) | When set to true, all subdirectories in root\_modules\_path will be treated as root modules. | `bool` | `false` | no |
 | <a name="input_autodeploy"></a> [autodeploy](#input\_autodeploy) | Flag to enable/disable automatic deployment of the stack | `bool` | `true` | no |
 | <a name="input_autoretry"></a> [autoretry](#input\_autoretry) | Flag to enable/disable automatic retry of the stack | `bool` | `false` | no |

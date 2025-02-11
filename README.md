@@ -239,7 +239,7 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 | Name | Version |
 |------|---------|
 | <a name="provider_jsonschema"></a> [jsonschema](#provider\_jsonschema) | 0.2.1 |
-| <a name="provider_spacelift"></a> [spacelift](#provider\_spacelift) | 1.19.0 |
+| <a name="provider_spacelift"></a> [spacelift](#provider\_spacelift) | 1.19.1 |
 
 ## Modules
 

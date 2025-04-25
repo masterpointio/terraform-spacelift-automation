@@ -12,3 +12,7 @@ whitespace: false
 # Ignore MD041/first-line-heading/first-line-h1
 # Error: First line in a file should be a top-level heading
 MD041: false
+
+# Ignore MD013/line-length
+# Error: Line length should be less than 120 characters
+MD013: false

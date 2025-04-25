@@ -1,6 +1,9 @@
 version: 0.20.0
 formatter: markdown table
 
+recursive:
+  enabled: false
+
 settings:
   lockfile: false
 

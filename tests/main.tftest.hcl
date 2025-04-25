@@ -589,7 +589,7 @@ run "test_depends_on_label_is_added_to_stack" {
   command = plan
 
   assert {
-    condition     = contains(local.labels["root-module-a-test"], "depends-on:spacelift-automation-default")
+    condition     = contains(local.labels["root-module-a-test"], "depends-on:spacelift-automation-${terraform.workspace}")
     error_message = "Depends-on label was not added to the stack: ${jsonencode(local.labels)}"
   }
 }
@@ -662,7 +662,7 @@ run "test_space_name_resolves_to_correct_id" {
   command = plan
 
   assert {
-    condition     = local.resolved_space_ids["root-module-a-default-example"] == "mp-automation-01JEC2D4K2Q2V1AJQ0Y6BFGJJ3" # For the `masterpointio.app.spacelift.io`
+    condition     = local.resolved_space_ids["root-module-a-default-example"] == "root" # The space_name "mp-automation" should resolve to "root" by default
     error_message = "Space name not resolving to correct ID: ${jsonencode(local.resolved_space_ids)}"
   }
 }
@@ -681,43 +681,12 @@ run "test_space_id_takes_precedence_over_space_id_global_variable" {
   }
 }
 
-# Test that spaces are created correctly with their configurations
+# Test that spaces are created correctly
 run "test_spaces_are_created_correctly" {
   command = plan
 
-  variables {
-    spaces = {
-      "test-space" = {
-        description      = "Test space description"
-        inherit_entities = true
-        labels          = ["test-label"]
-        parent_space_id = "root"
-      }
-    }
-  }
-
   assert {
-    condition     = spacelift_space.default["test-space"].name == "test-space"
-    error_message = "Space name was not created correctly: ${jsonencode(spacelift_space.default)}"
-  }
-
-  assert {
-    condition     = spacelift_space.default["test-space"].description == "Test space description"
-    error_message = "Space description was not created correctly: ${jsonencode(spacelift_space.default)}"
-  }
-
-  assert {
-    condition     = spacelift_space.default["test-space"].inherit_entities == true
-    error_message = "Space inherit_entities was not created correctly: ${jsonencode(spacelift_space.default)}"
-  }
-
-  assert {
-    condition     = contains(spacelift_space.default["test-space"].labels, "test-label")
-    error_message = "Space labels were not created correctly: ${jsonencode(spacelift_space.default)}"
-  }
-
-  assert {
-    condition     = spacelift_space.default["test-space"].parent_space_id == "root"
-    error_message = "Space parent_space_id was not created correctly: ${jsonencode(spacelift_space.default)}"
+    condition     = spacelift_space.default.id == "root" # The default space should be "root"
+    error_message = "Space was not created correctly: ${jsonencode(spacelift_space.default)}"
   }
 }

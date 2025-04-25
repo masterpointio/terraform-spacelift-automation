@@ -7,6 +7,7 @@ stack_settings:
   after_init: [echo 'after_init']
   after_perform: [echo 'after_perform']
   after_plan: [echo 'after_plan']
+  after_run: [echo 'after_run']
   autodeploy: false
   autoretry: true
   before_apply: [echo 'before_apply']
@@ -22,7 +23,7 @@ stack_settings:
   manage_state: true
   protect_from_deletion: true
   runner_image: masterpointio/spacelift-runner:latest
-  space_name: mp-automation # Tests space_name gets translated to space_id (the Terraform resource attribute that is accepted)
+  space_name: mp-aws-automation # Tests space_name gets translated to space_id (the Terraform resource attribute that is accepted)
   terraform_smart_sanitization: true
   terraform_version: 1.9.0
   worker_pool_id: "1234567890"

@@ -149,7 +149,6 @@ locals {
         "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
       content,
-      try(jsondecode(data.jsonschema_validator.runtime_overrides[module].validated), {}),
     ) if file != var.common_config_file
     }
   ]...)
@@ -312,8 +311,15 @@ module "deep" {
   source   = "cloudposse/config/yaml//modules/deepmerge"
   version  = "1.0.2"
   for_each = local._root_module_stack_configs
-  # Stack configuration will take precedence and overwrite the conflicting value from the common configuration (if any)
-  maps = [local._common_configs[each.value.root_module], each.value]
+
+  # Here is where some magic happens...
+  # The common config is the base config, it is overridden by the static StackConfig
+  # Runtime overrides are applied last (should be used sparingly), they overwrite all values for the Stack
+  maps = [
+    local._common_configs[each.value.root_module],
+    each.value,
+    try(jsondecode(data.jsonschema_validator.runtime_overrides[each.value.root_module].validated), {}),
+  ]
 
   # To support merging labels from common.yaml, we need lists to append instead of overwrite
   append_list_enabled = true
@@ -329,6 +335,7 @@ resource "spacelift_stack" "default" {
   after_init                       = compact(concat(try(local.stack_configs[each.key].after_init, []), var.after_init))
   after_perform                    = compact(concat(try(local.stack_configs[each.key].after_perform, []), var.after_perform))
   after_plan                       = compact(concat(try(local.stack_configs[each.key].after_plan, []), var.after_plan))
+  after_run                        = compact(concat(try(local.stack_configs[each.key].after_run, []), var.after_run))
   autodeploy                       = coalesce(try(local.stack_configs[each.key].autodeploy, null), var.autodeploy)
   autoretry                        = try(local.stack_configs[each.key].autoretry, var.autoretry)
   before_apply                     = compact(coalesce(try(local.stack_configs[each.key].before_apply, []), var.before_apply))

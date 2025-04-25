@@ -680,3 +680,44 @@ run "test_space_id_takes_precedence_over_space_id_global_variable" {
     error_message = "Space ID from stack settings not taking precedence over global variable space ID: ${jsonencode(local.resolved_space_ids)}"
   }
 }
+
+# Test that spaces are created correctly with their configurations
+run "test_spaces_are_created_correctly" {
+  command = plan
+
+  variables {
+    spaces = {
+      "test-space" = {
+        description      = "Test space description"
+        inherit_entities = true
+        labels          = ["test-label"]
+        parent_space_id = "root"
+      }
+    }
+  }
+
+  assert {
+    condition     = spacelift_space.default["test-space"].name == "test-space"
+    error_message = "Space name was not created correctly: ${jsonencode(spacelift_space.default)}"
+  }
+
+  assert {
+    condition     = spacelift_space.default["test-space"].description == "Test space description"
+    error_message = "Space description was not created correctly: ${jsonencode(spacelift_space.default)}"
+  }
+
+  assert {
+    condition     = spacelift_space.default["test-space"].inherit_entities == true
+    error_message = "Space inherit_entities was not created correctly: ${jsonencode(spacelift_space.default)}"
+  }
+
+  assert {
+    condition     = contains(spacelift_space.default["test-space"].labels, "test-label")
+    error_message = "Space labels were not created correctly: ${jsonencode(spacelift_space.default)}"
+  }
+
+  assert {
+    condition     = spacelift_space.default["test-space"].parent_space_id == "root"
+    error_message = "Space parent_space_id was not created correctly: ${jsonencode(spacelift_space.default)}"
+  }
+}

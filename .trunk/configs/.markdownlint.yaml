@@ -14,5 +14,6 @@ whitespace: false
 MD041: false
 
 # Ignore MD013/line-length
-# Error: Line length should be less than 120 characters
-MD013: false
+MD013:
+  strict: false
+  line_length: 350

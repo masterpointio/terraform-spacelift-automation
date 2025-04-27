@@ -22,199 +22,199 @@ run "test_default_example_stack_final_values" {
 
   # administrative
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].administrative == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].administrative == true
     error_message = "Administrative was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # additional_project_globs
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].additional_project_globs, "glob/*")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].additional_project_globs, "glob/*")
     error_message = "additional_project_globs was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_apply
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_apply, "echo 'after_apply'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_apply, "echo 'after_apply'")
     error_message = "after_apply was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_destroy
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_destroy, "echo 'after_destroy'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_destroy, "echo 'after_destroy'")
     error_message = "after_destroy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_init
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_init, "echo 'after_init'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_init, "echo 'after_init'")
     error_message = "after_init was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_perform
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_perform, "echo 'after_perform'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_perform, "echo 'after_perform'")
     error_message = "after_perform was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_plan
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_plan, "echo 'after_plan'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_plan, "echo 'after_plan'")
     error_message = "after_plan was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_run
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_run, "echo 'after_run'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_run, "echo 'after_run'")
     error_message = "after_run was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # autodeploy
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].autodeploy == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].autodeploy == false
     error_message = "autodeploy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # autoretry
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].autoretry == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].autoretry == true
     error_message = "autoretry was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_apply
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_apply, "echo 'before_apply'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_apply, "echo 'before_apply'")
     error_message = "before_apply was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_destroy
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_destroy, "echo 'before_destroy'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_destroy, "echo 'before_destroy'")
     error_message = "before_destroy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_init
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_init, "echo 'before_init'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_init, "echo 'before_init'")
     error_message = "before_init was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_perform
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_perform, "echo 'before_perform'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_perform, "echo 'before_perform'")
     error_message = "before_perform was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_plan
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_plan, "echo 'before_plan'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_plan, "echo 'before_plan'")
     error_message = "before_plan was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # branch
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].branch == "prod"
+    condition     = spacelift_stack.default["root-module-a-default-example"].branch == "prod"
     error_message = "branch was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # description
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].description == "This is a test of the emergency broadcast system"
+    condition     = spacelift_stack.default["root-module-a-default-example"].description == "This is a test of the emergency broadcast system"
     error_message = "description was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # enable_local_preview
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].enable_local_preview == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].enable_local_preview == true
     error_message = "enable_local_preview was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # enable_well_known_secret_masking
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].enable_well_known_secret_masking == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].enable_well_known_secret_masking == false
     error_message = "enable_well_known_secret_masking was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # github_action_deploy
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == false
     error_message = "github_action_deploy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # manage_state
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].manage_state == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].manage_state == true
     error_message = "manage_state was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # protect_from_deletion
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].protect_from_deletion == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].protect_from_deletion == true
     error_message = "protect_from_deletion was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # runner_image
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].runner_image == "masterpointio/spacelift-runner:latest"
+    condition     = spacelift_stack.default["root-module-a-default-example"].runner_image == "masterpointio/spacelift-runner:latest"
     error_message = "runner_image was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # space_id
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
+    condition     = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
     error_message = "space_id was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # terraform_smart_sanitization
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].terraform_smart_sanitization == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].terraform_smart_sanitization == true
     error_message = "terraform_smart_sanitization was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # terraform_version
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].terraform_version == "1.9.0"
+    condition     = spacelift_stack.default["root-module-a-default-example"].terraform_version == "1.9.0"
     error_message = "Terraform version was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # worker_pool_id
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].worker_pool_id == "1234567890"
+    condition     = spacelift_stack.default["root-module-a-default-example"].worker_pool_id == "1234567890"
     error_message = "worker_pool_id was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # destructor_enabled
   assert {
-    condition = spacelift_stack_destructor.default["root-module-a-default-example"].deactivated == false
+    condition     = spacelift_stack_destructor.default["root-module-a-default-example"].deactivated == false
     error_message = "destructor_enabled was not correct on the default-example stack: ${jsonencode(spacelift_stack_destructor.default["root-module-a-default-example"])}"
   }
 
   # aws_integration_id
   assert {
-    condition = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "1234567890"
+    condition     = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "1234567890"
     error_message = "aws_integration_id was not correct on the default-example stack: ${jsonencode(spacelift_aws_integration_attachment.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_ignore_state
   assert {
-    condition = spacelift_drift_detection.default["root-module-a-default-example"].ignore_state == true
+    condition     = spacelift_drift_detection.default["root-module-a-default-example"].ignore_state == true
     error_message = "drift_detection_ignore_state was not correct on the default-example stack: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_reconcile
   assert {
-    condition = spacelift_drift_detection.default["root-module-a-default-example"].reconcile == true
+    condition     = spacelift_drift_detection.default["root-module-a-default-example"].reconcile == true
     error_message = "drift_detection_reconcile was not correct on the default-example stack: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_schedule
   assert {
-    condition = contains(spacelift_drift_detection.default["root-module-a-default-example"].schedule, "0 0 * * *")
+    condition     = contains(spacelift_drift_detection.default["root-module-a-default-example"].schedule, "0 0 * * *")
     error_message = "drift_detection_schedule was not correct on the default-example stack: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_timezone
   assert {
-    condition = spacelift_drift_detection.default["root-module-a-default-example"].timezone == "America/Denver"
+    condition     = spacelift_drift_detection.default["root-module-a-default-example"].timezone == "America/Denver"
     error_message = "drift_detection_timezone was not correct on the default-example stack: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 }
@@ -227,44 +227,44 @@ run "test_default_example_stack_runtime_overrides" {
     runtime_overrides = {
       root-module-a = {
         stack_settings = {
-          administrative = false
-          additional_project_globs = ["changed/*"]
-          after_apply = ["echo 'changed_after_apply'"]
-          after_destroy = ["echo 'changed_after_destroy'"]
-          after_init = ["echo 'changed_after_init'"]
-          after_perform = ["echo 'changed_after_perform'"]
-          after_plan = ["echo 'changed_after_plan'"]
-          after_run = ["echo 'changed_after_run'"]
-          autodeploy = true
-          autoretry = false
-          before_apply = ["echo 'changed_before_apply'"]
-          before_destroy = ["echo 'changed_before_destroy'"]
-          before_init = ["echo 'changed_before_init'"]
-          before_perform = ["echo 'changed_before_perform'"]
-          before_plan = ["echo 'changed_before_plan'"]
-          branch = "dev"
-          description = "This is a changed test of the emergency broadcast system"
-          enable_local_preview = false
+          administrative                   = false
+          additional_project_globs         = ["changed/*"]
+          after_apply                      = ["echo 'changed_after_apply'"]
+          after_destroy                    = ["echo 'changed_after_destroy'"]
+          after_init                       = ["echo 'changed_after_init'"]
+          after_perform                    = ["echo 'changed_after_perform'"]
+          after_plan                       = ["echo 'changed_after_plan'"]
+          after_run                        = ["echo 'changed_after_run'"]
+          autodeploy                       = true
+          autoretry                        = false
+          before_apply                     = ["echo 'changed_before_apply'"]
+          before_destroy                   = ["echo 'changed_before_destroy'"]
+          before_init                      = ["echo 'changed_before_init'"]
+          before_perform                   = ["echo 'changed_before_perform'"]
+          before_plan                      = ["echo 'changed_before_plan'"]
+          branch                           = "dev"
+          description                      = "This is a changed test of the emergency broadcast system"
+          enable_local_preview             = false
           enable_well_known_secret_masking = true
-          github_action_deploy = true
-          manage_state = false
-          protect_from_deletion = false
-          runner_image = "masterpointio/spacelift-runner:dev"
-          space_id = "555"
-          terraform_smart_sanitization = false
-          terraform_version = "1.9.1"
-          worker_pool_id = "555"
+          github_action_deploy             = true
+          manage_state                     = false
+          protect_from_deletion            = false
+          runner_image                     = "masterpointio/spacelift-runner:dev"
+          space_id                         = "555"
+          terraform_smart_sanitization     = false
+          terraform_version                = "1.9.1"
+          worker_pool_id                   = "555"
 
           destructor_enabled = false
 
           aws_integration_enabled = true
-          aws_integration_id = "999"
+          aws_integration_id      = "999"
 
-          drift_detection_enabled = true
+          drift_detection_enabled      = true
           drift_detection_ignore_state = false
-          drift_detection_reconcile = false
-          drift_detection_schedule = ["0 7 * * *"]
-          drift_detection_timezone = "America/Denver"
+          drift_detection_reconcile    = false
+          drift_detection_schedule     = ["0 7 * * *"]
+          drift_detection_timezone     = "America/Denver"
         }
       }
     }
@@ -272,199 +272,199 @@ run "test_default_example_stack_runtime_overrides" {
 
   # administrative
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].administrative == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].administrative == false
     error_message = "Administrative override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # additional_project_globs
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].additional_project_globs, "changed/*")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].additional_project_globs, "changed/*")
     error_message = "additional_project_globs override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_apply
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_apply, "echo 'changed_after_apply'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_apply, "echo 'changed_after_apply'")
     error_message = "after_apply override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_destroy
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_destroy, "echo 'changed_after_destroy'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_destroy, "echo 'changed_after_destroy'")
     error_message = "after_destroy override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_init
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_init, "echo 'changed_after_init'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_init, "echo 'changed_after_init'")
     error_message = "after_init override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_perform
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_perform, "echo 'changed_after_perform'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_perform, "echo 'changed_after_perform'")
     error_message = "after_perform override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_plan
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_plan, "echo 'changed_after_plan'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_plan, "echo 'changed_after_plan'")
     error_message = "after_plan override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_run
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_run, "echo 'changed_after_run'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_run, "echo 'changed_after_run'")
     error_message = "after_run override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # autodeploy
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].autodeploy == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].autodeploy == true
     error_message = "autodeploy override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # autoretry
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].autoretry == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].autoretry == false
     error_message = "autoretry override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_apply
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_apply, "echo 'changed_before_apply'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_apply, "echo 'changed_before_apply'")
     error_message = "before_apply override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_destroy
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_destroy, "echo 'changed_before_destroy'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_destroy, "echo 'changed_before_destroy'")
     error_message = "before_destroy override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_init
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_init, "echo 'changed_before_init'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_init, "echo 'changed_before_init'")
     error_message = "before_init override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_perform
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_perform, "echo 'changed_before_perform'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_perform, "echo 'changed_before_perform'")
     error_message = "before_perform override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_plan
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_plan, "echo 'changed_before_plan'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_plan, "echo 'changed_before_plan'")
     error_message = "before_plan override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # branch
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].branch == "dev"
+    condition     = spacelift_stack.default["root-module-a-default-example"].branch == "dev"
     error_message = "branch override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # description
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].description == "This is a changed test of the emergency broadcast system"
+    condition     = spacelift_stack.default["root-module-a-default-example"].description == "This is a changed test of the emergency broadcast system"
     error_message = "description override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # enable_local_preview
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].enable_local_preview == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].enable_local_preview == false
     error_message = "enable_local_preview override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # enable_well_known_secret_masking
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].enable_well_known_secret_masking == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].enable_well_known_secret_masking == true
     error_message = "enable_well_known_secret_masking override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # github_action_deploy
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == true
     error_message = "github_action_deploy override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # manage_state
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].manage_state == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].manage_state == false
     error_message = "manage_state override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # protect_from_deletion
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].protect_from_deletion == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].protect_from_deletion == false
     error_message = "protect_from_deletion override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # runner_image
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].runner_image == "masterpointio/spacelift-runner:dev"
+    condition     = spacelift_stack.default["root-module-a-default-example"].runner_image == "masterpointio/spacelift-runner:dev"
     error_message = "runner_image override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # space_id
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].space_id == "555"
+    condition     = spacelift_stack.default["root-module-a-default-example"].space_id == "555"
     error_message = "space_id override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # terraform_smart_sanitization
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].terraform_smart_sanitization == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].terraform_smart_sanitization == false
     error_message = "terraform_smart_sanitization override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # terraform_version
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].terraform_version == "1.9.1"
+    condition     = spacelift_stack.default["root-module-a-default-example"].terraform_version == "1.9.1"
     error_message = "terraform_version override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # worker_pool_id
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].worker_pool_id == "555"
+    condition     = spacelift_stack.default["root-module-a-default-example"].worker_pool_id == "555"
     error_message = "worker_pool_id override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # destructor_enabled
   assert {
-    condition = spacelift_stack_destructor.default["root-module-a-default-example"].deactivated == true
+    condition     = spacelift_stack_destructor.default["root-module-a-default-example"].deactivated == true
     error_message = "destructor_enabled override was not applied correctly: ${jsonencode(spacelift_stack_destructor.default["root-module-a-default-example"])}"
   }
 
   # aws_integration_id
   assert {
-    condition = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "999"
+    condition     = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "999"
     error_message = "aws_integration_id override was not applied correctly: ${jsonencode(spacelift_aws_integration_attachment.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_ignore_state
   assert {
-    condition = spacelift_drift_detection.default["root-module-a-default-example"].ignore_state == false
+    condition     = spacelift_drift_detection.default["root-module-a-default-example"].ignore_state == false
     error_message = "drift_detection_ignore_state override was not applied correctly: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_reconcile
   assert {
-    condition = spacelift_drift_detection.default["root-module-a-default-example"].reconcile == false
+    condition     = spacelift_drift_detection.default["root-module-a-default-example"].reconcile == false
     error_message = "drift_detection_reconcile override was not applied correctly: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_schedule
   assert {
-    condition = contains(spacelift_drift_detection.default["root-module-a-default-example"].schedule, "0 7 * * *")
+    condition     = contains(spacelift_drift_detection.default["root-module-a-default-example"].schedule, "0 7 * * *")
     error_message = "drift_detection_schedule override was not applied correctly: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_timezone
   assert {
-    condition = spacelift_drift_detection.default["root-module-a-default-example"].timezone == "America/Denver"
+    condition     = spacelift_drift_detection.default["root-module-a-default-example"].timezone == "America/Denver"
     error_message = "drift_detection_timezone override was not applied correctly: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 }
@@ -485,193 +485,193 @@ run "test_default_example_stack_partial_runtime_overrides" {
 
   # administrative is overridden by the runtime override
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].administrative == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].administrative == false
     error_message = "Administrative is true because it's an override: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # additional_project_globs
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].additional_project_globs, "glob/*")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].additional_project_globs, "glob/*")
     error_message = "additional_project_globs was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_apply
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_apply, "echo 'after_apply'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_apply, "echo 'after_apply'")
     error_message = "after_apply was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_destroy
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_destroy, "echo 'after_destroy'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_destroy, "echo 'after_destroy'")
     error_message = "after_destroy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_init
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_init, "echo 'after_init'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_init, "echo 'after_init'")
     error_message = "after_init was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_perform
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_perform, "echo 'after_perform'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_perform, "echo 'after_perform'")
     error_message = "after_perform was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # after_plan
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].after_plan, "echo 'after_plan'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_plan, "echo 'after_plan'")
     error_message = "after_plan was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # autodeploy
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].autodeploy == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].autodeploy == false
     error_message = "autodeploy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # autoretry
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].autoretry == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].autoretry == true
     error_message = "autoretry was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_apply
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_apply, "echo 'before_apply'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_apply, "echo 'before_apply'")
     error_message = "before_apply was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_destroy
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_destroy, "echo 'before_destroy'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_destroy, "echo 'before_destroy'")
     error_message = "before_destroy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_init
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_init, "echo 'before_init'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_init, "echo 'before_init'")
     error_message = "before_init was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_perform
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_perform, "echo 'before_perform'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_perform, "echo 'before_perform'")
     error_message = "before_perform was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # before_plan
   assert {
-    condition = contains(spacelift_stack.default["root-module-a-default-example"].before_plan, "echo 'before_plan'")
+    condition     = contains(spacelift_stack.default["root-module-a-default-example"].before_plan, "echo 'before_plan'")
     error_message = "before_plan was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # branch
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].branch == "prod"
+    condition     = spacelift_stack.default["root-module-a-default-example"].branch == "prod"
     error_message = "branch was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # description
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].description == "This is a test of the emergency broadcast system"
+    condition     = spacelift_stack.default["root-module-a-default-example"].description == "This is a test of the emergency broadcast system"
     error_message = "description was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # enable_local_preview
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].enable_local_preview == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].enable_local_preview == true
     error_message = "enable_local_preview was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # enable_well_known_secret_masking
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].enable_well_known_secret_masking == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].enable_well_known_secret_masking == false
     error_message = "enable_well_known_secret_masking was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # github_action_deploy
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == false
+    condition     = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == false
     error_message = "github_action_deploy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # manage_state
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].manage_state == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].manage_state == true
     error_message = "manage_state was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # protect_from_deletion
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].protect_from_deletion == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].protect_from_deletion == true
     error_message = "protect_from_deletion was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # runner_image
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].runner_image == "masterpointio/spacelift-runner:latest"
+    condition     = spacelift_stack.default["root-module-a-default-example"].runner_image == "masterpointio/spacelift-runner:latest"
     error_message = "runner_image was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # space_id
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
+    condition     = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
     error_message = "space_id was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # terraform_smart_sanitization
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].terraform_smart_sanitization == true
+    condition     = spacelift_stack.default["root-module-a-default-example"].terraform_smart_sanitization == true
     error_message = "terraform_smart_sanitization was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # terraform_version
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].terraform_version == "1.9.0"
+    condition     = spacelift_stack.default["root-module-a-default-example"].terraform_version == "1.9.0"
     error_message = "Terraform version was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # worker_pool_id
   assert {
-    condition = spacelift_stack.default["root-module-a-default-example"].worker_pool_id == "1234567890"
+    condition     = spacelift_stack.default["root-module-a-default-example"].worker_pool_id == "1234567890"
     error_message = "worker_pool_id was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # destructor_enabled
   assert {
-    condition = spacelift_stack_destructor.default["root-module-a-default-example"].deactivated == false
+    condition     = spacelift_stack_destructor.default["root-module-a-default-example"].deactivated == false
     error_message = "destructor_enabled was not correct on the default-example stack: ${jsonencode(spacelift_stack_destructor.default["root-module-a-default-example"])}"
   }
 
   # aws_integration_id
   assert {
-    condition = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "1234567890"
+    condition     = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "1234567890"
     error_message = "aws_integration_id was not correct on the default-example stack: ${jsonencode(spacelift_aws_integration_attachment.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_ignore_state
   assert {
-    condition = spacelift_drift_detection.default["root-module-a-default-example"].ignore_state == true
+    condition     = spacelift_drift_detection.default["root-module-a-default-example"].ignore_state == true
     error_message = "drift_detection_ignore_state was not correct on the default-example stack: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_reconcile
   assert {
-    condition = spacelift_drift_detection.default["root-module-a-default-example"].reconcile == true
+    condition     = spacelift_drift_detection.default["root-module-a-default-example"].reconcile == true
     error_message = "drift_detection_reconcile was not correct on the default-example stack: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_schedule
   assert {
-    condition = contains(spacelift_drift_detection.default["root-module-a-default-example"].schedule, "0 0 * * *")
+    condition     = contains(spacelift_drift_detection.default["root-module-a-default-example"].schedule, "0 0 * * *")
     error_message = "drift_detection_schedule was not correct on the default-example stack: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 
   # drift_detection_timezone
   assert {
-    condition = spacelift_drift_detection.default["root-module-a-default-example"].timezone == "America/Denver"
+    condition     = spacelift_drift_detection.default["root-module-a-default-example"].timezone == "America/Denver"
     error_message = "drift_detection_timezone was not correct on the default-example stack: ${jsonencode(spacelift_drift_detection.default["root-module-a-default-example"])}"
   }
 }
@@ -882,8 +882,8 @@ run "test_spaces_are_created_with_required_attributes" {
       "test-space" = {
         description      = "Test space description"
         inherit_entities = true
-        labels          = ["test-label"]
-        parent_space_id = "root"
+        labels           = ["test-label"]
+        parent_space_id  = "root"
       }
     }
   }
@@ -923,8 +923,8 @@ run "test_spaces_with_minimal_configuration" {
       "minimal-space" = {
         description      = "Minimal space"
         inherit_entities = false
-        labels          = []
-        parent_space_id = "root"
+        labels           = []
+        parent_space_id  = "root"
       }
     }
   }
@@ -940,7 +940,7 @@ run "test_spaces_with_minimal_configuration" {
   }
 
   assert {
-    condition     = length(spacelift_space.default["minimal-space"].labels) == 0
+    condition     = length(coalesce(spacelift_space.default["minimal-space"].labels, [])) == 0
     error_message = "Minimal space labels were not created correctly: ${jsonencode(spacelift_space.default)}"
   }
 }
@@ -954,16 +954,14 @@ run "test_spaces_with_multiple_labels" {
       "multi-label-space" = {
         description      = "Space with multiple labels"
         inherit_entities = true
-        labels          = ["label1", "label2", "label3"]
-        parent_space_id = "root"
+        labels           = ["label1", "label2", "label3"]
+        parent_space_id  = "root"
       }
     }
   }
 
   assert {
-    condition     = contains(spacelift_space.default["multi-label-space"].labels, "label1") &&
-                   contains(spacelift_space.default["multi-label-space"].labels, "label2") &&
-                   contains(spacelift_space.default["multi-label-space"].labels, "label3")
+    condition     = alltrue([for label in ["label1", "label2", "label3"] : contains(spacelift_space.default["multi-label-space"].labels, label)])
     error_message = "Space with multiple labels was not created correctly: ${jsonencode(spacelift_space.default)}"
   }
 }
@@ -977,8 +975,8 @@ run "test_spaces_with_different_parents" {
       "child-space" = {
         description      = "Child space"
         inherit_entities = true
-        labels          = []
-        parent_space_id = "test-space"
+        labels           = []
+        parent_space_id  = "test-space"
       }
     }
   }

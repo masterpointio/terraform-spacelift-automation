@@ -344,3 +344,14 @@ variable "worker_pool_id" {
   EOT
   default     = null
 }
+
+variable "spaces" {
+  description = "A map of Spacelift Spaces to create"
+  type = map(object({
+    description      = optional(string, null)
+    inherit_entities = optional(bool, false)
+    labels           = optional(list(string), null)
+    parent_space_id  = optional(string, "root")
+  }))
+  default = {}
+}

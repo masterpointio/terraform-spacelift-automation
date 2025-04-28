@@ -1,21 +1,37 @@
 {
   "extends": [
-    "config:recommended",
-    "github>aquaproj/aqua-renovate-config#2.6.0"
+    "config:best-practices",
+    "github>aquaproj/aqua-renovate-config#2.7.5"
   ],
-  // Schedule once a month on the first day of the month before 4 AM.
-  "schedule": ["* 0-3 1 * *"],
-  "baseBranches": ["main", "master"],
-  "labels": ["auto-upgrade"],
+  "schedule": [
+    "after 9am on the first day of the month"
+  ],
+  "assigneesFromCodeOwners": true,
   "dependencyDashboardAutoclose": true,
-  "packageRules": [{
-      // Allow auto merge if it's not a major version update
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "automerge": true
-  }],
+  "addLabels": [
+    "auto-upgrade"
+  ],
+  "enabledManagers": [
+    "terraform"
+  ],
   "terraform": {
     "ignorePaths": [
-      "**/context.tf",
+      "**/context.tf" // Mixin file https://github.com/cloudposse/terraform-null-label/blob/main/exports/context.tf
     ]
   },
+  "packageRules": [
+    {
+      "matchDepTypes": [
+        "optionalDependencies"
+      ],
+      // Allow auto merge if it's not a major version update
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "automerge": true
+    }
+  ]
 }

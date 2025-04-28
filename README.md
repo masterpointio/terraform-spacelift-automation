@@ -1,10 +1,16 @@
-# `spacelift-automation`
+[![Banner][banner-image]](https://masterpoint.io/)
 
-[![Release](https://img.shields.io/github/release/masterpointio/terraform-spacelift-automation.svg)](https://github.com/masterpointio/terraform-spacelift-automation/releases/latest)
+# spacelift-automation
+
+[![Release][release-badge]][latest-release]
+
+💡 Learn more about Masterpoint [below](#who-we-are-𐦂𖨆𐀪𖠋).
+
+## Purpose and Functionality
 
 This Terraform child module provides infrastructure automation for projects in [Spacelift](https://docs.spacelift.io/).
 
-## Overview
+### Overview
 
 This `spacelift-automation` child module is designed to streamline the deployment and management of all Spacelift infrastructure, including creating a Spacelift Stack to manage itself.
 
@@ -225,7 +231,7 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-<!-- BEGIN_TF_DOCS -->
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
 | Name | Version |
@@ -238,8 +244,8 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 
 | Name | Version |
 |------|---------|
-| <a name="provider_jsonschema"></a> [jsonschema](#provider\_jsonschema) | 0.2.1 |
-| <a name="provider_spacelift"></a> [spacelift](#provider\_spacelift) | 1.19.1 |
+| <a name="provider_jsonschema"></a> [jsonschema](#provider\_jsonschema) | >= 0.2.1 |
+| <a name="provider_spacelift"></a> [spacelift](#provider\_spacelift) | >= 1.14 |
 
 ## Modules
 
@@ -253,6 +259,7 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 |------|------|
 | [spacelift_aws_integration_attachment.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/aws_integration_attachment) | resource |
 | [spacelift_drift_detection.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/drift_detection) | resource |
+| [spacelift_space.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/space) | resource |
 | [spacelift_stack.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack) | resource |
 | [spacelift_stack_destructor.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack_destructor) | resource |
 | [jsonschema_validator.runtime_overrides](https://registry.terraform.io/providers/bpedman/jsonschema/latest/docs/data-sources/validator) | data source |
@@ -307,6 +314,7 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 | <a name="input_runtime_overrides"></a> [runtime\_overrides](#input\_runtime\_overrides) | Runtime overrides that are merged into the stack config.<br/>  This allows for per-root-module overrides of the stack resources at runtime<br/>  so you have more flexibility beyond the variable defaults and the static stack config files.<br/>  Keys are the root module names and values match the StackConfig schema.<br/>  See `stack-config.schema.json` for full details on the schema and<br/>  `tests/fixtures/multi-instance/root-module-a/stacks/default-example.yaml` for a complete example. | `any` | `{}` | no |
 | <a name="input_space_id"></a> [space\_id](#input\_space\_id) | Place the created stacks in the specified space\_id. Mutually exclusive with space\_name. | `string` | `null` | no |
 | <a name="input_space_name"></a> [space\_name](#input\_space\_name) | Place the created stacks in the specified space\_name. Mutually exclusive with space\_id. | `string` | `null` | no |
+| <a name="input_spaces"></a> [spaces](#input\_spaces) | A map of Spacelift Spaces to create | <pre>map(object({<br/>    description      = optional(string, null)<br/>    inherit_entities = optional(bool, false)<br/>    labels           = optional(list(string), null)<br/>    parent_space_id  = optional(string, "root")<br/>  }))</pre> | `{}` | no |
 | <a name="input_terraform_smart_sanitization"></a> [terraform\_smart\_sanitization](#input\_terraform\_smart\_sanitization) | Indicates whether runs on this will use terraform's sensitive value system to sanitize<br/>the outputs of Terraform state and plans in spacelift instead of sanitizing all fields. | `bool` | `false` | no |
 | <a name="input_terraform_version"></a> [terraform\_version](#input\_terraform\_version) | Terraform version to use. | `string` | `"1.7.2"` | no |
 | <a name="input_terraform_workflow_tool"></a> [terraform\_workflow\_tool](#input\_terraform\_workflow\_tool) | Defines the tool that will be used to execute the workflow.<br/>This can be one of OPEN\_TOFU, TERRAFORM\_FOSS or CUSTOM. | `string` | `"OPEN_TOFU"` | no |
@@ -317,22 +325,69 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 | Name | Description |
 |------|-------------|
 | <a name="output_spacelift_stacks"></a> [spacelift\_stacks](#output\_spacelift\_stacks) | A map of Spacelift stacks with selected attributes.<br/>To reduce the risk of accidentally exporting sensitive data, only a subset of attributes is exported. |
-<!-- END_TF_DOCS -->
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
 
-## Contributing
+## Built By
+
+Powered by the [Masterpoint team](https://masterpoint.io/who-we-are/) and driven forward by contributions from the community ❤️
+
+[![Contributors][contributors-image]][contributors-url]
+
+## Contribution Guidelines
 
 Contributions are welcome and appreciated!
 
-Found an issue or want to request a feature? [Open an issue](https://github.com/masterpointio/terraform-spacelift-automation/issues/new)
+Found an issue or want to request a feature? [Open an issue][issues-url]
 
-Want to fix a bug you found or add some functionality?
-Fork, clone, commit, push, and PR and we'll check it out.
+Want to fix a bug you found or add some functionality? Fork, clone, commit, push, and PR — we'll check it out.
 
-If you have any issues or are waiting a long time for a PR to get merged then
-feel free to ping us at [hello@masterpoint.io](mailto:hello@masterpoint.io).
+## Who We Are 𐦂𖨆𐀪𖠋
 
-## Built By
+Established in 2016, Masterpoint is a team of experienced software and platform engineers specializing in Infrastructure as Code (IaC). We provide expert guidance to organizations of all sizes, helping them leverage the latest IaC practices to accelerate their engineering teams.
 
-[![Masterpoint Logo](https://i.imgur.com/RDLnuQO.png)](https://masterpoint.io)
+### Our Mission
+
+Our mission is to simplify cloud infrastructure so developers can innovate faster, safer, and with greater confidence. By open-sourcing tools and modules that we use internally, we aim to contribute back to the community, promoting consistency, quality, and security.
+
+### Our Commitments
+
+- 🌟 **Open Source**: We live and breathe open source, contributing to and maintaining hundreds of projects across multiple organizations.
+- 🌎 **1% for the Planet**: Demonstrating our commitment to environmental sustainability, we are proud members of [1% for the Planet](https://www.onepercentfortheplanet.org), pledging to donate 1% of our annual sales to environmental nonprofits.
+- 🇺🇦 **1% Towards Ukraine**: With team members and friends affected by the ongoing [Russo-Ukrainian war](https://en.wikipedia.org/wiki/Russo-Ukrainian_War), we donate 1% of our annual revenue to invasion relief efforts, supporting organizations providing aid to those in need. [Here's how you can help Ukraine with just a few clicks](https://masterpoint.io/updates/supporting-ukraine/).
+
+## Connect With Us
+
+We're active members of the community and are always publishing content, giving talks, and sharing our hard earned expertise. Here are a few ways you can see what we're up to:
+
+[![LinkedIn][linkedin-badge]][linkedin-url] [![Newsletter][newsletter-badge]][newsletter-url] [![Blog][blog-badge]][blog-url] [![YouTube][youtube-badge]][youtube-url]
+
+... and be sure to connect with our founder, [Matt Gowie](https://www.linkedin.com/in/gowiem/).
+
+## License
+
+[Apache License, Version 2.0][license-url].
+
+[![Open Source Initiative][osi-image]][license-url]
+
+Copyright © 2016-2025 [Masterpoint Consulting LLC](https://masterpoint.io/)
+
+<!-- MARKDOWN LINKS & IMAGES -->
+
+[banner-image]: https://masterpoint-public.s3.us-west-2.amazonaws.com/v2/standard-long-fullcolor.png
+[license-url]: https://opensource.org/license/apache-2-0
+[osi-image]: https://i0.wp.com/opensource.org/wp-content/uploads/2023/03/cropped-OSI-horizontal-large.png?fit=250%2C229&ssl=1
+[linkedin-badge]: https://img.shields.io/badge/LinkedIn-Follow-0A66C2?style=for-the-badge&logoColor=white
+[linkedin-url]: https://www.linkedin.com/company/masterpoint-consulting
+[blog-badge]: https://img.shields.io/badge/Blog-IaC_Insights-55C1B4?style=for-the-badge&logoColor=white
+[blog-url]: https://masterpoint.io/updates/
+[newsletter-badge]: https://img.shields.io/badge/Newsletter-Subscribe-ECE295?style=for-the-badge&logoColor=222222
+[newsletter-url]: https://newsletter.masterpoint.io/
+[youtube-badge]: https://img.shields.io/badge/YouTube-Subscribe-D191BF?style=for-the-badge&logo=youtube&logoColor=white
+[youtube-url]: https://www.youtube.com/channel/UCeeDaO2NREVlPy9Plqx-9JQ
+[release-badge]: https://img.shields.io/github/v/release/masterpointio/terraform-spacelift-automation?color=0E383A&label=Release&style=for-the-badge&logo=github&logoColor=white
+[latest-release]: https://github.com/masterpointio/terraform-spacelift-automation/releases/latest
+[contributors-image]: https://contrib.rocks/image?repo=masterpointio/terraform-spacelift-automation
+[contributors-url]: https://github.com/masterpointio/terraform-spacelift-automation/graphs/contributors
+[issues-url]: https://github.com/masterpointio/terraform-spacelift-automation/issues

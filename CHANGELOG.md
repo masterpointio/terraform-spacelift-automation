@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.1.1...v1.2.0) (2025-04-28)
+
+
+### Features
+
+* **spaces:** adds spaces + consolidates with the template ([#62](https://github.com/masterpointio/terraform-spacelift-automation/issues/62)) ([dd9162f](https://github.com/masterpointio/terraform-spacelift-automation/commit/dd9162fde23bbd596c4d5e687a395f338411e2e5))
+
 ## [1.1.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.1.0...v1.1.1) (2025-02-12)
 
 

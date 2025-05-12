@@ -244,6 +244,11 @@ variable "destructor_deactivated" {
   type        = bool
   description = "Whether to deactivate the stack destructor by default"
   default     = true
+
+  validation {
+    condition     = !(var.destructor_deactivated && !var.destructor_enabled)
+    error_message = "destructor_deactivated cannot be true when destructor_enabled is false"
+  }
 }
 
 variable "drift_detection_enabled" {

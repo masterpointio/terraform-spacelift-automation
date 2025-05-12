@@ -432,12 +432,6 @@ run "test_default_example_stack_runtime_overrides" {
     error_message = "worker_pool_id override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
-  # destructor_enabled
-  assert {
-    condition     = spacelift_stack_destructor.default["root-module-a-default-example"].deactivated == true
-    error_message = "destructor_enabled override was not applied correctly: ${jsonencode(spacelift_stack_destructor.default["root-module-a-default-example"])}"
-  }
-
   # aws_integration_id
   assert {
     condition     = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "999"
@@ -984,6 +978,29 @@ run "test_spaces_with_different_parents" {
   assert {
     condition     = spacelift_space.default["child-space"].parent_space_id == "test-space"
     error_message = "Space with different parent was not created correctly: ${jsonencode(spacelift_space.default)}"
+  }
+}
+
+# Test destructor creation and activation states
+run "test_destructor_states" {
+  command = plan
+
+  # Test stack should have destructor created but deactivated
+  assert {
+    condition     = spacelift_stack_destructor.default["root-module-a-test"].deactivated == true
+    error_message = "Test stack destructor should be deactivated: ${jsonencode(spacelift_stack_destructor.default)}"
+  }
+
+  # Common stack should not have destructor created
+  assert {
+    condition     = !contains(keys(spacelift_stack_destructor.default), "root-module-a-common")
+    error_message = "Common stack should not have destructor created: ${jsonencode(spacelift_stack_destructor.default)}"
+  }
+
+  # Default example stack should have destructor created and activated
+  assert {
+    condition     = spacelift_stack_destructor.default["root-module-a-default-example"].deactivated == false
+    error_message = "Default example stack destructor should be activated: ${jsonencode(spacelift_stack_destructor.default)}"
   }
 }
 

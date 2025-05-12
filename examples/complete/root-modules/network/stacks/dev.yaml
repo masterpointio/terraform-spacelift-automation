@@ -3,3 +3,4 @@ stack_settings:
   description: Create the VPC + Subnets for the Dev environment
   labels:
     - dev_stack_specific_label
+  destructor_enabled: true

@@ -17,6 +17,8 @@ stack_settings:
   before_plan: [echo 'before_plan']
   branch: prod
   description: This is a test of the emergency broadcast system
+  destructor_enabled: true
+  destructor_deactivated: false
   enable_local_preview: true
   enable_well_known_secret_masking: false
   github_action_deploy: false
@@ -27,8 +29,6 @@ stack_settings:
   terraform_smart_sanitization: true
   terraform_version: 1.9.0
   worker_pool_id: "1234567890"
-
-  destructor_enabled: true
 
   aws_integration_enabled: true
   aws_integration_id: "1234567890"

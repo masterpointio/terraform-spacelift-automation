@@ -297,6 +297,11 @@ locals {
     for stack, config in local.stack_configs :
     stack => config if try(config.drift_detection_enabled, var.drift_detection_enabled)
   }
+
+  destructor_stacks = {
+    for stack, config in local.stack_configs :
+    stack => config if try(config.destructor_enabled, var.destructor_enabled)
+  }
 }
 
 check "spaces_enforce_mutual_exclusivity" {
@@ -383,10 +388,10 @@ resource "spacelift_stack" "default" {
 # Use the 'deactivated' attribute to disable the stack destructor functionality instead.
 # https://github.com/spacelift-io/terraform-provider-spacelift/blob/master/spacelift/resource_stack_destructor.go
 resource "spacelift_stack_destructor" "default" {
-  for_each = local.stacks
+  for_each = local.destructor_stacks
 
   stack_id    = spacelift_stack.default[each.key].id
-  deactivated = !try(local.stack_configs[each.key].destructor_enabled, var.destructor_enabled)
+  deactivated = try(local.stack_configs[each.key].destructor_deactivated, var.destructor_deactivated)
 
   # `depends_on` should be used to make sure that all necessary resources (environment variables, roles, integrations, etc.)
   # are still in place when the destruction run is executed.

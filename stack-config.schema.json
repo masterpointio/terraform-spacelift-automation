@@ -232,6 +232,10 @@
         "destructor_enabled": {
           "type": "boolean",
           "description": "Whether to enable the stack destructor"
+        },
+        "destructor_deactivated": {
+          "type": "boolean",
+          "description": "Whether to deactivate the stack destructor when enabled"
         }
       }
     }

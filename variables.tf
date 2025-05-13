@@ -236,8 +236,19 @@ variable "description" {
 
 variable "destructor_enabled" {
   type        = bool
-  description = "Flag to enable/disable the destructor for the Stack."
-  default     = false
+  description = "Whether to enable the stack destructor by default"
+  default     = true
+}
+
+variable "destructor_deactivated" {
+  type        = bool
+  description = "Whether to deactivate the stack destructor by default"
+  default     = true
+
+  validation {
+    condition     = !(var.destructor_deactivated && !var.destructor_enabled)
+    error_message = "destructor_deactivated cannot be true when destructor_enabled is false"
+  }
 }
 
 variable "drift_detection_enabled" {

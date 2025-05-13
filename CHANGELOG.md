@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.2.0...v1.3.0) (2025-05-12)
+
+
+### Features
+
+* manage destructor creation and activation separately ([#66](https://github.com/masterpointio/terraform-spacelift-automation/issues/66)) ([af2a2de](https://github.com/masterpointio/terraform-spacelift-automation/commit/af2a2dea6209d00416059ee4c9a38aa41d961445))
+
 ## [1.2.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.1.1...v1.2.0) (2025-04-28)
 
 

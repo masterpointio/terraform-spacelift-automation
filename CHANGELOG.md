@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.3.0...v1.3.1) (2025-06-09)
+
+
+### Bug Fixes
+
+* **gha:** wait for checks and merge with admin ([#71](https://github.com/masterpointio/terraform-spacelift-automation/issues/71)) ([bfc8f23](https://github.com/masterpointio/terraform-spacelift-automation/commit/bfc8f23960d874bb209e9f18b23e33c750d4cf4f))
+
 ## [1.3.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.2.0...v1.3.0) (2025-05-12)
 
 

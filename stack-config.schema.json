@@ -190,7 +190,7 @@
           "description": "Whether to enable smart sanitization"
         },
         "terraform_version": {
-          "type": "string",
+          "type": ["string", "null"],
           "description": "OpenTofu/Terraform version to use. Defaults to the latest available version."
         },
         "worker_pool_id": {

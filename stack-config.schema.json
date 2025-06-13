@@ -191,7 +191,7 @@
         },
         "terraform_version": {
           "type": "string",
-          "description": "Terraform version to use"
+          "description": "OpenTofu/Terraform version to use. Defaults to the latest available version."
         },
         "worker_pool_id": {
           "type": "string",

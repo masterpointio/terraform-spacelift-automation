@@ -343,8 +343,8 @@ variable "terraform_smart_sanitization" {
 
 variable "terraform_version" {
   type        = string
-  description = "Terraform version to use."
-  default     = "1.7.2"
+  description = "OpenTofu/Terraform version to use. Defaults to the latest available version of the `terraform_workflow_tool`."
+  default     = null
 }
 
 variable "worker_pool_id" {

@@ -385,18 +385,20 @@ module "deep" {
 resource "spacelift_stack" "default" {
   for_each = local.stacks
 
-  administrative                   = local.stack_property_resolver[each.key].administrative
-  additional_project_globs         = local.stack_property_resolver[each.key].additional_project_globs
-  after_apply                      = local.stack_array_merger[each.key].after_apply
-  after_destroy                    = local.stack_array_merger[each.key].after_destroy
-  after_init                       = local.stack_array_merger[each.key].after_init
-  after_perform                    = local.stack_array_merger[each.key].after_perform
-  after_plan                       = local.stack_array_merger[each.key].after_plan
-  after_run                        = local.stack_array_merger[each.key].after_run
-  autodeploy                       = local.stack_property_resolver[each.key].autodeploy
-  autoretry                        = local.stack_property_resolver[each.key].autoretry
-  before_apply                     = local.stack_array_merger[each.key].before_apply
-  before_destroy                   = local.stack_array_merger[each.key].before_destroy
+  administrative           = local.stack_property_resolver[each.key].administrative
+  additional_project_globs = local.stack_property_resolver[each.key].additional_project_globs
+  after_apply              = local.stack_array_merger[each.key].after_apply
+  after_destroy            = local.stack_array_merger[each.key].after_destroy
+  after_init               = local.stack_array_merger[each.key].after_init
+  after_perform            = local.stack_array_merger[each.key].after_perform
+  after_plan               = local.stack_array_merger[each.key].after_plan
+  after_run                = local.stack_array_merger[each.key].after_run
+  autodeploy               = local.stack_property_resolver[each.key].autodeploy
+  autoretry                = local.stack_property_resolver[each.key].autoretry
+  before_apply             = local.stack_array_merger[each.key].before_apply
+  before_destroy           = local.stack_array_merger[each.key].before_destroy
+  # before_init is handled separately from other script arrays due to special tfvars logic
+  # See local.before_init for details on tfvars file copying and MultiInstance vs SingleInstance handling
   before_init                      = local.before_init[each.key]
   before_perform                   = local.stack_array_merger[each.key].before_perform
   before_plan                      = local.stack_array_merger[each.key].before_plan

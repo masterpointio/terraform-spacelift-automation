@@ -284,10 +284,10 @@ locals {
   stack_property_resolver = {
     for stack in local.stacks : stack => {
       # Simple property resolution with fallback
-      administrative                   = coalesce(try(local.stack_configs[stack].administrative, null), var.administrative)
+      administrative                   = try(local.stack_configs[stack].administrative, var.administrative)
       autoretry                        = try(local.stack_configs[stack].autoretry, var.autoretry)
       additional_project_globs         = try(local.stack_configs[stack].additional_project_globs, var.additional_project_globs)
-      autodeploy                       = coalesce(try(local.stack_configs[stack].autodeploy, null), var.autodeploy)
+      autodeploy                       = try(local.stack_configs[stack].autodeploy, var.autodeploy)
       branch                           = try(local.stack_configs[stack].branch, var.branch)
       enable_local_preview             = try(local.stack_configs[stack].enable_local_preview, var.enable_local_preview)
       enable_well_known_secret_masking = try(local.stack_configs[stack].enable_well_known_secret_masking, var.enable_well_known_secret_masking)

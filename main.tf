@@ -323,10 +323,10 @@ locals {
       after_perform  = compact(concat(try(local.stack_configs[stack].after_perform, []), var.after_perform))
       after_plan     = compact(concat(try(local.stack_configs[stack].after_plan, []), var.after_plan))
       after_run      = compact(concat(try(local.stack_configs[stack].after_run, []), var.after_run))
-      before_apply   = compact(coalesce(try(local.stack_configs[stack].before_apply, []), var.before_apply))
-      before_destroy = compact(coalesce(try(local.stack_configs[stack].before_destroy, []), var.before_destroy))
-      before_perform = compact(coalesce(try(local.stack_configs[stack].before_perform, []), var.before_perform))
-      before_plan    = compact(coalesce(try(local.stack_configs[stack].before_plan, []), var.before_plan))
+      before_apply   = compact(concat(try(local.stack_configs[stack].before_apply, []), var.before_apply))
+      before_destroy = compact(concat(try(local.stack_configs[stack].before_destroy, []), var.before_destroy))
+      before_perform = compact(concat(try(local.stack_configs[stack].before_perform, []), var.before_perform))
+      before_plan    = compact(concat(try(local.stack_configs[stack].before_plan, []), var.before_plan))
     }
   }
 

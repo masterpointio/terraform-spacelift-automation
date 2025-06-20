@@ -330,22 +330,6 @@ locals {
     }
   }
 
-  # Generic stack filtering helper
-  filtered_stacks = {
-    aws_integration = {
-      for stack, config in local.stack_configs :
-      stack => config if try(config.aws_integration_enabled, var.aws_integration_enabled)
-    }
-    drift_detection = {
-      for stack, config in local.stack_configs :
-      stack => config if try(config.drift_detection_enabled, var.drift_detection_enabled)
-    }
-    destructor = {
-      for stack, config in local.stack_configs :
-      stack => config if try(config.destructor_enabled, var.destructor_enabled)
-    }
-  }
-
   resolved_space_ids = {
     for stack in local.stacks : stack => coalesce(
       try(local.stack_configs[stack].space_id, null),                           # space_id always takes precedence since it's the most explicit
@@ -358,9 +342,18 @@ locals {
 
   ## Filter integration + drift detection stacks
 
-  aws_integration_stacks = local.filtered_stacks.aws_integration
-  drift_detection_stacks = local.filtered_stacks.drift_detection
-  destructor_stacks      = local.filtered_stacks.destructor
+  aws_integration_stacks = {
+    for stack, config in local.stack_configs :
+    stack => config if try(config.aws_integration_enabled, var.aws_integration_enabled)
+  }
+  drift_detection_stacks = {
+    for stack, config in local.stack_configs :
+    stack => config if try(config.drift_detection_enabled, var.drift_detection_enabled)
+  }
+  destructor_stacks = {
+    for stack, config in local.stack_configs :
+    stack => config if try(config.destructor_enabled, var.destructor_enabled)
+  }
 }
 
 check "spaces_enforce_mutual_exclusivity" {

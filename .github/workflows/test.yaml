@@ -4,12 +4,7 @@ on:
   push:
     branches:
       - main
-  pull_request:
-
-env:
-  SPACELIFT_API_KEY_ENDPOINT: ${{ secrets.SPACELIFT_API_KEY_ENDPOINT }}
-  SPACELIFT_API_KEY_ID: ${{ secrets.SPACELIFT_API_KEY_ID }}
-  SPACELIFT_API_KEY_SECRET: ${{ secrets.SPACELIFT_API_KEY_SECRET }}
+  pull_request_target:
 
 permissions:
   actions: read

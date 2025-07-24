@@ -54,18 +54,18 @@ locals {
   #   "../root-module-a/stack.yaml",
   #   "../root-module-b/stack.yaml",
   # ]
-  _multi_instance_stack_files  = fileset("${path.root}/${var.root_modules_path}/**/stacks", "*.yaml")
-  _single_instance_stack_files = fileset("${path.root}/${var.root_modules_path}/**", "stack.yaml")
+  _multi_instance_stack_files  = fileset("${path.root}/${var.root_modules_path}", "**/stacks/*.yaml")
+  _single_instance_stack_files = fileset("${path.root}/${var.root_modules_path}", "**/stack.yaml")
   _all_stack_files             = local._multi_instance_structure ? local._multi_instance_stack_files : local._single_instance_stack_files
 
   # Extract the root module name from the stack file path
-  # For MultiInstance: remove "../" and "/stacks" to get the full nested path
-  # For SingleInstance: remove "../" and the filename to get the full nested path
+  # For MultiInstance: extract path before "/stacks" to get the full nested path
+  # For SingleInstance: extract directory path to get the full nested path
   _all_root_modules = distinct([
     for file in local._all_stack_files :
     local._multi_instance_structure ?
-    dirname(dirname(replace(file, "../", ""))) : # For MultiInstance: ../example2/nested/stacks/stack.yaml -> example2/nested
-    dirname(replace(file, "../", ""))            # For SingleInstance: ../example2/nested/stack.yaml -> example2/nested
+    dirname(dirname(file)) : # For MultiInstance: example2/nested/stacks/stack.yaml -> example2/nested
+    dirname(file)            # For SingleInstance: example2/nested/stack.yaml -> example2/nested
   ])
 
   # If all root modules are enabled, use all root modules, otherwise use only those given to us

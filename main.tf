@@ -54,8 +54,7 @@ locals {
   #   "../root-module-a/stack.yaml",
   #   "../root-module-b/stack.yaml",
   # ]
-  # This includes nested directories, example:
-  # [
+  # This includes nested directories, example: [
   #   "ecs-infrastructure/service-1/stacks/example.yaml",
   #   "ecs-infrastructure/service-1/stacks/common.yaml",
   #   "ecs-infrastructure/service-2/stacks/example.yaml",

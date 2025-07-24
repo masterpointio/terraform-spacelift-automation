@@ -54,12 +54,19 @@ locals {
   #   "../root-module-a/stack.yaml",
   #   "../root-module-b/stack.yaml",
   # ]
-  _multi_instance_stack_files  = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
-  _single_instance_stack_files = fileset("${path.root}/${var.root_modules_path}/*", "stack.yaml")
+  _multi_instance_stack_files  = fileset("${path.root}/${var.root_modules_path}/**/stacks", "*.yaml")
+  _single_instance_stack_files = fileset("${path.root}/${var.root_modules_path}/**", "stack.yaml")
   _all_stack_files             = local._multi_instance_structure ? local._multi_instance_stack_files : local._single_instance_stack_files
 
   # Extract the root module name from the stack file path
-  _all_root_modules = distinct([for file in local._all_stack_files : dirname(replace(replace(file, "../", ""), "stacks/", ""))])
+  # For MultiInstance: remove "../" and "/stacks" to get the full nested path
+  # For SingleInstance: remove "../" and the filename to get the full nested path
+  _all_root_modules = distinct([
+    for file in local._all_stack_files :
+    local._multi_instance_structure ?
+    dirname(dirname(replace(file, "../", ""))) : # For MultiInstance: ../example2/nested/stacks/stack.yaml -> example2/nested
+    dirname(replace(file, "../", ""))            # For SingleInstance: ../example2/nested/stack.yaml -> example2/nested
+  ])
 
   # If all root modules are enabled, use all root modules, otherwise use only those given to us
   enabled_root_modules = var.all_root_modules_enabled ? local._all_root_modules : var.enabled_root_modules
@@ -138,7 +145,7 @@ locals {
   # }
   _root_module_stack_configs = merge([for module, files in local._root_module_yaml_decoded : {
     for file, content in files :
-    local._multi_instance_structure ? "${module}-${trimsuffix(file, ".yaml")}" : module =>
+    local._multi_instance_structure ? "${replace(module, "/", "-")}-${trimsuffix(file, ".yaml")}" : replace(module, "/", "-") =>
     merge(
       {
         # Use specified project_root, if not, build it using the root_modules_path and module name

@@ -31,7 +31,7 @@ locals {
 
   _multi_instance_structure = var.root_module_structure == "MultiInstance"
 
-  # Read all stack files following the associated root_module_structue convention:
+  # Read all stack files following the associated root_module_structure convention:
   # MultiInstance: root-module-name/stacks/*.yaml
   # SingleInstance: root-module-name/stack.yaml
   # Example:
@@ -54,7 +54,6 @@ locals {
   #   "../root-module-a/stack.yaml",
   #   "../root-module-b/stack.yaml",
   # ]
-  # Get all stack files from the root_modules_path, excluding .terraform directories
   _multi_instance_stack_files_raw  = fileset("${path.root}/${var.root_modules_path}", "**/stacks/*.yaml")
   _single_instance_stack_files_raw = fileset("${path.root}/${var.root_modules_path}", "**/stack.yaml")
 

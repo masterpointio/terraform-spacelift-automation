@@ -54,8 +54,13 @@ locals {
   #   "../root-module-a/stack.yaml",
   #   "../root-module-b/stack.yaml",
   # ]
-  _multi_instance_stack_files  = fileset("${path.root}/${var.root_modules_path}", "**/stacks/*.yaml")
-  _single_instance_stack_files = fileset("${path.root}/${var.root_modules_path}", "**/stack.yaml")
+  # Get all stack files from the root_modules_path, excluding .terraform directories
+  _multi_instance_stack_files_raw  = fileset("${path.root}/${var.root_modules_path}", "**/stacks/*.yaml")
+  _single_instance_stack_files_raw = fileset("${path.root}/${var.root_modules_path}", "**/stack.yaml")
+
+  # Filter out any files that are in .terraform directories to avoid picking up module cache now that it's using ** as the wildcard
+  _multi_instance_stack_files  = [for file in local._multi_instance_stack_files_raw : file if !can(regex("\\.terraform/", file))]
+  _single_instance_stack_files = [for file in local._single_instance_stack_files_raw : file if !can(regex("\\.terraform/", file))]
   _all_stack_files             = local._multi_instance_structure ? local._multi_instance_stack_files : local._single_instance_stack_files
 
   # Extract the root module name from the stack file path

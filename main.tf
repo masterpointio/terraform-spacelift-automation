@@ -150,7 +150,7 @@ locals {
   # }
   _root_module_stack_configs = merge([for module, files in local._root_module_yaml_decoded : {
     for file, content in files :
-    local._multi_instance_structure ? "${replace(module, "/", "-")}-${trimsuffix(file, ".yaml")}" : replace(module, "/", "-") =>
+    local._multi_instance_structure ? "${module}-${trimsuffix(file, ".yaml")}" : module =>
     merge(
       {
         # Use specified project_root, if not, build it using the root_modules_path and module name

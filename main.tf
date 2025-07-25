@@ -55,10 +55,10 @@ locals {
   #   "../root-module-b/stack.yaml",
   # ]
   # This includes nested directories, example: [
-  #   "ecs-infrastructure/service-1/stacks/example.yaml",
-  #   "ecs-infrastructure/service-1/stacks/common.yaml",
-  #   "ecs-infrastructure/service-2/stacks/example.yaml",
-  #   "ecs-infrastructure/service-2/stacks/common.yaml",
+  #   "../ecs-infrastructure/service-1/stacks/example.yaml",
+  #   "../ecs-infrastructure/service-1/stacks/common.yaml",
+  #   "../data-infrastructure/redshift-clusters/financial-reporting/stacks/example.yaml",
+  #   "../data-infrastructure/redshift-clusters/bi-reporting/stacks/example.yaml",
   # ]
   _multi_instance_stack_files_raw  = fileset("${path.root}/${var.root_modules_path}", "**/stacks/*.yaml")
   _single_instance_stack_files_raw = fileset("${path.root}/${var.root_modules_path}", "**/stack.yaml")

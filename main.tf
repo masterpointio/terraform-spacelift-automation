@@ -31,7 +31,7 @@ locals {
 
   _multi_instance_structure = var.root_module_structure == "MultiInstance"
 
-  # Read all stack files following the associated root_module_structue convention:
+  # Read all stack files following the associated root_module_structure convention:
   # MultiInstance: root-module-name/stacks/*.yaml
   # SingleInstance: root-module-name/stack.yaml
   # Example:
@@ -54,12 +54,29 @@ locals {
   #   "../root-module-a/stack.yaml",
   #   "../root-module-b/stack.yaml",
   # ]
-  _multi_instance_stack_files  = fileset("${path.root}/${var.root_modules_path}/*/stacks", "*.yaml")
-  _single_instance_stack_files = fileset("${path.root}/${var.root_modules_path}/*", "stack.yaml")
+  # This includes nested directories, example: [
+  #   "../ecs-infrastructure/service-1/stacks/example.yaml",
+  #   "../ecs-infrastructure/service-1/stacks/common.yaml",
+  #   "../data-infrastructure/redshift-clusters/financial-reporting/stacks/example.yaml",
+  #   "../data-infrastructure/redshift-clusters/bi-reporting/stacks/example.yaml",
+  # ]
+  _multi_instance_stack_files_raw  = fileset("${path.root}/${var.root_modules_path}", "**/stacks/*.yaml")
+  _single_instance_stack_files_raw = fileset("${path.root}/${var.root_modules_path}", "**/stack.yaml")
+
+  # Filter out any files that are in .terraform directories to avoid picking up module cache now that it's using ** as the wildcard
+  _multi_instance_stack_files  = [for file in local._multi_instance_stack_files_raw : file if !can(regex("\\.terraform/", file))]
+  _single_instance_stack_files = [for file in local._single_instance_stack_files_raw : file if !can(regex("\\.terraform/", file))]
   _all_stack_files             = local._multi_instance_structure ? local._multi_instance_stack_files : local._single_instance_stack_files
 
   # Extract the root module name from the stack file path
-  _all_root_modules = distinct([for file in local._all_stack_files : dirname(replace(replace(file, "../", ""), "stacks/", ""))])
+  # For MultiInstance: extract path before "/stacks" to get the full nested path
+  # For SingleInstance: extract directory path to get the full nested path
+  _all_root_modules = distinct([
+    for file in local._all_stack_files :
+    local._multi_instance_structure ?
+    dirname(dirname(file)) : # For MultiInstance: example2/nested/stacks/stack.yaml -> example2/nested
+    dirname(file)            # For SingleInstance: example2/nested/stack.yaml -> example2/nested
+  ])
 
   # If all root modules are enabled, use all root modules, otherwise use only those given to us
   enabled_root_modules = var.all_root_modules_enabled ? local._all_root_modules : var.enabled_root_modules

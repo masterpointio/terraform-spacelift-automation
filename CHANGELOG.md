@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.4.0...v1.5.0) (2025-08-01)
+
+
+### Features
+
+* support root module nested directories  ([#80](https://github.com/masterpointio/terraform-spacelift-automation/issues/80)) ([78b675b](https://github.com/masterpointio/terraform-spacelift-automation/commit/78b675b275ed753b312831ebb21f8d161276cbb7))
+
 ## [1.4.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.3.1...v1.4.0) (2025-06-16)
 
 

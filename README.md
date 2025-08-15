@@ -325,6 +325,7 @@ This is to support easy local and outside-spacelift operations. Keeping variable
 
 | Name | Description |
 |------|-------------|
+| <a name="output_spacelift_spaces"></a> [spacelift\_spaces](#output\_spacelift\_spaces) | A map of Spacelift Spaces with relevant attributes. |
 | <a name="output_spacelift_stacks"></a> [spacelift\_stacks](#output\_spacelift\_stacks) | A map of Spacelift stacks with selected attributes.<br/>To reduce the risk of accidentally exporting sensitive data, only a subset of attributes is exported. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable -->

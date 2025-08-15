@@ -12,3 +12,17 @@ output "spacelift_stacks" {
     }
   }
 }
+
+output "spacelift_spaces" {
+  description = "A map of Spacelift Spaces with relevant attributes."
+  value = {
+    for name, space in spacelift_space.default : name => {
+      id               = space.id
+      name             = space.name
+      description      = space.description
+      inherit_entities = space.inherit_entities
+      labels           = space.labels
+      parent_space_id  = space.parent_space_id
+    }
+  }
+}

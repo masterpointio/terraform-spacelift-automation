@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.5.0...v1.6.0) (2025-08-17)
+
+
+### Features
+
+* add spaces as output ([#83](https://github.com/masterpointio/terraform-spacelift-automation/issues/83)) ([bc842db](https://github.com/masterpointio/terraform-spacelift-automation/commit/bc842dbe88e8d836a2feead16a513c8c004c1556))
+
 ## [1.5.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.4.0...v1.5.0) (2025-08-01)
 
 

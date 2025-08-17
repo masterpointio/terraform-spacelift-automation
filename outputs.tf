@@ -12,3 +12,10 @@ output "spacelift_stacks" {
     }
   }
 }
+
+output "spacelift_spaces" {
+  description = "A map of Spacelift spaces with all their attributes."
+  value = {
+    for name, space in spacelift_space.default : name => space
+  }
+}

@@ -229,6 +229,65 @@ automation_settings:
 
 This is to support easy local and outside-spacelift operations. Keeping variable values in a `tfvars` file per workspace allows you to simply pass that file to the relevant CLI command locally via the `-var-file` option so that you don't need to provide values individually. e.g. `tofu plan -var-file=tfvars/dev.tfvars`
 
+### What if my stacks are in another repo?
+
+By default, this module assumes all stacks are in the same repo as the stack with the module instance. To manage "remote stacks" in a different repo:
+
+1. Create the other repo. Add configuration files for each stack at the desired file path, such as `stacks/random-pet`. There should not be a `stack.yaml` file in the other repo.
+
+   ```text
+   other-repo
+   └── stacks
+       └── random-pet
+           ├── main.tf
+           └── versions.tofu
+   ```
+
+2. Update any Spacelift GitHub apps to allow access to the other repo.
+3. Add a directory for remote stacks to _this repo_. It is not recommended to nest the `remote-stacks` directory within the Spacelift automation stack directory because of how the module detects nested stacks (see [masterpointio/terraform-spacelift-automation#80](https://github.com/masterpointio/terraform-spacelift-automation/pull/80), released in [module v1.5.0](https://github.com/masterpointio/terraform-spacelift-automation/releases/tag/v1.5.0)). For example, here's now it might look for a repo named `other-repo` and a stack named `other-repo-random-pet`:
+
+   ```text
+   this-repo
+   ├── remote-stacks
+   │   └── other-repo
+   │       └── other-repo-random-pet
+   │           └── stack.yaml
+   └── stacks
+       └── spacelift-automation
+           ├── main.tf
+           ├── stack.yaml
+           └── versions.tofu
+   ```
+
+4. Ensure that each `stack.yaml` has the `project_root` set to the stack path in _the other repo_ and that the appropriate settings have been applied.
+
+   ```yaml
+   # this-repo/remote-stacks/other-repo/other-repo-random-pet/stack.yaml
+   stack_settings:
+     project_root: stacks/random-pet
+   ```
+
+5. Add a new module block for the repo to `this-repo/stacks/spacelift-automation/main.tf`. The `root_modules_path` should point to the new `remote-stacks` subdirectory for the repo.
+
+   ```hcl
+   # this-repo/stacks/spacelift-automation/main.tf
+   module "spacelift_automation_this_repo" {
+     source = "git::https://github.com/masterpointio/terraform-spacelift-automation.git"
+
+     repository            = "this-repo"
+     root_module_structure = "SingleInstance"
+     root_modules_path     = "../../stacks"
+   }
+
+   module "spacelift_automation_other_repo" {
+     source = "git::https://github.com/masterpointio/terraform-spacelift-automation.git"
+
+     repository            = "other-repo"
+     root_module_structure = "SingleInstance"
+     root_modules_path     = "../../remote-stacks/other-repo"
+   }
+   ```
+
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.6.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.5.0...v1.6.0) (2025-08-17)
+
+
+### Features
+
+* add spaces as output ([#83](https://github.com/masterpointio/terraform-spacelift-automation/issues/83)) ([bc842db](https://github.com/masterpointio/terraform-spacelift-automation/commit/bc842dbe88e8d836a2feead16a513c8c004c1556))
+
+## [1.5.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.4.0...v1.5.0) (2025-08-01)
+
+
+### Features
+
+* support root module nested directories  ([#80](https://github.com/masterpointio/terraform-spacelift-automation/issues/80)) ([78b675b](https://github.com/masterpointio/terraform-spacelift-automation/commit/78b675b275ed753b312831ebb21f8d161276cbb7))
+
+## [1.4.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.3.1...v1.4.0) (2025-06-16)
+
+
+### Features
+
+* set default `terraform_version = null` ([#73](https://github.com/masterpointio/terraform-spacelift-automation/issues/73)) ([b19e782](https://github.com/masterpointio/terraform-spacelift-automation/commit/b19e782461ff8d5dbf37888885e97712068fe538))
+
+
+### Bug Fixes
+
+* **gha:** trigger test workflow on pull_request_target ([#74](https://github.com/masterpointio/terraform-spacelift-automation/issues/74)) ([0320c70](https://github.com/masterpointio/terraform-spacelift-automation/commit/0320c70da3b2553c0f8376241cc5d1fa638c11f4))
+
+## [1.3.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.3.0...v1.3.1) (2025-06-09)
+
+
+### Bug Fixes
+
+* **gha:** wait for checks and merge with admin ([#71](https://github.com/masterpointio/terraform-spacelift-automation/issues/71)) ([bfc8f23](https://github.com/masterpointio/terraform-spacelift-automation/commit/bfc8f23960d874bb209e9f18b23e33c750d4cf4f))
+
 ## [1.3.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.2.0...v1.3.0) (2025-05-12)
 
 

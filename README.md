@@ -276,7 +276,6 @@ By default, this module assumes all stacks are in the same repo as the stack wit
      source = "git::https://github.com/masterpointio/terraform-spacelift-automation.git"
 
      repository            = "this-repo"
-     root_module_structure = "SingleInstance"
      root_modules_path     = "../../stacks"
    }
 
@@ -284,10 +283,13 @@ By default, this module assumes all stacks are in the same repo as the stack wit
      source = "git::https://github.com/masterpointio/terraform-spacelift-automation.git"
 
      repository            = "other-repo"
-     root_module_structure = "SingleInstance"
      root_modules_path     = "../../remote-stacks/other-repo"
    }
    ```
+
+This will properly configure your spacelift-automation root module to start managing the stacks for the remote repositories.
+
+If you have many remote repositories that you need to manage via this pattern, you can supply different `repository` values in your Stack configs and omit that value from the "remote-stacks" child module arguments.
 
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->

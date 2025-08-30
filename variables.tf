@@ -350,10 +350,27 @@ variable "terraform_version" {
 variable "worker_pool_id" {
   type        = string
   description = <<-EOT
-  ID of the worker pool to use.
-  NOTE: worker_pool_id is required when using a self-hosted instance of Spacelift.
+  ID of the worker pool to use. Mutually exclusive with worker_pool_name.
+  NOTE: worker_pool_name or worker_pool_id is required when using a self-hosted instance of Spacelift.
   EOT
   default     = null
+  validation {
+    condition     = !(var.worker_pool_id != null && var.worker_pool_name != null)
+    error_message = "Only one of worker_pool_id or worker_pool_name can be specified."
+  }
+}
+
+variable "worker_pool_name" {
+  type        = string
+  description = <<-EOT
+  Name of the worker pool to use. Mutually exclusive with worker_pool_id.
+  NOTE: worker_pool_name or worker_pool_id is required when using a self-hosted instance of Spacelift.
+  EOT
+  default     = null
+  validation {
+    condition     = !(var.worker_pool_id != null && var.worker_pool_name != null)
+    error_message = "Only one of worker_pool_id or worker_pool_name can be specified."
+  }
 }
 
 variable "spaces" {

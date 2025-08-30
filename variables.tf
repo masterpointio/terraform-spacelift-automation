@@ -354,10 +354,6 @@ variable "worker_pool_id" {
   NOTE: worker_pool_name or worker_pool_id is required when using a self-hosted instance of Spacelift.
   EOT
   default     = null
-  validation {
-    condition     = !(var.worker_pool_id != null && var.worker_pool_name != null)
-    error_message = "Only one of worker_pool_id or worker_pool_name can be specified."
-  }
 }
 
 variable "worker_pool_name" {
@@ -367,10 +363,6 @@ variable "worker_pool_name" {
   NOTE: worker_pool_name or worker_pool_id is required when using a self-hosted instance of Spacelift.
   EOT
   default     = null
-  validation {
-    condition     = !(var.worker_pool_id != null && var.worker_pool_name != null)
-    error_message = "Only one of worker_pool_id or worker_pool_name can be specified."
-  }
 }
 
 variable "spaces" {

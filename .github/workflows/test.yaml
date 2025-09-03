@@ -17,11 +17,15 @@ jobs:
   tf-test:
     name: 🧪 ${{ matrix.tf }} test
     runs-on: ubuntu-latest
+    env:
+      SPACELIFT_API_KEY_ENDPOINT: ${{ secrets.SPACELIFT_API_KEY_ENDPOINT }}
+      SPACELIFT_API_KEY_ID: ${{ secrets.SPACELIFT_API_KEY_ID }}
+      SPACELIFT_API_KEY_SECRET: ${{ secrets.SPACELIFT_API_KEY_SECRET }}
     strategy:
       matrix:
         tf: [tofu, terraform]
     steps:
-      - uses: masterpointio/github-action-tf-test@c3b619f3bca9e4f482b9e0fb3166ab3f02d9d54c # v1.0.0
+      - uses: masterpointio/github-action-tf-test@v1.0.1
         with:
           tf_type: ${{ matrix.tf }}
           aws_role_arn: ${{ vars.TF_TEST_AWS_ROLE_ARN }}

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.6.0...v1.7.0) (2025-09-09)
+
+
+### Features
+
+* ability to assign workerpool by name ([#89](https://github.com/masterpointio/terraform-spacelift-automation/issues/89)) ([7597e4d](https://github.com/masterpointio/terraform-spacelift-automation/commit/7597e4d10db955b17e70d8075a1dac7e801927f6))
+
 ## [1.6.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.5.0...v1.6.0) (2025-08-17)
 
 

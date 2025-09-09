@@ -304,7 +304,6 @@ locals {
     }
   }
 
-
   # Helper for property resolution with fallback to defaults
   stack_property_resolver = {
     for stack in local.stacks : stack => {

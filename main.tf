@@ -288,8 +288,6 @@ locals {
     ))
   }
 
-  ## Generic name-to-ID mappings for Spacelift resources
-
   # Helper function to create name-to-ID mappings
   name_to_id_mappings = {
     space = {

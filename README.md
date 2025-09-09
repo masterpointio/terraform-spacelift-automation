@@ -187,7 +187,7 @@ Spacelift Automation can manage itself as a Stack as well, and we recommend this
 4. Move the Automation configs to the `<root-modules>/spacelift-automation/stacks` directory and push the changes to the tracked repo and branch.
 5. After pushed to your repo's tracked branch, Spacelift Automation will track the addition of new root modules and create Stacks for them.
 
-Check out an example configuration in the [examples/complete](./examples/complete/root-modules/spacelift-automation/tfvars/example.tfvars).
+Check out an example configuration in the [examples/complete](./examples/complete/root-modules/spacelift-automation).
 
 <!-- NOTE to Masterpoint team: We might want to create a small wrapper to automatize this using Taskit. On hold for now. -->
 
@@ -245,7 +245,7 @@ By default, this module assumes all stacks are in the same repo as the stack wit
 
 2. Update any Spacelift GitHub apps to allow access to the other repo.
 3. Add a directory for remote stacks to _this repo_. It is not recommended to nest the `remote-stacks` directory within the Spacelift automation stack directory because of how the module detects nested stacks (see [masterpointio/terraform-spacelift-automation#80](https://github.com/masterpointio/terraform-spacelift-automation/pull/80), released in
-   [module v1.5.0](https://github.com/masterpointio/terraform-spacelift-automation/releases/tag/v1.5.0)). For example, here's now it might look for a repo named `other-repo` and a stack named `other-repo-random-pet`:
+   [module v1.5.0](https://github.com/masterpointio/terraform-spacelift-automation/releases/tag/v1.5.0)). For example, here's how it might look for a repo named `other-repo` and a stack named `other-repo-random-pet`:
 
    ```text
    this-repo

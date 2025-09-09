@@ -326,6 +326,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 | [spacelift_stack_destructor.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack_destructor) | resource |
 | [jsonschema_validator.runtime_overrides](https://registry.terraform.io/providers/bpedman/jsonschema/latest/docs/data-sources/validator) | data source |
 | [spacelift_spaces.all](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/spaces) | data source |
+| [spacelift_worker_pools.all](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/worker_pools) | data source |
 
 ## Inputs
 
@@ -381,7 +382,8 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_terraform_smart_sanitization"></a> [terraform\_smart\_sanitization](#input\_terraform\_smart\_sanitization) | Indicates whether runs on this will use terraform's sensitive value system to sanitize<br/>the outputs of Terraform state and plans in spacelift instead of sanitizing all fields. | `bool` | `false` | no |
 | <a name="input_terraform_version"></a> [terraform\_version](#input\_terraform\_version) | OpenTofu/Terraform version to use. Defaults to the latest available version of the `terraform_workflow_tool`. | `string` | `null` | no |
 | <a name="input_terraform_workflow_tool"></a> [terraform\_workflow\_tool](#input\_terraform\_workflow\_tool) | Defines the tool that will be used to execute the workflow.<br/>This can be one of OPEN\_TOFU, TERRAFORM\_FOSS or CUSTOM. | `string` | `"OPEN_TOFU"` | no |
-| <a name="input_worker_pool_id"></a> [worker\_pool\_id](#input\_worker\_pool\_id) | ID of the worker pool to use.<br/>NOTE: worker\_pool\_id is required when using a self-hosted instance of Spacelift. | `string` | `null` | no |
+| <a name="input_worker_pool_id"></a> [worker\_pool\_id](#input\_worker\_pool\_id) | ID of the worker pool to use. Mutually exclusive with worker\_pool\_name.<br/>NOTE: worker\_pool\_name or worker\_pool\_id is required when using a self-hosted instance of Spacelift. | `string` | `null` | no |
+| <a name="input_worker_pool_name"></a> [worker\_pool\_name](#input\_worker\_pool\_name) | Name of the worker pool to use. Mutually exclusive with worker\_pool\_id.<br/>NOTE: worker\_pool\_name or worker\_pool\_id is required when using a self-hosted instance of Spacelift. | `string` | `null` | no |
 
 ## Outputs
 

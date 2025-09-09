@@ -1004,3 +1004,26 @@ run "test_destructor_states" {
   }
 }
 
+# Test that worker_pool_name from stack settings resolves to correct ID
+run "test_worker_pool_name_resolves_to_correct_id" {
+  command = plan
+
+  assert {
+    condition     = local.resolved_worker_pool_ids["root-module-a-test"] == "01K3VABYB4FBXNV24KN4A4EKC8" # For the `mp-ue1-automation-spft-priv-workers` in our `mp-infra` Spacelift account
+    error_message = "Worker pool name not resolving to correct ID: ${jsonencode(local.resolved_worker_pool_ids)}"
+  }
+}
+
+# Test that worker_pool_name from stack settings takes precedence over worker_pool_name global variable
+run "test_worker_pool_name_takes_precedence_over_worker_pool_name_global_variable" {
+  command = plan
+
+  variables {
+    worker_pool_name = "some-other-worker-pool"
+  }
+
+  assert {
+    condition     = local.resolved_worker_pool_ids["root-module-a-test"] == "01K3VABYB4FBXNV24KN4A4EKC8" # For the `mp-ue1-automation-spft-priv-workers` in our `mp-infra` Spacelift account
+    error_message = "Worker pool name from stack settings not taking precedence over global variable worker_pool_name: ${jsonencode(local.resolved_worker_pool_ids)}"
+  }
+}

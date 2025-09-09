@@ -103,6 +103,12 @@ variable "aws_integration_id" {
   default     = null
 }
 
+variable "aws_integration_name" {
+  type        = string
+  description = "Name of the AWS integration to attach, which will be resolved to aws_integration_id."
+  default     = null
+}
+
 variable "aws_integration_attachment_read" {
   type        = bool
   description = "Indicates whether this attachment is used for read operations."

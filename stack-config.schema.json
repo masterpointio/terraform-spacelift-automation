@@ -197,6 +197,10 @@
           "type": "string",
           "description": "Worker pool ID"
         },
+        "worker_pool_name": {
+          "type": "string",
+          "description": "Worker pool name, this will be translated to a worker_pool_id. Mutually exclusive with worker_pool_id"
+        },
         "aws_integration_enabled": {
           "type": "boolean",
           "description": "Whether to enable AWS integration"

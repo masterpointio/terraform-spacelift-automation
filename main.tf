@@ -297,6 +297,13 @@ locals {
     space.name => space.space_id
   }
 
+  ## Handle worker pool names
+  # Allow usage of worker_pool_name along with worker_pool_id.
+  worker_pool_name_to_id = {
+    for pool in data.spacelift_worker_pools.all.worker_pools :
+    pool.name => pool.worker_pool_id
+  }
+
   # Helper for property resolution with fallback to defaults
   stack_property_resolver = {
     for stack in local.stacks : stack => {
@@ -355,6 +362,16 @@ locals {
       try(local.space_name_to_id[var.space_name], null), # Then try to look up the space_name global variable to ID
       local.root_space_id                                # If no space_id or space_name is provided, default to the root space
     )
+  }
+
+  # Resolve worker_pool_id if worker_pool_name is provided
+  resolved_worker_pool_ids = {
+    for stack in local.stacks : stack => try(coalesce(
+      try(local.stack_configs[stack].worker_pool_id, null),                                 # worker_pool_id always takes precedence since it's the most explicit
+      try(local.worker_pool_name_to_id[local.stack_configs[stack].worker_pool_name], null), # Then try to look up worker_pool_name from the stack.yaml to ID
+      var.worker_pool_id,                                                                   # Then try to use the global variable worker_pool_id 
+      try(local.worker_pool_name_to_id[var.worker_pool_name], null),                        # Then try to look up the global variable worker_pool_name to ID
+    ), null)                                                                                # If no worker_pool_id or worker_pool_name is provided, default to null
   }
 
   ## Filter integration + drift detection stacks
@@ -435,7 +452,7 @@ resource "spacelift_stack" "default" {
   terraform_version                = local.stack_property_resolver[each.key].terraform_version
   terraform_workflow_tool          = var.terraform_workflow_tool
   terraform_workspace              = local.configs[each.key].terraform_workspace
-  worker_pool_id                   = local.stack_property_resolver[each.key].worker_pool_id
+  worker_pool_id                   = local.resolved_worker_pool_ids[each.key]
 
   # Usage of `templatestring` requires OpenTofu 1.7 and Terraform 1.9 or later.
   description = coalesce(

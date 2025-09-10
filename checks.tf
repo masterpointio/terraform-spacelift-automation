@@ -20,21 +20,21 @@
  * | "some-id" | "some-name" | false || false = false  | ❌ FAIL          |
  */
 
-check "spaces_enforce_mutual_exclusivity" {
+check "spaces_enforce_exclusivity" {
   assert {
     condition     = var.space_id == null || var.space_name == null
     error_message = "space_id and space_name are mutually exclusive."
   }
 }
 
-check "worker_pools_enforce_mutual_exclusivity" {
+check "worker_pools_mutual_exclusivity" {
   assert {
     condition     = var.worker_pool_id == null || var.worker_pool_name == null
     error_message = "worker_pool_id and worker_pool_name are mutually exclusive."
   }
 }
 
-check "aws_integrations_enforce_mutual_exclusivity" {
+check "aws_integrations_mutual_exclusivity" {
   assert {
     condition     = var.aws_integration_id == null || var.aws_integration_name == null
     error_message = "aws_integration_id and aws_integration_name are mutually exclusive."

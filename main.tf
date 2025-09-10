@@ -288,7 +288,7 @@ locals {
     ))
   }
 
-  # Helper function to create name-to-ID mappings
+  # Name to ID mappings
   name_to_id_mappings = {
     space = {
       for space in data.spacelift_spaces.all.spaces :
@@ -325,7 +325,7 @@ locals {
       worker_pool_id                   = try(local.stack_configs[stack].worker_pool_id, var.worker_pool_id)
 
       # AWS Integration properties
-      aws_integration_id = local.resolved_resource_ids.aws_integration[stack]
+      aws_integration_id = local.resource_id_resolver.aws_integration[stack]
 
       # Drift detection properties
       drift_detection_ignore_state = try(local.stack_configs[stack].drift_detection_ignore_state, var.drift_detection_ignore_state)
@@ -386,7 +386,7 @@ locals {
   }
 
   # Resolve Precedence order: stack ID > stack name > global ID > global name > default
-  resolved_resource_ids = {
+  resource_id_resolver = {
     for resource_type, config in local.resource_resolver_config : resource_type => {
       for stack in local.stacks : stack => try(coalesce(
         try(local.stack_configs[stack][config.id_attr], null),                                             # Direct stack-level ID always takes precedence
@@ -464,12 +464,12 @@ resource "spacelift_stack" "default" {
   protect_from_deletion            = local.stack_property_resolver[each.key].protect_from_deletion
   repository                       = local.stack_property_resolver[each.key].repository
   runner_image                     = local.stack_property_resolver[each.key].runner_image
-  space_id                         = local.resolved_resource_ids.space[each.key]
+  space_id                         = local.resource_id_resolver.space[each.key]
   terraform_smart_sanitization     = local.stack_property_resolver[each.key].terraform_smart_sanitization
   terraform_version                = local.stack_property_resolver[each.key].terraform_version
   terraform_workflow_tool          = var.terraform_workflow_tool
   terraform_workspace              = local.configs[each.key].terraform_workspace
-  worker_pool_id                   = local.resolved_resource_ids.worker_pool[each.key]
+  worker_pool_id                   = local.resource_id_resolver.worker_pool[each.key]
 
   # Usage of `templatestring` requires OpenTofu 1.7 and Terraform 1.9 or later.
   description = coalesce(

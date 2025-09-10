@@ -356,6 +356,7 @@ locals {
       integration.name => integration.integration_id
     }
   }
+
   resource_id_resolver_config = {
     space = {
       id_attr       = "space_id"
@@ -383,18 +384,9 @@ locals {
     aws_integration_name = var.aws_integration_name
   }
 
-  # The DRY Resource ID Resolver - converts names to IDs with clear precedence
-  # This single resolver handles space_id, worker_pool_id, and aws_integration_id resolution
-  # 
   # How it works:
-  # 1. Loops through each resource type (space, worker_pool, aws_integration) 
-  # 2. For each stack, tries to resolve the ID using coalesce() with this precedence:
-  #    - Stack-level ID (from YAML): highest priority, direct ID wins
-  #    - Stack-level name → ID: convert stack's name to ID using name_to_id_mappings
-  #    - Global variable ID: fallback to module-level ID variable 
-  #    - Global variable name → ID: convert module-level name to ID
-  #    - Default value: resource-specific fallback (e.g. "root" for spaces, null for others)
-  #
+  # 1. Loops through each resource type (space, worker_pool, aws_integration)
+  # 2. For each stack, tries to resolve the ID using coalesce() with this precedence: stack ID > stack name > global ID > global name > default
   # Example for space resolution on stack "my-stack":
   # 1. Check local.stack_configs["my-stack"]["space_id"] (direct ID from YAML)
   # 2. Check local.name_to_id_mappings["space"][local.stack_configs["my-stack"]["space_name"]] (name→ID from YAML)
@@ -404,11 +396,11 @@ locals {
   resource_id_resolver = {
     for resource_type, config in local.resource_id_resolver_config : resource_type => {
       for stack in local.stacks : stack => try(coalesce(
-        try(local.stack_configs[stack][config.id_attr], null),                                             # 1. Direct stack-level ID (e.g. space_id: "some-id" in YAML)
-        try(local.name_to_id_mappings[resource_type][local.stack_configs[stack][config.name_attr]], null), # 2. Stack-level name→ID lookup (e.g. space_name: "my-space" → resolve to ID)
-        local.var_lookup[config.id_attr],                                                                  # 3. Global module variable ID (e.g. var.space_id)
-        try(local.name_to_id_mappings[resource_type][local.var_lookup[config.name_attr]], null),           # 4. Global module name→ID lookup (e.g. var.space_name → resolve to ID)
-      ), config.default_value)                                                                             # 5. Resource-specific default fallback
+        try(local.stack_configs[stack][config.id_attr], null),                                             # Direct stack-level ID always takes precedence
+        try(local.name_to_id_mappings[resource_type][local.stack_configs[stack][config.name_attr]], null), # Direct stack-level name resolution
+        local.var_lookup[config.id_attr],                                                                  # Global variable ID
+        try(local.name_to_id_mappings[resource_type][local.var_lookup[config.name_attr]], null),           # Global variable name resolution
+      ), config.default_value)                                                                             # Resource-specific default
     }
   }
 

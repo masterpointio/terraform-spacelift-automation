@@ -369,7 +369,7 @@ locals {
     for stack in local.stacks : stack => try(coalesce(
       try(local.stack_configs[stack].worker_pool_id, null),                                 # worker_pool_id always takes precedence since it's the most explicit
       try(local.worker_pool_name_to_id[local.stack_configs[stack].worker_pool_name], null), # Then try to look up worker_pool_name from the stack.yaml to ID
-      var.worker_pool_id,                                                                   # Then try to use the global variable worker_pool_id 
+      var.worker_pool_id,                                                                   # Then try to use the global variable worker_pool_id
       try(local.worker_pool_name_to_id[var.worker_pool_name], null),                        # Then try to look up the global variable worker_pool_name to ID
     ), null)                                                                                # If no worker_pool_id or worker_pool_name is provided, default to null
   }
@@ -466,6 +466,14 @@ resource "spacelift_stack" "default" {
     content {
       namespace = github_enterprise.value["namespace"]
       id        = github_enterprise.value["id"]
+    }
+  }
+
+  dynamic "azure_devops" {
+    for_each = var.azure_devops != null ? [var.azure_devops] : []
+    content {
+      project = azure_devops.value["project"]
+      id      = azure_devops.value["id"]
     }
   }
 }

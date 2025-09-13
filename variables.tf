@@ -36,6 +36,15 @@ variable "github_enterprise" {
   default     = null
 }
 
+variable "azure_devops" {
+  type = object({
+    project = string
+    id      = optional(string)
+  })
+  description = "The Azure DevOps integration settings"
+  default     = null
+}
+
 variable "repository" {
   type        = string
   description = "The name of your infrastructure repo"

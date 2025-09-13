@@ -347,6 +347,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_aws_integration_attachment_write"></a> [aws\_integration\_attachment\_write](#input\_aws\_integration\_attachment\_write) | Indicates whether this attachment is used for write operations. | `bool` | `true` | no |
 | <a name="input_aws_integration_enabled"></a> [aws\_integration\_enabled](#input\_aws\_integration\_enabled) | Indicates whether the AWS integration is enabled. | `bool` | `false` | no |
 | <a name="input_aws_integration_id"></a> [aws\_integration\_id](#input\_aws\_integration\_id) | ID of the AWS integration to attach. | `string` | `null` | no |
+| <a name="input_azure_devops"></a> [azure\_devops](#input\_azure\_devops) | The Azure DevOps integration settings | <pre>object({<br/>    project = string<br/>    id      = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_before_apply"></a> [before\_apply](#input\_before\_apply) | List of before-apply scripts | `list(string)` | `[]` | no |
 | <a name="input_before_destroy"></a> [before\_destroy](#input\_before\_destroy) | List of before-destroy scripts | `list(string)` | `[]` | no |
 | <a name="input_before_init"></a> [before\_init](#input\_before\_init) | List of before-init scripts | `list(string)` | `[]` | no |

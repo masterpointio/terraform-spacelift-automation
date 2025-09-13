@@ -476,6 +476,14 @@ resource "spacelift_stack" "default" {
       id      = try(azure_devops.value["id"], null)
     }
   }
+
+  dynamic "raw_git" {
+    for_each = var.raw_git != null ? [var.raw_git] : []
+    content {
+      namespace = raw_git.value["namespace"]
+      url       = raw_git.value["url"]
+    }
+  }
 }
 
 # The Spacelift Destructor is a feature designed to automatically clean up the resources no longer managed by our IaC.

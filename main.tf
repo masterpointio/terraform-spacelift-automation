@@ -473,7 +473,7 @@ resource "spacelift_stack" "default" {
     for_each = var.azure_devops != null ? [var.azure_devops] : []
     content {
       project = azure_devops.value["project"]
-      id      = azure_devops.value["id"]
+      id      = try(azure_devops.value["id"], null)
     }
   }
 }

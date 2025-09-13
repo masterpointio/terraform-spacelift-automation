@@ -465,7 +465,7 @@ resource "spacelift_stack" "default" {
     for_each = var.github_enterprise != null ? [var.github_enterprise] : []
     content {
       namespace = github_enterprise.value["namespace"]
-      id        = github_enterprise.value["id"]
+      id        = try(github_enterprise.value["id"], null)
     }
   }
 

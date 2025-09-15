@@ -30,7 +30,7 @@ module "spacelift_policies" {
       labels      = ["team:sre", "env:dev"]
     }
 
-    trigger-administrative = {
+    "trigger-administrative" = {
       body_url = "https://raw.githubusercontent.com/cloudposse/terraform-spacelift-cloud-infrastructure-automation/1.6.0/catalog/policies/trigger.administrative.rego"
       type     = "TRIGGER"
       labels   = ["autoattach:*"] # Showcasing how to attach to ALL stacks

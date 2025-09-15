@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.6.0...v1.7.0) (2025-09-15)
+
+
+### Features
+
+* ability to assign workerpool by name ([#89](https://github.com/masterpointio/terraform-spacelift-automation/issues/89)) ([7597e4d](https://github.com/masterpointio/terraform-spacelift-automation/commit/7597e4d10db955b17e70d8075a1dac7e801927f6))
+* enable integration with ADO ([#93](https://github.com/masterpointio/terraform-spacelift-automation/issues/93)) ([f3b0da4](https://github.com/masterpointio/terraform-spacelift-automation/commit/f3b0da41fd35a1549825a6665769057aa3a2ec6c))
+
 ## [1.6.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.5.0...v1.6.0) (2025-08-17)
 
 

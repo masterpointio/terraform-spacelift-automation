@@ -288,22 +288,6 @@ locals {
     ))
   }
 
-  ## Handle space lookups
-
-  # Allow usage of space_name along with space_id.
-  # A space_id is long and hard to look at in the stack.yaml file, so pass in the space_name and it will be resolved to the space_id, which will be consumed by the `spacelife_stack` resource.
-  space_name_to_id = {
-    for space in data.spacelift_spaces.all.spaces :
-    space.name => space.space_id
-  }
-
-  ## Handle worker pool names
-  # Allow usage of worker_pool_name along with worker_pool_id.
-  worker_pool_name_to_id = {
-    for pool in data.spacelift_worker_pools.all.worker_pools :
-    pool.name => pool.worker_pool_id
-  }
-
   # Helper for property resolution with fallback to defaults
   stack_property_resolver = {
     for stack in local.stacks : stack => {
@@ -325,7 +309,7 @@ locals {
       worker_pool_id                   = try(local.stack_configs[stack].worker_pool_id, var.worker_pool_id)
 
       # AWS Integration properties
-      aws_integration_id = try(local.stack_configs[stack].aws_integration_id, var.aws_integration_id)
+      aws_integration_id = local.resource_id_resolver.aws_integration[stack]
 
       # Drift detection properties
       drift_detection_ignore_state = try(local.stack_configs[stack].drift_detection_ignore_state, var.drift_detection_ignore_state)
@@ -354,24 +338,70 @@ locals {
     }
   }
 
-  resolved_space_ids = {
-    for stack in local.stacks : stack => coalesce(
-      try(local.stack_configs[stack].space_id, null),                           # space_id always takes precedence since it's the most explicit
-      try(local.space_name_to_id[local.stack_configs[stack].space_name], null), # Then try to look up space_name from the stack.yaml to ID
-      var.space_id,
-      try(local.space_name_to_id[var.space_name], null), # Then try to look up the space_name global variable to ID
-      local.root_space_id                                # If no space_id or space_name is provided, default to the root space
-    )
+  ###############
+  # Resource Name to ID Resolver
+  #(e.g. space_name -> space_id so users can use the human readable name rather than the ID in configs)
+  ###############
+  name_to_id_mappings = {
+    space = {
+      for space in data.spacelift_spaces.all.spaces :
+      space.name => space.space_id
+    }
+    worker_pool = {
+      for pool in data.spacelift_worker_pools.all.worker_pools :
+      pool.name => pool.worker_pool_id
+    }
+    aws_integration = {
+      for integration in data.spacelift_aws_integrations.all.integrations :
+      integration.name => integration.integration_id
+    }
   }
 
-  # Resolve worker_pool_id if worker_pool_name is provided
-  resolved_worker_pool_ids = {
-    for stack in local.stacks : stack => try(coalesce(
-      try(local.stack_configs[stack].worker_pool_id, null),                                 # worker_pool_id always takes precedence since it's the most explicit
-      try(local.worker_pool_name_to_id[local.stack_configs[stack].worker_pool_name], null), # Then try to look up worker_pool_name from the stack.yaml to ID
-      var.worker_pool_id,                                                                   # Then try to use the global variable worker_pool_id
-      try(local.worker_pool_name_to_id[var.worker_pool_name], null),                        # Then try to look up the global variable worker_pool_name to ID
-    ), null)                                                                                # If no worker_pool_id or worker_pool_name is provided, default to null
+  resource_id_resolver_config = {
+    space = {
+      id_attr       = "space_id"
+      name_attr     = "space_name"
+      default_value = local.root_space_id
+    }
+    worker_pool = {
+      id_attr       = "worker_pool_id"
+      name_attr     = "worker_pool_name"
+      default_value = null
+    }
+    aws_integration = {
+      id_attr       = "aws_integration_id"
+      name_attr     = "aws_integration_name"
+      default_value = null
+    }
+  }
+
+  var_lookup = { # We need this map to dynamically access vars like var.space_id when config.id_attr = "space_id". TF doesn't support var[dynamic_key] syntax, downside of it not being a full programming language.
+    space_id             = var.space_id
+    space_name           = var.space_name
+    worker_pool_id       = var.worker_pool_id
+    worker_pool_name     = var.worker_pool_name
+    aws_integration_id   = var.aws_integration_id
+    aws_integration_name = var.aws_integration_name
+  }
+
+  # How it works:
+  # 1. Loops through each resource type (space, worker_pool, aws_integration)
+  # 2. For each stack, tries to resolve the ID using coalesce() with this precedence: stack ID > stack name > global ID > global name > default
+  # Example for space resolution on stack "my-stack":
+  # 1. Check local.stack_configs["my-stack"]["space_id"] (direct ID from YAML)
+  # 2. Check local.name_to_id_mappings["space"][local.stack_configs["my-stack"]["space_name"]] (name→ID from YAML)
+  # 3. Check var.space_id (global module variable)
+  # 4. Check local.name_to_id_mappings["space"][var.space_name] (global name→ID)
+  # 5. Fall back to local.root_space_id ("root")
+  resource_id_resolver = {
+    for resource_type, config in local.resource_id_resolver_config : resource_type => {
+      for stack in local.stacks : stack => try(coalesce(
+        try(local.stack_configs[stack][config.id_attr], null),                                             # Direct stack-level ID always takes precedence
+        try(local.name_to_id_mappings[resource_type][local.stack_configs[stack][config.name_attr]], null), # Direct stack-level name resolution
+        local.var_lookup[config.id_attr],                                                                  # Global variable ID
+        try(local.name_to_id_mappings[resource_type][local.var_lookup[config.name_attr]], null),           # Global variable name resolution
+      ), config.default_value)                                                                             # Resource-specific default
+    }
   }
 
   ## Filter integration + drift detection stacks
@@ -390,12 +420,6 @@ locals {
   }
 }
 
-check "spaces_enforce_mutual_exclusivity" {
-  assert {
-    condition     = var.space_id == null || var.space_name == null
-    error_message = "space_id and space_name are mutually exclusive."
-  }
-}
 
 # Perform deep merge for common configurations and stack configurations
 module "deep" {
@@ -447,12 +471,12 @@ resource "spacelift_stack" "default" {
   protect_from_deletion            = local.stack_property_resolver[each.key].protect_from_deletion
   repository                       = local.stack_property_resolver[each.key].repository
   runner_image                     = local.stack_property_resolver[each.key].runner_image
-  space_id                         = local.resolved_space_ids[each.key]
+  space_id                         = local.resource_id_resolver.space[each.key]
   terraform_smart_sanitization     = local.stack_property_resolver[each.key].terraform_smart_sanitization
   terraform_version                = local.stack_property_resolver[each.key].terraform_version
   terraform_workflow_tool          = var.terraform_workflow_tool
   terraform_workspace              = local.configs[each.key].terraform_workspace
-  worker_pool_id                   = local.resolved_worker_pool_ids[each.key]
+  worker_pool_id                   = local.resource_id_resolver.worker_pool[each.key]
 
   # Usage of `templatestring` requires OpenTofu 1.7 and Terraform 1.9 or later.
   description = coalesce(

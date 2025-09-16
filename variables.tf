@@ -122,6 +122,12 @@ variable "aws_integration_id" {
   default     = null
 }
 
+variable "aws_integration_name" {
+  type        = string
+  description = "Name of the AWS integration to attach, which will be resolved to aws_integration_id. We recommend using names rather than IDs to improve clarity & readability. Since Spacelift enforces unique names, you can rely on names as identifiers without worrying about duplication issues."
+  default     = null
+}
+
 variable "aws_integration_attachment_read" {
   type        = bool
   description = "Indicates whether this attachment is used for read operations."
@@ -347,7 +353,7 @@ variable "space_id" {
 
 variable "space_name" {
   type        = string
-  description = "Place the created stacks in the specified space_name. Mutually exclusive with space_id."
+  description = "Place the created stacks in the specified space_name. Mutually exclusive with space_id. We recommend using names rather than IDs to improve clarity & readability. Since Spacelift enforces unique names, you can rely on names as identifiers without worrying about duplication issues."
   default     = null
 }
 
@@ -371,6 +377,7 @@ variable "worker_pool_id" {
   description = <<-EOT
   ID of the worker pool to use. Mutually exclusive with worker_pool_name.
   NOTE: worker_pool_name or worker_pool_id is required when using a self-hosted instance of Spacelift.
+  We recommend using names rather than IDs to improve clarity & readability. Since Spacelift enforces unique names, you can rely on names as identifiers without worrying about duplication issues.
   EOT
   default     = null
 }

@@ -145,8 +145,8 @@ run "test_default_space_id_is_used" {
   command = plan
 
   assert {
-    condition     = local.resolved_space_ids["root-module-a"] == "root"
-    error_message = "Default space_id (root) was not used when no other values provided: ${jsonencode(local.resolved_space_ids)}"
+    condition     = local.resource_id_resolver.space["root-module-a"] == "root"
+    error_message = "Default space_id (root) was not used when no other values provided: ${jsonencode(local.resource_id_resolver.space)}"
   }
 }
 
@@ -155,7 +155,7 @@ run "test_space_id_is_used_from_stack_yaml" {
   command = plan
 
   assert {
-    condition     = local.resolved_space_ids["root-module-b"] == "some-space-id"
-    error_message = "Space ID from stack.yaml is not being used: ${jsonencode(local.resolved_space_ids)}"
+    condition     = local.resource_id_resolver.space["root-module-b"] == "some-space-id"
+    error_message = "Space ID from stack.yaml is not being used: ${jsonencode(local.resource_id_resolver.space)}"
   }
 }

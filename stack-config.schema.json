@@ -209,6 +209,10 @@
           "type": "string",
           "description": "AWS integration ID"
         },
+        "aws_integration_name": {
+          "type": "string",
+          "description": "AWS integration name, this will be translated to an aws_integration_id. Mutually exclusive with aws_integration_id"
+        },
         "drift_detection_enabled": {
           "type": "boolean",
           "description": "Whether to enable drift detection"

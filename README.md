@@ -349,6 +349,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_aws_integration_enabled"></a> [aws\_integration\_enabled](#input\_aws\_integration\_enabled) | Indicates whether the AWS integration is enabled. | `bool` | `false` | no |
 | <a name="input_aws_integration_id"></a> [aws\_integration\_id](#input\_aws\_integration\_id) | ID of the AWS integration to attach. | `string` | `null` | no |
 | <a name="input_aws_integration_name"></a> [aws\_integration\_name](#input\_aws\_integration\_name) | Name of the AWS integration to attach, which will be resolved to aws\_integration\_id. We recommend using names rather than IDs to improve clarity & readability. Since Spacelift enforces unique names, you can rely on names as identifiers without worrying about duplication issues. | `string` | `null` | no |
+| <a name="input_azure_devops"></a> [azure\_devops](#input\_azure\_devops) | The Azure DevOps integration settings | <pre>object({<br/>    project = string<br/>    id      = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_before_apply"></a> [before\_apply](#input\_before\_apply) | List of before-apply scripts | `list(string)` | `[]` | no |
 | <a name="input_before_destroy"></a> [before\_destroy](#input\_before\_destroy) | List of before-destroy scripts | `list(string)` | `[]` | no |
 | <a name="input_before_init"></a> [before\_init](#input\_before\_init) | List of before-init scripts | `list(string)` | `[]` | no |
@@ -373,6 +374,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_labels"></a> [labels](#input\_labels) | List of labels to apply to the stacks. | `list(string)` | `[]` | no |
 | <a name="input_manage_state"></a> [manage\_state](#input\_manage\_state) | Determines if Spacelift should manage state for this stack. | `bool` | `false` | no |
 | <a name="input_protect_from_deletion"></a> [protect\_from\_deletion](#input\_protect\_from\_deletion) | Protect this stack from accidental deletion. If set, attempts to delete this stack will fail. | `bool` | `false` | no |
+| <a name="input_raw_git"></a> [raw\_git](#input\_raw\_git) | The raw Git integration settings | <pre>object({<br/>    namespace = string<br/>    url       = string<br/>  })</pre> | `null` | no |
 | <a name="input_repository"></a> [repository](#input\_repository) | The name of your infrastructure repo | `string` | n/a | yes |
 | <a name="input_root_module_structure"></a> [root\_module\_structure](#input\_root\_module\_structure) | The root module structure of the Stacks that you're reading in. See README for full details.<br/><br/>MultiInstance - You're using Workspaces or Dynamic Backend configuration to create multiple instances of the same root module code.<br/>SingleInstance - You're using copies of a root module and your directory structure to create multiple instances of the same Terraform code. | `string` | `"MultiInstance"` | no |
 | <a name="input_root_modules_path"></a> [root\_modules\_path](#input\_root\_modules\_path) | The path, relative to the root of the repository, where the root module can be found. | `string` | `"root-modules"` | no |

@@ -489,7 +489,23 @@ resource "spacelift_stack" "default" {
     for_each = var.github_enterprise != null ? [var.github_enterprise] : []
     content {
       namespace = github_enterprise.value["namespace"]
-      id        = github_enterprise.value["id"]
+      id        = try(github_enterprise.value["id"], null)
+    }
+  }
+
+  dynamic "azure_devops" {
+    for_each = var.azure_devops != null ? [var.azure_devops] : []
+    content {
+      project = azure_devops.value["project"]
+      id      = try(azure_devops.value["id"], null)
+    }
+  }
+
+  dynamic "raw_git" {
+    for_each = var.raw_git != null ? [var.raw_git] : []
+    content {
+      namespace = raw_git.value["namespace"]
+      url       = raw_git.value["url"]
     }
   }
 }

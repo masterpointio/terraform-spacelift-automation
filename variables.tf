@@ -54,6 +54,33 @@ variable "raw_git" {
   default     = null
 }
 
+variable "gitlab" {
+  type = object({
+    namespace = string
+    id        = optional(string)
+  })
+  description = "The GitLab integration settings"
+  default     = null
+}
+
+variable "bitbucket_cloud" {
+  type = object({
+    namespace = string
+    id        = optional(string)
+  })
+  description = "The Bitbucket Cloud integration settings"
+  default     = null
+}
+
+variable "bitbucket_datacenter" {
+  type = object({
+    namespace = string
+    id        = optional(string)
+  })
+  description = "The Bitbucket Data Center integration settings"
+  default     = null
+}
+
 
 variable "repository" {
   type        = string

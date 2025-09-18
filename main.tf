@@ -508,6 +508,30 @@ resource "spacelift_stack" "default" {
       url       = raw_git.value["url"]
     }
   }
+
+  dynamic "gitlab" {
+    for_each = var.gitlab != null ? [var.gitlab] : []
+    content {
+      namespace = gitlab.value["namespace"]
+      id        = try(gitlab.value["id"], null)
+    }
+  }
+
+  dynamic "bitbucket_cloud" {
+    for_each = var.bitbucket_cloud != null ? [var.bitbucket_cloud] : []
+    content {
+      namespace = bitbucket_cloud.value["namespace"]
+      id        = try(bitbucket_cloud.value["id"], null)
+    }
+  }
+
+  dynamic "bitbucket_datacenter" {
+    for_each = var.bitbucket_datacenter != null ? [var.bitbucket_datacenter] : []
+    content {
+      namespace = bitbucket_datacenter.value["namespace"]
+      id        = try(bitbucket_datacenter.value["id"], null)
+    }
+  }
 }
 
 # The Spacelift Destructor is a feature designed to automatically clean up the resources no longer managed by our IaC.

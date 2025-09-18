@@ -36,6 +36,15 @@ variable "github_enterprise" {
   default     = null
 }
 
+variable "bitbucket_cloud" {
+  type = object({
+    namespace = string
+    id        = optional(string)
+  })
+  description = "The Bitbucket Cloud integration settings"
+  default     = null
+}
+
 variable "azure_devops" {
   type = object({
     project = string
@@ -53,7 +62,6 @@ variable "raw_git" {
   description = "The raw Git integration settings"
   default     = null
 }
-
 
 variable "repository" {
   type        = string

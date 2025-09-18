@@ -34,6 +34,27 @@ variables {
   aws_integration_enabled  = false
 }
 
+# Test gitlab dynamic block is created correctly
+run "test_gitlab_integration_id_is_null" {
+  command = plan
+
+  variables {
+    gitlab = {
+      namespace = "my-gitlab-group"
+    }
+  }
+
+  assert {
+    condition     = spacelift_stack.default["root-module-a-test"].gitlab[0].namespace == "my-gitlab-group"
+    error_message = "GitLab namespace was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].gitlab)}"
+  }
+
+  assert {
+    condition     = spacelift_stack.default["root-module-a-test"].gitlab[0].id == null
+    error_message = "GitLab id was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].gitlab)}"
+  }
+}
+
 # Test github_enterprise dynamic block is created correctly
 run "test_github_enterprise_integration" {
   command = plan
@@ -75,28 +96,6 @@ run "test_raw_git_integration" {
   assert {
     condition     = spacelift_stack.default["root-module-a-test"].raw_git[0].url == "https://git.example.com/repo.git"
     error_message = "Raw Git url was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].raw_git)}"
-  }
-}
-
-# Test gitlab dynamic block is created correctly
-run "test_gitlab_integration" {
-  command = plan
-
-  variables {
-    gitlab = {
-      namespace = "my-gitlab-group"
-      id        = "test-gitlab-id"
-    }
-  }
-
-  assert {
-    condition     = spacelift_stack.default["root-module-a-test"].gitlab[0].namespace == "my-gitlab-group"
-    error_message = "GitLab namespace was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].gitlab)}"
-  }
-
-  assert {
-    condition     = spacelift_stack.default["root-module-a-test"].gitlab[0].id == "test-gitlab-id"
-    error_message = "GitLab id was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].gitlab)}"
   }
 }
 

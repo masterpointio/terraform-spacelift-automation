@@ -1,3 +1,31 @@
+mock_provider "spacelift" {
+  mock_data "spacelift_spaces" {
+    defaults = {
+      spaces = []
+    }
+  }
+
+  mock_data "spacelift_worker_pools" {
+    defaults = {
+      worker_pools = []
+    }
+  }
+
+  mock_data "spacelift_aws_integrations" {
+    defaults = {
+      integrations = []
+    }
+  }
+}
+
+mock_provider "jsonschema" {
+  mock_data "jsonschema_validator" {
+    defaults = {
+      validated = "{}"
+    }
+  }
+}
+
 variables {
   root_modules_path        = "./tests/fixtures/multi-instance"
   common_config_file       = "common.yaml"
@@ -50,13 +78,82 @@ run "test_raw_git_integration" {
   }
 }
 
+# Test gitlab dynamic block is created correctly
+run "test_gitlab_integration" {
+  command = plan
+
+  variables {
+    gitlab = {
+      namespace = "my-gitlab-group"
+      id        = "test-gitlab-id"
+    }
+  }
+
+  assert {
+    condition     = spacelift_stack.default["root-module-a-test"].gitlab[0].namespace == "my-gitlab-group"
+    error_message = "GitLab namespace was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].gitlab)}"
+  }
+
+  assert {
+    condition     = spacelift_stack.default["root-module-a-test"].gitlab[0].id == "test-gitlab-id"
+    error_message = "GitLab id was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].gitlab)}"
+  }
+}
+
+# Test bitbucket_cloud dynamic block is created correctly
+run "test_bitbucket_cloud_integration" {
+  command = plan
+
+  variables {
+    bitbucket_cloud = {
+      namespace = "my-bitbucket-project"
+      id        = "test-bb-cloud-id"
+    }
+  }
+
+  assert {
+    condition     = spacelift_stack.default["root-module-a-test"].bitbucket_cloud[0].namespace == "my-bitbucket-project"
+    error_message = "Bitbucket Cloud namespace was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].bitbucket_cloud)}"
+  }
+
+  assert {
+    condition     = spacelift_stack.default["root-module-a-test"].bitbucket_cloud[0].id == "test-bb-cloud-id"
+    error_message = "Bitbucket Cloud id was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].bitbucket_cloud)}"
+  }
+}
+
+# Test bitbucket_datacenter dynamic block is created correctly
+run "test_bitbucket_datacenter_integration" {
+  command = plan
+
+  variables {
+    bitbucket_datacenter = {
+      namespace = "my-bitbucket-dc-project"
+      id        = "test-bb-dc-id"
+    }
+  }
+
+  assert {
+    condition     = spacelift_stack.default["root-module-a-test"].bitbucket_datacenter[0].namespace == "my-bitbucket-dc-project"
+    error_message = "Bitbucket Data Center namespace was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].bitbucket_datacenter)}"
+  }
+
+  assert {
+    condition     = spacelift_stack.default["root-module-a-test"].bitbucket_datacenter[0].id == "test-bb-dc-id"
+    error_message = "Bitbucket Data Center id was not set correctly: ${jsonencode(spacelift_stack.default["root-module-a-test"].bitbucket_datacenter)}"
+  }
+}
+
 # Test that VCS blocks are empty when variables are null
 run "test_vcs_blocks_empty_when_null" {
   command = plan
 
   variables {
-    github_enterprise = null
-    raw_git          = null
+    github_enterprise    = null
+    raw_git             = null
+    gitlab              = null
+    bitbucket_cloud     = null
+    bitbucket_datacenter = null
   }
 
   assert {
@@ -67,5 +164,20 @@ run "test_vcs_blocks_empty_when_null" {
   assert {
     condition     = length(spacelift_stack.default["root-module-a-test"].raw_git) == 0
     error_message = "Raw Git block should be empty when variable is null: ${jsonencode(spacelift_stack.default["root-module-a-test"].raw_git)}"
+  }
+
+  assert {
+    condition     = length(spacelift_stack.default["root-module-a-test"].gitlab) == 0
+    error_message = "GitLab block should be empty when variable is null: ${jsonencode(spacelift_stack.default["root-module-a-test"].gitlab)}"
+  }
+
+  assert {
+    condition     = length(spacelift_stack.default["root-module-a-test"].bitbucket_cloud) == 0
+    error_message = "Bitbucket Cloud block should be empty when variable is null: ${jsonencode(spacelift_stack.default["root-module-a-test"].bitbucket_cloud)}"
+  }
+
+  assert {
+    condition     = length(spacelift_stack.default["root-module-a-test"].bitbucket_datacenter) == 0
+    error_message = "Bitbucket Data Center block should be empty when variable is null: ${jsonencode(spacelift_stack.default["root-module-a-test"].bitbucket_datacenter)}"
   }
 }

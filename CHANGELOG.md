@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.7.0...v1.8.0) (2025-09-18)
+
+
+### Features
+
+* ability to assign AWS integration by name instead of ID only, and add TF Check blocks for mutual exclusivity ([#92](https://github.com/masterpointio/terraform-spacelift-automation/issues/92)) ([8143a92](https://github.com/masterpointio/terraform-spacelift-automation/commit/8143a92b5586d40f14837121d5c13fa802be8e48))
+* add remaining VCS integrations ([#98](https://github.com/masterpointio/terraform-spacelift-automation/issues/98)) ([987e24b](https://github.com/masterpointio/terraform-spacelift-automation/commit/987e24b1675ffa315370a049f630c23e52e05f78))
+
 ## [1.7.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.6.0...v1.7.0) (2025-09-15)
 
 

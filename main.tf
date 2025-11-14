@@ -115,6 +115,46 @@ locals {
 
   _root_module_yaml_decoded = merge(local._multi_instance_root_module_yaml_decoded, local._single_instance_root_module_yaml_decoded)
 
+  ## Stack Name Template Resolution
+  # Determine the default template based on structure type
+  # MultiInstance: "${workspace}-${module_path}" (e.g., "dev-network")
+  # SingleInstance: "${module_name}" (e.g., "rds-cluster")
+  default_stack_name_template = local._multi_instance_structure ? "$${workspace}-$${module_path}" : "$${module_name}"
+
+  # Use provided template or fall back to default
+  stack_name_template = coalesce(var.stack_name_template, local.default_stack_name_template)
+
+  # Generate stack names using the template
+  # Iterates over all modules and their stack files, applying the template with available parameters
+  stack_names = {
+    for module, files in local._root_module_yaml_decoded :
+    module => {
+      for file, content in files :
+      file => (
+        file == var.common_config_file ? null :
+        templatestring(
+          local.stack_name_template,
+          {
+            module_name = basename(module)
+            workspace   = trimsuffix(file, ".yaml")
+            module_path = replace(module, "/", "-")
+          }
+        )
+      ) if file != var.common_config_file
+    }
+  }
+
+  # Clean up stack names to handle edge cases
+  # Removes double hyphens, leading/trailing hyphens, and applies trimspace
+  # This handles cases where template parameters may be empty (e.g., SingleInstance with ${workspace})
+  cleaned_stack_names = {
+    for module, names in local.stack_names :
+    module => {
+      for file, name in names :
+      file => name != null ? trimspace(replace(replace(replace(name, "--", "-"), "/^-/", ""), "/-$/", "")) : null
+    }
+  }
+
   ## Common Stack configurations
   # Retrieve common Stack configurations for each root module.
   # SingleInstance root_module_structure does not support common configs today.
@@ -155,7 +195,7 @@ locals {
   # }
   _root_module_stack_configs = merge([for module, files in local._root_module_yaml_decoded : {
     for file, content in files :
-    local._multi_instance_structure ? "${module}-${trimsuffix(file, ".yaml")}" : module =>
+    local.cleaned_stack_names[module][file] =>
     merge(
       {
         # Use specified project_root, if not, build it using the root_modules_path and module name

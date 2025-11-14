@@ -15,3 +15,5 @@ packages:
     tags: [terraform]
   - name: opentofu/opentofu@v1.9.1
     tags: [tofu]
+  - name: trunk-io/launcher
+    version: 1.0.0

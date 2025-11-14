@@ -137,7 +137,7 @@ locals {
           {
             module_name = basename(module)
             workspace   = trimsuffix(file, ".yaml")
-            module_path = replace(module, "/", "-")
+            module_path = module
           }
         )
       ) if file != var.common_config_file

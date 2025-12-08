@@ -1,6 +1,66 @@
 # This test file validates the resource_id_resolver logic in main.tf which handles
 # name-to-ID resolution for Spacelift resources and when to use global vs stack-level values,
 # including Spaces, Worker Pools, and AWS Integrations, etc.
+
+mock_provider "spacelift" {
+  mock_data "spacelift_spaces" {
+    defaults = {
+      spaces = [
+        {
+          space_id    = "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
+          name        = "mp-aws-automation"
+          parent_space_id = "root"
+          description = "Test space"
+          labels      = []
+          inherit_entities = true
+        }
+      ]
+    }
+  }
+
+  mock_data "spacelift_worker_pools" {
+    defaults = {
+      worker_pools = [
+        {
+          worker_pool_id           = "01K3VABYB4FBXNV24KN4A4EKC8"
+          name                     = "mp-ue1-automation-spft-priv-workers"
+          description              = "Test worker pool"
+          labels                   = []
+          config                   = ""
+          space_id                 = "root"
+          drift_detection_run_limit = 0
+        }
+      ]
+    }
+  }
+
+  mock_data "spacelift_aws_integrations" {
+    defaults = {
+      integrations = [
+        {
+          integration_id                 = "01JEC7ZACVKHTSVY4NF8QNZVVB"
+          name                           = "mp-automation-755965222190"
+          role_arn                       = "arn:aws:iam::755965222190:role/spacelift"
+          external_id                    = "test"
+          duration_seconds               = 3600
+          generate_credentials_in_worker = false
+          space_id                       = "root"
+          labels                         = []
+          region                         = "us-east-1"
+        }
+      ]
+    }
+  }
+}
+
+mock_provider "jsonschema" {
+  mock_data "jsonschema_validator" {
+    defaults = {
+      validated = "{}"
+    }
+  }
+}
+
 variables {
   stack_name_template = "$${module_path}-$${workspace}"
   root_modules_path   = "./tests/fixtures/multi-instance"

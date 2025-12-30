@@ -105,6 +105,18 @@ variable "root_modules_path" {
   default     = "root-modules"
 }
 
+variable "project_root_prefix" {
+  type        = string
+  description = <<-EOT
+  A prefix to prepend to the calculated project_root for all stacks.
+  This is useful when root_modules_path uses relative paths (e.g., "../../root-modules" for local scanning)
+  but the actual path in the repository is different (e.g., "terraform/root-modules").
+  When set, the default project_root becomes: project_root_prefix/module_name
+  Per-stack project_root in YAML files still takes precedence over this.
+  EOT
+  default     = null
+}
+
 variable "enabled_root_modules" {
   type        = list(string)
   description = <<-EOT

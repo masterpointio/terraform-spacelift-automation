@@ -158,9 +158,14 @@ locals {
     local._multi_instance_structure ? "${module}-${trimsuffix(file, ".yaml")}" : module =>
     merge(
       {
-        # Use specified project_root, if not, build it using the root_modules_path and module name
-        "project_root" = try(content.stack_settings.project_root, replace(format("%s/%s", var.root_modules_path, module), "../", "")),
-        "root_module"  = module,
+        # Use specified project_root, if not:
+        # - If project_root_prefix is set, use project_root_prefix/module
+        # - Otherwise, use root_modules_path/module with "../" stripped
+        "project_root" = try(
+          content.stack_settings.project_root,
+          var.project_root_prefix != null ? format("%s/%s", var.project_root_prefix, module) : replace(format("%s/%s", var.root_modules_path, module), "../", "")
+        ),
+        "root_module" = module,
 
         # If default_tf_workspace_enabled is true, use "default" workspace, otherwise our file name is the workspace name
         "terraform_workspace" = try(content.automation_settings.default_tf_workspace_enabled, local._default_tf_workspace_enabled) ? local.default_workspace_name : trimsuffix(file, ".yaml"),

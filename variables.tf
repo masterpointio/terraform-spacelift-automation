@@ -339,7 +339,7 @@ variable "drift_detection_timezone" {
 variable "enable_local_preview" {
   type        = bool
   description = "Indicates whether local preview runs can be triggered on this Stack."
-  default     = false
+  default     = true
 }
 
 variable "enable_well_known_secret_masking" {

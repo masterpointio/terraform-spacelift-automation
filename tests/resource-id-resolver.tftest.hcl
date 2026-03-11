@@ -47,6 +47,8 @@ mock_provider "spacelift" {
           space_id                       = "root"
           labels                         = []
           region                         = "us-east-1"
+          autoattach_enabled             = false
+          tag_assume_role                = false
         }
       ]
     }

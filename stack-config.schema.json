@@ -93,7 +93,7 @@
         },
         "autoretry": {
           "type": "boolean",
-          "description": "Whether to automatically retry failed runs"
+          "description": "Flag to enable/disable automatic retry of the stack. Only supported with private worker pools; on public workers use a Trigger policy. Docs: https://docs.spacelift.io/concepts/stack/stack-settings#autoretry"
         },
         "before_apply": {
           "type": "array",

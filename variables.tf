@@ -230,7 +230,7 @@ variable "autodeploy" {
 
 variable "autoretry" {
   type        = bool
-  description = "Flag to enable/disable automatic retry of the stack"
+  description = "Flag to enable/disable automatic retry of the stack. Only supported with private worker pools; on public workers use a Trigger policy. Docs: https://docs.spacelift.io/concepts/stack/stack-settings#autoretry"
   default     = false
 }
 

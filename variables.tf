@@ -466,6 +466,19 @@ variable "managed_roles" {
   ```
   EOT
   default     = {}
+
+  validation {
+    condition = length(setintersection(
+      keys(var.managed_roles),
+      toset(concat(
+        # Built-in Spacelift role slugs that should not be shadowed
+        ["space-admin", "space-writer", "space-reader"],
+        # Module-level role_attachment slug if configured
+        var.role_attachment != null ? [var.role_attachment.role_slug] : []
+      ))
+    )) == 0
+    error_message = "managed_roles keys cannot collide with built-in Spacelift role slugs ('space-admin', 'space-writer', 'space-reader') or with the role slug specified in var.role_attachment.role_slug. Please choose different keys for your managed roles."
+  }
 }
 
 variable "spaces" {

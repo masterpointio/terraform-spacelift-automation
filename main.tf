@@ -407,14 +407,14 @@ locals {
   # YAML config, OR when the module-level `var.role_attachment` is configured (applies to all stacks).
   role_attachment_stacks = {
     for stack, config in local.stack_configs :
-    stack => config if coalesce(try(config.role_attachment_role_slug, null), try(var.role_attachment.role_slug, null)) != null
+    stack => config if try(config.role_attachment_role_slug, null) != null || var.role_attachment != null
   }
 
   # Collect the unique role slugs/keys needed across all role attachment stacks so we can look them up once.
   # role_attachment_role_slug is required — either per-stack in YAML or via var.role_attachment.role_slug.
   _role_attachment_slugs = toset([
     for stack in keys(local.role_attachment_stacks) :
-    coalesce(try(local.stack_configs[stack].role_attachment_role_slug, null), var.role_attachment.role_slug)
+    try(local.stack_configs[stack].role_attachment_role_slug, var.role_attachment.role_slug)
   ])
 
   # Exclude managed role keys from the data source lookup — those roles are resolved directly
@@ -628,6 +628,6 @@ resource "spacelift_role_attachment" "default" {
   )
 
   role_id = local._role_slug_to_id[
-    coalesce(try(local.stack_configs[each.key].role_attachment_role_slug, null), var.role_attachment.role_slug)
+    try(local.stack_configs[each.key].role_attachment_role_slug, var.role_attachment.role_slug)
   ]
 }

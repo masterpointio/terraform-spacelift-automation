@@ -1,6 +1,5 @@
 kind: StackConfigV1
 stack_settings:
-  administrative: false
   labels:
     - nested_dev_label
   manage_state: true

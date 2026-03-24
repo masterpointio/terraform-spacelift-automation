@@ -10,7 +10,7 @@ module "automation" {
   root_modules_path        = "../../../../examples/complete/root-modules"
   all_root_modules_enabled = true
 
-  aws_integration_id      = "01JEC7ZACVKHTSVY4NF8QNZVVB"
+  aws_integration_id      = "YOUR_AWS_INTEGRATION_ID"
   aws_integration_enabled = true
 }
 

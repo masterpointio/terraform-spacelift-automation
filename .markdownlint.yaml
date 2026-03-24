@@ -9,11 +9,16 @@ spaces: false
 url: false
 whitespace: false
 
+# Allow duplicate headings under different parent sections (e.g. ### Features in each ## version)
+MD024:
+  siblings_only: true
+
 # Ignore MD041/first-line-heading/first-line-h1
 # Error: First line in a file should be a top-level heading
 MD041: false
 
-# Ignore MD013/line-length
+# MD013/line-length — exclude tables (auto-generated terraform-docs rows exceed any practical limit)
 MD013:
   strict: false
-  line_length: 350
+  line_length: 500
+  tables: false

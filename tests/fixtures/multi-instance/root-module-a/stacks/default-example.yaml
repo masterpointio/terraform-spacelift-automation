@@ -1,6 +1,6 @@
 kind: StackConfigV1
 stack_settings:
-  administrative: true
+  role_attachment_role_slug: space-admin
   additional_project_globs: [glob/*]
   after_apply: [echo 'after_apply']
   after_destroy: [echo 'after_destroy']
@@ -24,8 +24,8 @@ stack_settings:
   github_action_deploy: false
   manage_state: true
   protect_from_deletion: true
-  runner_image: masterpointio/spacelift-runner:latest
-  space_name: mp-aws-automation # Tests space_name gets translated to space_id (the Terraform resource attribute that is accepted)
+  runner_image: example/spacelift-runner:latest
+  space_name: example-space # Tests space_name gets translated to space_id (the Terraform resource attribute that is accepted)
   terraform_smart_sanitization: true
   terraform_version: 1.9.0
   worker_pool_id: "1234567890"

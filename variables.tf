@@ -354,6 +354,12 @@ variable "github_action_deploy" {
   default     = true
 }
 
+variable "dependency_labels_enabled" {
+  type        = bool
+  description = "Whether to automatically add `depends-on` labels to stacks. When enabled, each stack gets a `depends-on:<automation-stack-name>` label. You may set this to `false` if you do NOT want stacks to be triggered after the automation stack finishes running, or have a custom trigger policy in place that supports this."
+  default     = true
+}
+
 variable "labels" {
   type        = list(string)
   description = "List of labels to apply to the stacks."

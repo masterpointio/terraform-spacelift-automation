@@ -1,0 +1,9 @@
+kind: StackConfigV1
+stack_settings:
+  # Custom project_root should take precedence over project_root_prefix
+  project_root: custom/path/to/root-module-a
+  labels:
+    - custom_project_root_label
+
+automation_settings:
+  tfvars_enabled: false

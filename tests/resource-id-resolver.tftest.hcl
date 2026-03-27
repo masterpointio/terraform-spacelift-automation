@@ -44,6 +44,7 @@ mock_provider "spacelift" {
           external_id                    = "test"
           duration_seconds               = 3600
           generate_credentials_in_worker = false
+          autoattach_enabled             = false
           space_id                       = "root"
           labels                         = []
           region                         = "us-east-1"

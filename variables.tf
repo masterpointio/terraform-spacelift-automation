@@ -101,8 +101,30 @@ variable "branch" {
 
 variable "root_modules_path" {
   type        = string
-  description = "The path, relative to the root of the repository, where the root module can be found."
+  description = <<-EOT
+  The path where root modules can be found, used internally by spacelift-automation to discover
+  stack YAML files via fileset(). This path is relative to the spacelift-automation root module.
+
+  NOTE: It does NOT affect the configuration of created stacks (use project_root_prefix for that).
+
+  Example: If spacelift-automation is at `some-directory/root-modules/spacelift-automation/`
+  and you want to discover stacks in sibling directories, use `../../root-modules`.
+  EOT
   default     = "root-modules"
+}
+
+variable "project_root_prefix" {
+  type        = string
+  description = <<-EOT
+  The path from the repository root to the root-modules directory. Used to set each stack's project_root.
+  This is the path Spacelift uses to find Terraform code in your repo.
+
+  When set, each stack's project_root becomes: project_root_prefix/module_name
+  (e.g., "some-directory/root-modules" + "network" = "some-directory/root-modules/network")
+
+  Per-stack project_root in YAML files takes precedence.
+  EOT
+  default     = null
 }
 
 variable "enabled_root_modules" {

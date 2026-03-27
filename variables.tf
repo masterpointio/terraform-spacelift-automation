@@ -195,6 +195,14 @@ variable "role_attachment" {
   Can be overridden per-stack via `stack_settings.role_attachment_role_slug` and
   `role_attachment_space_id` in the stack config YAML.
   Set to `null` (the default) to create no role attachment for any stack.
+
+  Example:
+  ```
+  role_attachment = {
+    role_slug = "space-admin"
+    # space_id = "root"  # optional: set to attach in a different space (e.g. for cross-space access)
+  }
+  ```
   EOT
   default     = null
 }

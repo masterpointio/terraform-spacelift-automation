@@ -1,102 +1,84 @@
 # Changelog
 
-## [2.0.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.8.0...v2.0.0) (2026-03-20)
-
-### ⚠ BREAKING CHANGES
-
-* The deprecated `administrative` flag has been removed from the `spacelift_stack` resource and all related variables, outputs, labels, and stack config YAML keys. Spacelift is deprecating this flag on June 1, 2026.
-* The `administrative` input variable has been removed. Use `var.role_attachment = { role_slug = "..." }` instead.
-* The `administrative` key in stack config YAML files (`stack_settings.administrative`) is no longer recognized. Replace it with `stack_settings.role_attachment_role_slug: "<slug>"`.
-* The `administrative` attribute has been removed from the `spacelift_stacks` output map.
-* The auto-generated `"administrative"` label is no longer added to stacks. If you rely on this label for policy auto-attachment, add it manually via `stack_settings.labels`.
-
-### Features
-
-* Migrate from deprecated `administrative` flag to `spacelift_role_attachment` resource
-  * New `var.role_attachment` module-level variable — set `{ role_slug = "..." }` to attach a role to every stack managed by this module instance
-  * New `role_attachment_role_slug` stack config key — set in a per-stack YAML to attach a role to that specific stack; presence of this key is what triggers the attachment
-  * New `role_attachment_space_id` stack config key / `var.role_attachment.space_id` — optional; defaults to the stack's own space, set to a different space ID for cross-space access
-* New `var.managed_roles` — create and manage custom Spacelift roles directly from the module; role keys from this map can be referenced in `var.role_attachment.role_slug` and per-stack `role_attachment_role_slug` alongside built-in slugs like `"space-admin"`
-* New `spacelift_roles` output — exposes `id`, `slug`, `name`, `description`, and `actions` for all roles created via `var.managed_roles`
-
-
 ## [1.8.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.7.0...v1.8.0) (2025-09-18)
+
 
 ### Features
 
 * ability to assign AWS integration by name instead of ID only, and add TF Check blocks for mutual exclusivity ([#92](https://github.com/masterpointio/terraform-spacelift-automation/issues/92)) ([8143a92](https://github.com/masterpointio/terraform-spacelift-automation/commit/8143a92b5586d40f14837121d5c13fa802be8e48))
 * add remaining VCS integrations ([#98](https://github.com/masterpointio/terraform-spacelift-automation/issues/98)) ([987e24b](https://github.com/masterpointio/terraform-spacelift-automation/commit/987e24b1675ffa315370a049f630c23e52e05f78))
 
-
 ## [1.7.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.6.0...v1.7.0) (2025-09-15)
+
 
 ### Features
 
 * ability to assign workerpool by name ([#89](https://github.com/masterpointio/terraform-spacelift-automation/issues/89)) ([7597e4d](https://github.com/masterpointio/terraform-spacelift-automation/commit/7597e4d10db955b17e70d8075a1dac7e801927f6))
 * enable integration with ADO ([#93](https://github.com/masterpointio/terraform-spacelift-automation/issues/93)) ([f3b0da4](https://github.com/masterpointio/terraform-spacelift-automation/commit/f3b0da41fd35a1549825a6665769057aa3a2ec6c))
 
-
 ## [1.6.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.5.0...v1.6.0) (2025-08-17)
+
 
 ### Features
 
 * add spaces as output ([#83](https://github.com/masterpointio/terraform-spacelift-automation/issues/83)) ([bc842db](https://github.com/masterpointio/terraform-spacelift-automation/commit/bc842dbe88e8d836a2feead16a513c8c004c1556))
 
-
 ## [1.5.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.4.0...v1.5.0) (2025-08-01)
+
 
 ### Features
 
 * support root module nested directories  ([#80](https://github.com/masterpointio/terraform-spacelift-automation/issues/80)) ([78b675b](https://github.com/masterpointio/terraform-spacelift-automation/commit/78b675b275ed753b312831ebb21f8d161276cbb7))
 
-
 ## [1.4.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.3.1...v1.4.0) (2025-06-16)
+
 
 ### Features
 
 * set default `terraform_version = null` ([#73](https://github.com/masterpointio/terraform-spacelift-automation/issues/73)) ([b19e782](https://github.com/masterpointio/terraform-spacelift-automation/commit/b19e782461ff8d5dbf37888885e97712068fe538))
 
+
 ### Bug Fixes
 
 * **gha:** trigger test workflow on pull_request_target ([#74](https://github.com/masterpointio/terraform-spacelift-automation/issues/74)) ([0320c70](https://github.com/masterpointio/terraform-spacelift-automation/commit/0320c70da3b2553c0f8376241cc5d1fa638c11f4))
 
-
 ## [1.3.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.3.0...v1.3.1) (2025-06-09)
+
 
 ### Bug Fixes
 
 * **gha:** wait for checks and merge with admin ([#71](https://github.com/masterpointio/terraform-spacelift-automation/issues/71)) ([bfc8f23](https://github.com/masterpointio/terraform-spacelift-automation/commit/bfc8f23960d874bb209e9f18b23e33c750d4cf4f))
 
-
 ## [1.3.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.2.0...v1.3.0) (2025-05-12)
+
 
 ### Features
 
 * manage destructor creation and activation separately ([#66](https://github.com/masterpointio/terraform-spacelift-automation/issues/66)) ([af2a2de](https://github.com/masterpointio/terraform-spacelift-automation/commit/af2a2dea6209d00416059ee4c9a38aa41d961445))
 
-
 ## [1.2.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.1.1...v1.2.0) (2025-04-28)
+
 
 ### Features
 
 * **spaces:** adds spaces + consolidates with the template ([#62](https://github.com/masterpointio/terraform-spacelift-automation/issues/62)) ([dd9162f](https://github.com/masterpointio/terraform-spacelift-automation/commit/dd9162fde23bbd596c4d5e687a395f338411e2e5))
 
-
 ## [1.1.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.1.0...v1.1.1) (2025-02-12)
+
 
 ### Bug Fixes
 
 * pin tofu 1.8 due to usage of .tofu extension ([#54](https://github.com/masterpointio/terraform-spacelift-automation/issues/54)) ([814d64b](https://github.com/masterpointio/terraform-spacelift-automation/commit/814d64b98ac4e43d8cf677e356d68f78b6ab9254))
 
-
 ## [1.1.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.0.0...v1.1.0) (2025-02-11)
+
 
 ### Features
 
 * add spacelift stack's `after_run` config, FINALLY hook ([#52](https://github.com/masterpointio/terraform-spacelift-automation/issues/52)) ([5ad3902](https://github.com/masterpointio/terraform-spacelift-automation/commit/5ad3902cd884648d9ef98c727fd36b707c692b26))
 
-
 ## [1.0.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.7.0...v1.0.0) (2025-02-04)
+
 
 ### ⚠ BREAKING CHANGES
 
@@ -110,42 +92,42 @@
 * feat: allow specifying `space_name` that maps to space_id #46
 * **schema:** adds initial JSON schema + StackConfig changes ([#42](https://github.com/masterpointio/terraform-spacelift-automation/issues/42)) ([f247b5e](https://github.com/masterpointio/terraform-spacelift-automation/commit/f247b5ee371f0c436f97b6a9f5a90bb83c802fec))
 
+
 ### Bug Fixes
 
 * cron validator regex escape characters ([#45](https://github.com/masterpointio/terraform-spacelift-automation/issues/45)) ([81a386b](https://github.com/masterpointio/terraform-spacelift-automation/commit/81a386bf5eb20be7e28ee0fcd24d51d21113de55))
 * dont clobber static config with overrides ([#50](https://github.com/masterpointio/terraform-spacelift-automation/issues/50)) ([b352674](https://github.com/masterpointio/terraform-spacelift-automation/commit/b352674bbd53f03be798d256eb5ba541e4940709))
 * external space changed so update test data ([#51](https://github.com/masterpointio/terraform-spacelift-automation/issues/51)) ([569d8d4](https://github.com/masterpointio/terraform-spacelift-automation/commit/569d8d4ff438954cc546cbe5221d94fc19445037))
-
-
 ## [0.7.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.6.0...v0.7.0) (2025-01-09)
+
 
 ### Features
 
 * adds a variable to support labels on a root module level ([#39](https://github.com/masterpointio/terraform-spacelift-automation/issues/39)) ([f84d9ac](https://github.com/masterpointio/terraform-spacelift-automation/commit/f84d9ac639664ded004d00796dea3c14c07cc9b2))
 
-
 ## [0.6.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.5.0...v0.6.0) (2024-12-31)
+
 
 ### Features
 
 * runner image and globs paths for stacks ([#34](https://github.com/masterpointio/terraform-spacelift-automation/issues/34)) ([074dae8](https://github.com/masterpointio/terraform-spacelift-automation/commit/074dae8b5ee4f8e07ff7ec484a79f5c2156dac19))
 
-
 ## [0.5.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.4.0...v0.5.0) (2024-12-30)
+
 
 ### Features
 
 * allow project root to be customized for stack ([#32](https://github.com/masterpointio/terraform-spacelift-automation/issues/32)) ([3eb9027](https://github.com/masterpointio/terraform-spacelift-automation/commit/3eb9027dfb0cb6bfeb01153ea56fc3f1126fa9c9))
 
-
 ## [0.4.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.3.1...v0.4.0) (2024-12-26)
+
 
 ### Features
 
 * begins the work to support single vs multi root_module_structure ([#17](https://github.com/masterpointio/terraform-spacelift-automation/issues/17)) ([598f0c7](https://github.com/masterpointio/terraform-spacelift-automation/commit/598f0c7be4fd69de0b598bd83db28ca8960cf715))
 
-
 ## [0.3.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.3.0...v0.3.1) (2024-12-19)
+
 
 ### Bug Fixes
 
@@ -153,8 +135,8 @@
 * include stack specific `before_init` even if tfvars disabled + adds initial tests 🎉 ([#13](https://github.com/masterpointio/terraform-spacelift-automation/issues/13)) ([9eb3cd4](https://github.com/masterpointio/terraform-spacelift-automation/commit/9eb3cd42e77e2c41307740142cc7c7b18b2b5b2e))
 * pass github_enterprise.id to stacks ([#14](https://github.com/masterpointio/terraform-spacelift-automation/issues/14)) ([f4c6c1b](https://github.com/masterpointio/terraform-spacelift-automation/commit/f4c6c1b2ffca87de178fb8db6a19c552b9a9fbe8))
 
-
 ## [0.3.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.2.1...v0.3.0) (2024-12-18)
+
 
 ### Features
 
@@ -166,20 +148,19 @@
 
 * Fixes drift detection precondition
 
-
 ## [0.2.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.2.0...v0.2.1) (2024-12-13)
+
 
 ### Bug Fixes
 
 * common labels merge with stack labels ([b9e63ae](https://github.com/masterpointio/terraform-spacelift-automation/commit/b9e63ae4bbc020e285be543c1decb953f148a59b))
 
-
 ## [0.2.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v0.1.0...v0.2.0) (2024-11-14)
+
 
 ### Features
 
 * adds CRabbit custom config ([e9b4889](https://github.com/masterpointio/terraform-spacelift-automation/commit/e9b4889f5d05e390903d01b4485a09c63c0f1af3))
-
 
 ## 0.1.0 (2024-11-11)
 
@@ -187,7 +168,6 @@
 
 - initial testing ([b831715](https://github.com/masterpointio/terraform-spacelift-automation/commit/b831715cb84960d10e94e23e799eeab6b16656ce))
 - support all root modules + add example ([ca711fa](https://github.com/masterpointio/terraform-spacelift-automation/commit/ca711fab4208d79a0870cb2d9e5799e2679f696b))
-
 
 ## [0.1.1](https://github.com/masterpointio/terraform-module-template/compare/0.1.0...v0.1.1) (2024-08-15)
 

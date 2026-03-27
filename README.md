@@ -251,7 +251,7 @@ Or apply it to every stack managed by a module instance via `var.role_attachment
 ```hcl
 module "spacelift_automation" {
   source  = "masterpointio/automation/spacelift"
-  version = "~> 2.0"
+  version = "2.0.0"
   # ...
   role_attachment = {
     role_slug = "space-admin"
@@ -266,7 +266,7 @@ For least-privilege access, create a custom role with only the actions your stac
 ```hcl
 module "spacelift_automation" {
   source  = "masterpointio/automation/spacelift"
-  version = "~> 2.0"
+  version = "2.0.0"
   # ...
 
   managed_roles = {

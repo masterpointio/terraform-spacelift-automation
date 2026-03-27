@@ -63,7 +63,7 @@ If you were setting `administrative = true` at the module level (applying to all
 # Before
 module "spacelift_automation" {
   source  = "masterpointio/automation/spacelift"
-  version = "~> 1.0"
+  version = "1.8.0"
 
   administrative = true
   # ...
@@ -72,7 +72,7 @@ module "spacelift_automation" {
 # After
 module "spacelift_automation" {
   source  = "masterpointio/automation/spacelift"
-  version = "~> 2.0"
+  version = "2.0.0"
 
   role_attachment = {
     role_slug = "space-admin"

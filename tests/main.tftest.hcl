@@ -842,6 +842,20 @@ run "test_depends_on_label_is_added_to_stack" {
   }
 }
 
+# Test that the depends-on label is not added to the stack when dependency_labels_enabled is false
+run "test_depends_on_label_is_not_added_when_disabled" {
+  command = plan
+
+  variables {
+    dependency_labels_enabled = false
+  }
+
+  assert {
+    condition     = !contains(local.labels["root-module-a-test"], "depends-on:spacelift-automation-default")
+    error_message = "Depends-on label should not be present when dependency_labels_enabled is false: ${jsonencode(local.labels)}"
+  }
+}
+
 # Test before_init excludes the expected tfvars copy command when tfvars are not enabled
 run "test_before_init_excludes_the_expected_tfvars_copy_command_when_tfvars_are_not_enabled" {
   command = plan

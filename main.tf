@@ -218,7 +218,7 @@ locals {
   _dependency_labels = {
     for stack in local.stacks : stack => [
       "depends-on:spacelift-automation-${terraform.workspace}"
-    ]
+    ] if var.dependency_labels_enabled
   }
 
   # Creates a map of folder labels for each stack based on Git structure for a proper grouping stacks in Spacelift UI.

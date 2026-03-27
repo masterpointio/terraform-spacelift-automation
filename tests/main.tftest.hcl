@@ -1,6 +1,7 @@
 variables {
-  root_modules_path  = "./tests/fixtures/multi-instance"
-  common_config_file = "common.yaml"
+  root_modules_path   = "./tests/fixtures/multi-instance"
+  stack_name_template = "$${module_path}-$${workspace}"
+  common_config_file  = "common.yaml"
   github_enterprise = {
     namespace = "masterpointio"
   }

@@ -424,6 +424,25 @@ variable "worker_pool_name" {
   default     = null
 }
 
+variable "stack_name_template" {
+  type        = string
+  description = <<-EOT
+    Template for generating stack names. Supports the following parameters:
+    - $${module_name}: The root module directory name (e.g., 'network', 'delegated-tf')
+    - $${workspace}: The workspace/environment name from YAML filename (e.g., 'dev', 'prod')
+    - $${module_path}: The root module path for S3 backend workspace isolation (e.g., 'aws-iam/delegated-tf')
+    Examples:
+    - "$${workspace}-$${module_path}" (default for MultiInstance)
+    - "$${module_name}" (default for SingleInstance)
+  EOT
+  default     = null
+
+  validation {
+    condition     = var.stack_name_template == null || can(regex("\\$\\{(module_name|workspace|module_path)\\}", var.stack_name_template))
+    error_message = "stack_name_template must contain at least one of: $${module_name}, $${workspace}, or $${module_path}"
+  }
+}
+
 variable "spaces" {
   description = "A map of Spacelift Spaces to create"
   type = map(object({

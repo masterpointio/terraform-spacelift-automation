@@ -1,5 +1,6 @@
 variables {
-  repository = "terraform-spacelift-automation"
+  repository          = "terraform-spacelift-automation"
+  stack_name_template = "$${module_path}-$${workspace}"
   github_enterprise = {
     namespace = "masterpointio"
   }
@@ -55,7 +56,7 @@ run "test_nested_directory_multi_instance_support" {
   }
 
   assert {
-    condition     = spacelift_stack.default["parent/nested-prod"].branch == "main"  
+    condition     = spacelift_stack.default["parent/nested-prod"].branch == "main"
     error_message = "Nested directory prod stack should have main branch: ${spacelift_stack.default["parent/nested-prod"].branch}"
   }
 }

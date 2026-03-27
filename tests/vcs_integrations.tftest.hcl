@@ -27,6 +27,7 @@ mock_provider "jsonschema" {
 }
 
 variables {
+  stack_name_template      = "$${module_path}-$${workspace}"
   root_modules_path        = "./tests/fixtures/multi-instance"
   common_config_file       = "common.yaml"
   repository               = "terraform-spacelift-automation"
@@ -149,9 +150,9 @@ run "test_vcs_blocks_empty_when_null" {
 
   variables {
     github_enterprise    = null
-    raw_git             = null
-    gitlab              = null
-    bitbucket_cloud     = null
+    raw_git              = null
+    gitlab               = null
+    bitbucket_cloud      = null
     bitbucket_datacenter = null
   }
 

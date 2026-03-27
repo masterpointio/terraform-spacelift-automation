@@ -64,8 +64,9 @@ mock_provider "jsonschema" {
 }
 
 variables {
-  root_modules_path  = "./tests/fixtures/multi-instance"
-  common_config_file = "common.yaml"
+  stack_name_template = "$${module_path}-$${workspace}"
+  root_modules_path   = "./tests/fixtures/multi-instance"
+  common_config_file  = "common.yaml"
   github_enterprise = {
     namespace = "masterpointio"
   }
@@ -110,8 +111,8 @@ run "test_global_space_id_variable_is_used" {
   command = plan
 
   variables {
-    space_id = "global-space-id-from-variable"
-    root_modules_path = "./tests/fixtures/single-instance"
+    space_id              = "global-space-id-from-variable"
+    root_modules_path     = "./tests/fixtures/single-instance"
     root_module_structure = "SingleInstance"
   }
 
@@ -126,7 +127,7 @@ run "test_default_space_id_is_used_when_no_values_provided" {
   command = plan
 
   variables {
-    root_modules_path = "./tests/fixtures/single-instance"
+    root_modules_path     = "./tests/fixtures/single-instance"
     root_module_structure = "SingleInstance"
   }
 
@@ -141,7 +142,7 @@ run "test_single_instance_space_id_from_stack_yaml" {
   command = plan
 
   variables {
-    root_modules_path = "./tests/fixtures/single-instance"
+    root_modules_path     = "./tests/fixtures/single-instance"
     root_module_structure = "SingleInstance"
   }
 

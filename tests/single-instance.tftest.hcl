@@ -1,6 +1,7 @@
 
 variables {
-  root_modules_path = "./tests/fixtures/single-instance"
+  stack_name_template = "$${module_path}-$${workspace}"
+  root_modules_path   = "./tests/fixtures/single-instance"
   github_enterprise = {
     namespace = "masterpointio"
   }

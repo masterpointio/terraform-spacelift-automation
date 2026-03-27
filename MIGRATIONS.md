@@ -101,7 +101,7 @@ The new role attachment system unlocks functionality that the old flag could not
 
 - **Cross-space access** — set `role_attachment_space_id` to a sibling space ID to grant the stack permissions outside its own space hierarchy.
 - **Fine-grained roles** — attach any built-in or custom role slug defined in your Spacelift account, scoped to precisely the permissions your stack needs.
-- **Per-stack overrides** — module-level `var.role_attachment` applies to all stacks; individual stacks can set their own `role_attachment_role_slug` to use a different role.
+- **Per-stack overrides** — module-level `var.role_attachment` applies to all stacks, individual stacks can set their own `role_attachment_role_slug` to use a different role.
 - **Managed role creation** — use `var.managed_roles` to create custom Spacelift roles (with specific `actions`) directly from this module, then reference them by their map key in `var.role_attachment.role_slug` or per-stack `role_attachment_role_slug`. This replaces the need to create roles manually in the Spacelift UI before referencing them.
 
   ```hcl

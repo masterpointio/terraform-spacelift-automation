@@ -525,7 +525,7 @@ run "test_default_example_stack_runtime_overrides" {
   }
 }
 
-# Test the default-example stack with only 1 runtime override; the other static configs should not be overridden
+# Test the default-example stack with only 1 runtime override, the other static configs should not be overridden
 run "test_default_example_stack_partial_runtime_overrides" {
   command = plan
 
@@ -1150,4 +1150,3 @@ run "test_role_attachment_created_with_module_level_managed_role" {
     error_message = "Role attachment was not created for root-module-a-default-example with managed role: ${jsonencode(keys(spacelift_role_attachment.default))}"
   }
 }
-

@@ -425,7 +425,7 @@ locals {
   ])
 
   # Unified key/slug → role ID map used by spacelift_role_attachment.
-  # Managed roles (keyed by var.managed_roles map key) take precedence; external roles
+  # Managed roles (keyed by var.managed_roles map key) take precedence, external roles
   # are keyed by their Spacelift slug as looked up via data.spacelift_role.attachments.
   _role_slug_to_id = merge(
     { for slug, role in data.spacelift_role.attachments : slug => role.id },

@@ -193,7 +193,7 @@ variable "role_attachment" {
   old `administrative = true` behavior. Set to a different space ID to enable cross-space access.
 
   Can be overridden per-stack via `stack_settings.role_attachment_role_slug` and
-  `role_attachment_space_id` in the stack config YAML.
+  `stack_settings.role_attachment_space_id` in the stack config YAML.
   Set to `null` (the default) to create no role attachment for any stack.
 
   Example:

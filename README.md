@@ -305,14 +305,14 @@ If you have many remote repositories that you need to manage via this pattern, y
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9 |
 | <a name="requirement_jsonschema"></a> [jsonschema](#requirement\_jsonschema) | >= 0.2.1 |
-| <a name="requirement_spacelift"></a> [spacelift](#requirement\_spacelift) | >= 1.14 |
+| <a name="requirement_spacelift"></a> [spacelift](#requirement\_spacelift) | >= 1.37 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_jsonschema"></a> [jsonschema](#provider\_jsonschema) | >= 0.2.1 |
-| <a name="provider_spacelift"></a> [spacelift](#provider\_spacelift) | >= 1.14 |
+| <a name="provider_spacelift"></a> [spacelift](#provider\_spacelift) | >= 1.37 |
 
 ## Modules
 
@@ -326,11 +326,14 @@ If you have many remote repositories that you need to manage via this pattern, y
 |------|------|
 | [spacelift_aws_integration_attachment.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/aws_integration_attachment) | resource |
 | [spacelift_drift_detection.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/drift_detection) | resource |
+| [spacelift_role.managed](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/role) | resource |
+| [spacelift_role_attachment.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/role_attachment) | resource |
 | [spacelift_space.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/space) | resource |
 | [spacelift_stack.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack) | resource |
 | [spacelift_stack_destructor.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack_destructor) | resource |
 | [jsonschema_validator.runtime_overrides](https://registry.terraform.io/providers/bpedman/jsonschema/latest/docs/data-sources/validator) | data source |
 | [spacelift_aws_integrations.all](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/aws_integrations) | data source |
+| [spacelift_role.attachments](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/role) | data source |
 | [spacelift_spaces.all](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/spaces) | data source |
 | [spacelift_worker_pools.all](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/worker_pools) | data source |
 
@@ -382,9 +385,11 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_gitlab"></a> [gitlab](#input\_gitlab) | The GitLab integration settings | <pre>object({<br/>    namespace = string<br/>    id        = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | List of labels to apply to the stacks. | `list(string)` | `[]` | no |
 | <a name="input_manage_state"></a> [manage\_state](#input\_manage\_state) | Determines if Spacelift should manage state for this stack. | `bool` | `false` | no |
+| <a name="input_managed_roles"></a> [managed\_roles](#input\_managed\_roles) | Map of Spacelift roles to create and manage. The map key acts as the Terraform resource<br/>identifier and is used to reference the role in `var.role_attachment.role_slug` or<br/>per-stack `role_attachment_role_slug` in stack YAML (in addition to built-in slugs like<br/>`"space-admin"`).<br/><br/>`name`        — (required) Human-readable display name shown in the Spacelift UI.<br/>`description` — (optional) Human-readable description of the role's purpose.<br/>`actions`     — (required) Set of permission strings granted by this role, e.g.<br/>                `"SPACE_READ"`, `"SPACE_WRITE"`, `"SPACE_ADMIN"`, `"RUN_TRIGGER"`.<br/>                Use the `spacelift_role_actions` data source to list all available actions.<br/><br/>Example:<pre>managed_roles = {<br/>  "ci-deployer" = {<br/>    name    = "CI Deployer"<br/>    actions = ["SPACE_READ", "RUN_TRIGGER"]<br/>  }<br/>}</pre> | <pre>map(object({<br/>    name        = string<br/>    description = optional(string, null)<br/>    actions     = set(string)<br/>  }))</pre> | `{}` | no |
 | <a name="input_protect_from_deletion"></a> [protect\_from\_deletion](#input\_protect\_from\_deletion) | Protect this stack from accidental deletion. If set, attempts to delete this stack will fail. | `bool` | `false` | no |
 | <a name="input_raw_git"></a> [raw\_git](#input\_raw\_git) | The raw Git integration settings | <pre>object({<br/>    namespace = string<br/>    url       = string<br/>  })</pre> | `null` | no |
 | <a name="input_repository"></a> [repository](#input\_repository) | The name of your infrastructure repo | `string` | n/a | yes |
+| <a name="input_role_attachment"></a> [role\_attachment](#input\_role\_attachment) | When set, a `spacelift_role_attachment` is created for every stack managed by this module,<br/>attaching the specified Spacelift role. This replaces the deprecated `administrative = true` flag.<br/><br/>`role_slug` — (required) slug of the Spacelift role to attach. Accepts: built-in slugs<br/>(`"space-admin"`, `"space-writer"`, `"space-reader"`), slugs of pre-existing custom roles, or<br/>a key from `var.managed_roles` to reference a role created by this module.<br/><br/>`space_id` — (optional) the space in which the attachment is created (the "binding space").<br/>Defaults to `null`, meaning the attachment is created in the stack's own space — equivalent to the<br/>old `administrative = true` behavior. Set to a different space ID to enable cross-space access.<br/><br/>Can be overridden per-stack via `stack_settings.role_attachment_role_slug` and<br/>`role_attachment_space_id` in the stack config YAML.<br/>Set to `null` (the default) to create no role attachment for any stack.<br/><br/>Example:<pre>role_attachment = {<br/>  role_slug = "space-admin"<br/>  # space_id = "root"  # optional: set to attach in a different space (e.g. for cross-space access)<br/>}</pre> | <pre>object({<br/>    role_slug = string<br/>    space_id  = optional(string, null)<br/>  })</pre> | `null` | no |
 | <a name="input_root_module_structure"></a> [root\_module\_structure](#input\_root\_module\_structure) | The root module structure of the Stacks that you're reading in. See README for full details.<br/><br/>MultiInstance - You're using Workspaces or Dynamic Backend configuration to create multiple instances of the same root module code.<br/>SingleInstance - You're using copies of a root module and your directory structure to create multiple instances of the same Terraform code. | `string` | `"MultiInstance"` | no |
 | <a name="input_root_modules_path"></a> [root\_modules\_path](#input\_root\_modules\_path) | The path, relative to the root of the repository, where the root module can be found. | `string` | `"root-modules"` | no |
 | <a name="input_runner_image"></a> [runner\_image](#input\_runner\_image) | URL of the Docker image used to process Runs. Defaults to `null` which is Spacelift's standard (Alpine) runner image. | `string` | `null` | no |
@@ -402,6 +407,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 
 | Name | Description |
 |------|-------------|
+| <a name="output_spacelift_roles"></a> [spacelift\_roles](#output\_spacelift\_roles) | A map of managed Spacelift roles created by this module, keyed by the var.managed\_roles map key. |
 | <a name="output_spacelift_spaces"></a> [spacelift\_spaces](#output\_spacelift\_spaces) | A map of Spacelift spaces with all their attributes. |
 | <a name="output_spacelift_stacks"></a> [spacelift\_stacks](#output\_spacelift\_stacks) | A map of Spacelift stacks with selected attributes.<br/>To reduce the risk of accidentally exporting sensitive data, only a subset of attributes is exported. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

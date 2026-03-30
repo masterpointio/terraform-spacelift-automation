@@ -16,6 +16,45 @@ Spacelift is deprecating the `administrative` stack flag on **June 1, 2026**. v2
 | `"administrative"` auto-label      | Added automatically when `administrative = true` | No longer generated                                      |
 | Spacelift provider minimum version | `>= 1.14`                                        | `>= 1.37` (required for stack role attachments)          |
 
+### Preparing for migration: the chicken-and-egg problem
+
+Before running the v2.0.0 migration, you need to ensure your managing stack has a role attachment in the root space with at least `space-writer` privilege. Here is why:
+
+- Role attachments can be created while `administrative = true` is set, but they do not take effect until `administrative` is removed.
+- v2.0.0 removes `administrative` and adds `role_attachment_role_slug: space-admin`. The moment `administrative` is removed, the stack needs an already-active role to have privilege to create the new role bindings. With none in place, the apply fails: `could not create stack role binding: unauthorized`.
+
+**Why `space-writer` and not `space-admin`?**
+
+Per the migration guide, you add `role_attachment_role_slug: space-admin` to your managing stack's YAML when upgrading to v2.0.0. If you pre-attached `space-admin` as the stepping-stone, the apply fails with a conflict: `could not create stack role bindings: stack role binding already exists for this role, space and stack combination`. Using `space-writer` avoids the conflict — it grants sufficient privilege to create role bindings without colliding with the `space-admin` attachment v2.0.0 creates.
+
+**Resolution options:**
+
+**Option A — Spacelift UI (no intermediate release needed):**
+
+Before upgrading to v2.0.0, manually add a `space-writer` role attachment to your managing stack in the root space via the Spacelift UI. After the v2.0.0 migration applies successfully, remove the `space-writer` attachment.
+
+**Option B — v1.10.0 stepping stone:**
+
+1. Upgrade to v1.10.0. Keep `administrative: true` in your YAML — do not remove it yet.
+2. Add `space-writer` to your managing stack in the root space using `var.role_attachment`:
+
+   ```hcl
+   module "spacelift_automation" {
+     source  = "masterpointio/automation/spacelift"
+     version = "1.10.0"
+
+     role_attachment = {
+       role_slug = "space-writer"
+       space_id  = "root"
+     }
+     # ... rest of your config, keep administrative: true in YAML
+   }
+   ```
+
+3. Apply. The `space-writer` attachment is created (inactive while `administrative` is still set).
+4. Upgrade to v2.0.0, replace `administrative: true` with `role_attachment_role_slug: space-admin` in your YAML, and apply.
+5. After the v2.0.0 apply completes successfully, remove the `space-writer` `role_attachment` config and apply once more to clean up.
+
 ### Migration steps
 
 #### 1. Upgrade the Spacelift Terraform provider

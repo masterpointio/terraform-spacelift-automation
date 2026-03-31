@@ -5,10 +5,22 @@ output "spacelift_stacks" {
   EOT
   value = {
     for name, stack in spacelift_stack.default : name => {
-      id             = stack.id
-      labels         = stack.labels
-      autodeploy     = stack.autodeploy
-      administrative = stack.administrative
+      id         = stack.id
+      labels     = stack.labels
+      autodeploy = stack.autodeploy
+    }
+  }
+}
+
+output "spacelift_roles" {
+  description = "A map of managed Spacelift roles created by this module, keyed by the var.managed_roles map key."
+  value = {
+    for key, role in spacelift_role.managed : key => {
+      id          = role.id
+      slug        = role.slug
+      name        = role.name
+      description = role.description
+      actions     = role.actions
     }
   }
 }

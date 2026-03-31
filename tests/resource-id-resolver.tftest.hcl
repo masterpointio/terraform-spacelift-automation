@@ -7,8 +7,8 @@ mock_provider "spacelift" {
     defaults = {
       spaces = [
         {
-          space_id    = "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
-          name        = "mp-aws-automation"
+          space_id    = "example-space-id"
+          name        = "example-space"
           parent_space_id = "root"
           description = "Test space"
           labels      = []
@@ -22,8 +22,8 @@ mock_provider "spacelift" {
     defaults = {
       worker_pools = [
         {
-          worker_pool_id           = "01K3VABYB4FBXNV24KN4A4EKC8"
-          name                     = "mp-ue1-automation-spft-priv-workers"
+          worker_pool_id           = "example-worker-pool-id"
+          name                     = "example-worker-pool"
           description              = "Test worker pool"
           labels                   = []
           config                   = ""
@@ -38,15 +38,17 @@ mock_provider "spacelift" {
     defaults = {
       integrations = [
         {
-          integration_id                 = "01JEC7ZACVKHTSVY4NF8QNZVVB"
-          name                           = "mp-automation-755965222190"
-          role_arn                       = "arn:aws:iam::755965222190:role/spacelift"
+          integration_id                 = "example-aws-integration-id"
+          name                           = "example-aws-integration"
+          role_arn                       = "arn:aws:iam::123456789012:role/spacelift"
           external_id                    = "test"
           duration_seconds               = 3600
           generate_credentials_in_worker = false
           space_id                       = "root"
           labels                         = []
           region                         = "us-east-1"
+          autoattach_enabled             = false
+          tag_assume_role                = false
         }
       ]
     }
@@ -85,7 +87,7 @@ run "test_space_name_is_used" {
   command = plan
 
   assert {
-    condition     = local.resource_id_resolver.space["root-module-a-default-example"] == "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
+    condition     = local.resource_id_resolver.space["root-module-a-default-example"] == "example-space-id"
     error_message = "Space name not being used: ${jsonencode(local.resource_id_resolver.space)}"
   }
 }
@@ -159,7 +161,7 @@ run "test_worker_pool_name_resolves_to_correct_id" {
   command = plan
 
   assert {
-    condition     = local.resource_id_resolver.worker_pool["root-module-a-test"] == "01K3VABYB4FBXNV24KN4A4EKC8" # For the `mp-ue1-automation-spft-priv-workers` in our `mp-infra` Spacelift account
+    condition     = local.resource_id_resolver.worker_pool["root-module-a-test"] == "example-worker-pool-id"
     error_message = "Worker pool name not resolving to correct ID: ${jsonencode(local.resource_id_resolver.worker_pool)}"
   }
 }
@@ -173,7 +175,7 @@ run "test_worker_pool_name_takes_precedence_over_global_variable" {
   }
 
   assert {
-    condition     = local.resource_id_resolver.worker_pool["root-module-a-test"] == "01K3VABYB4FBXNV24KN4A4EKC8" # For the `mp-ue1-automation-spft-priv-workers` in our `mp-infra` Spacelift account
+    condition     = local.resource_id_resolver.worker_pool["root-module-a-test"] == "example-worker-pool-id"
     error_message = "Worker pool name from stack settings not taking precedence over global variable worker_pool_name: ${jsonencode(local.resource_id_resolver.worker_pool)}"
   }
 }
@@ -187,7 +189,7 @@ run "test_aws_integration_name_resolves_to_correct_id" {
   command = plan
 
   assert {
-    condition     = local.resource_id_resolver.aws_integration["root-module-a-test"] == "01JEC7ZACVKHTSVY4NF8QNZVVB" # For the `mp-automation-755965222190` in our `mp-infra` Spacelift account
+    condition     = local.resource_id_resolver.aws_integration["root-module-a-test"] == "example-aws-integration-id"
     error_message = "AWS integration name not resolving to correct ID: ${jsonencode(local.resource_id_resolver.aws_integration)}"
   }
 }
@@ -201,7 +203,7 @@ run "test_aws_integration_name_takes_precedence_over_global_variable" {
   }
 
   assert {
-    condition     = local.resource_id_resolver.aws_integration["root-module-a-test"] == "01JEC7ZACVKHTSVY4NF8QNZVVB" # For the `mp-automation-755965222190` in our `mp-infra` Spacelift account
+    condition     = local.resource_id_resolver.aws_integration["root-module-a-test"] == "example-aws-integration-id"
     error_message = "AWS integration name from stack settings not taking precedence over global variable aws_integration_name: ${jsonencode(local.resource_id_resolver.aws_integration)}"
   }
 }

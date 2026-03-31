@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.10.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.9.0...v1.10.0) (2026-03-31)
+
+
+### Features
+
+* add spacelift roles and role attachments (INT-142) ([#110](https://github.com/masterpointio/terraform-spacelift-automation/issues/110)) ([bfd13bb](https://github.com/masterpointio/terraform-spacelift-automation/commit/bfd13bb6366fb08e2652fa58eb764e1752bd6917))
+
+## [1.9.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.8.0...v1.9.0) (2026-03-26)
+
+
+### Features
+
+* dependency label of depends-on to be optional ([#109](https://github.com/masterpointio/terraform-spacelift-automation/issues/109)) ([fee5cc4](https://github.com/masterpointio/terraform-spacelift-automation/commit/fee5cc46557d948843df3de38ad51a53a908e750))
+
+
+### Bug Fixes
+
+* add mocked resources ([#102](https://github.com/masterpointio/terraform-spacelift-automation/issues/102)) ([bbd29ad](https://github.com/masterpointio/terraform-spacelift-automation/commit/bbd29ad681de45d6520e4da067aca8f563c335f0))
+
 ## [1.8.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.7.0...v1.8.0) (2025-09-18)
 
 

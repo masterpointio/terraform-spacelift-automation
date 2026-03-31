@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.0.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.10.0...v2.0.0) (2026-03-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* Enable smart sanitization and local preview by default ([#106](https://github.com/masterpointio/terraform-spacelift-automation/issues/106))
+* Remove deprecate administrative flag for stack role attachments replacement (INT-142) ([#108](https://github.com/masterpointio/terraform-spacelift-automation/issues/108))
+
+### Features
+
+* Enable smart sanitization and local preview by default ([#106](https://github.com/masterpointio/terraform-spacelift-automation/issues/106)) ([bea5e68](https://github.com/masterpointio/terraform-spacelift-automation/commit/bea5e687163ed89d946efdcf0ef0d72f243f1f6f))
+* Remove deprecate administrative flag for stack role attachments replacement (INT-142) ([#108](https://github.com/masterpointio/terraform-spacelift-automation/issues/108)) ([53f44e9](https://github.com/masterpointio/terraform-spacelift-automation/commit/53f44e90890fd109cf36a189a3dc4cb4b7008fb4))
+
+### Migration Guide
+
+[MIGRATION GUIDE](MIGRATIONS.md)
+
 ## [1.10.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.9.0...v1.10.0) (2026-03-31)
 
 

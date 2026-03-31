@@ -25,19 +25,6 @@ output "spacelift_roles" {
   }
 }
 
-output "spacelift_roles" {
-  description = "A map of managed Spacelift roles created by this module, keyed by the var.managed_roles map key."
-  value = {
-    for key, role in spacelift_role.managed : key => {
-      id          = role.id
-      slug        = role.slug
-      name        = role.name
-      description = role.description
-      actions     = role.actions
-    }
-  }
-}
-
 output "spacelift_spaces" {
   description = "A map of Spacelift spaces with all their attributes."
   value = {

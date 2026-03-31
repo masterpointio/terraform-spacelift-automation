@@ -180,6 +180,38 @@ variable "administrative" {
   default     = false
 }
 
+variable "role_attachment" {
+  type = object({
+    role_slug = string
+    space_id  = optional(string, null)
+  })
+  description = <<-EOT
+  When set, a `spacelift_role_attachment` is created for every stack managed by this module,
+  attaching the specified Spacelift role. This replaces the deprecated `administrative = true` flag.
+
+  `role_slug` — (required) slug of the Spacelift role to attach. Accepts: built-in slugs
+  (`"space-admin"`, `"space-writer"`, `"space-reader"`), slugs of pre-existing custom roles, or
+  a key from `var.managed_roles` to reference a role created by this module.
+
+  `space_id` — (optional) the space in which the attachment is created (the "binding space").
+  Defaults to `null`, meaning the attachment is created in the stack's own space — equivalent to the
+  old `administrative = true` behavior. Set to a different space ID to enable cross-space access.
+
+  Can be overridden per-stack via `stack_settings.role_attachment_role_slug` and
+  `stack_settings.role_attachment_space_id` in the stack config YAML.
+  Set to `null` (the default) to create no role attachment for any stack.
+
+  Example:
+  ```
+  role_attachment = {
+    role_slug = "space-admin"
+    # space_id = "root"  # optional: set to attach in a different space (e.g. for cross-space access)
+  }
+  ```
+  EOT
+  default     = null
+}
+
 variable "additional_project_globs" {
   type        = set(string)
   description = "Project globs is an optional list of paths to track stack changes of outside of the project root. Push policies are another alternative to track changes in additional paths."
@@ -422,6 +454,46 @@ variable "worker_pool_name" {
   NOTE: worker_pool_name or worker_pool_id is required when using a self-hosted instance of Spacelift.
   EOT
   default     = null
+}
+
+variable "managed_roles" {
+  type = map(object({
+    name        = string
+    description = optional(string, null)
+    actions     = set(string)
+  }))
+  description = <<-EOT
+  Map of Spacelift roles to create and manage. The map key acts as the Terraform resource
+  identifier and is used to reference the role in `var.role_attachment.role_slug` or
+  per-stack `role_attachment_role_slug` in stack YAML (in addition to built-in slugs like
+  `"space-admin"`).
+
+  `name`        — (required) Human-readable display name shown in the Spacelift UI.
+  `description` — (optional) Human-readable description of the role's purpose.
+  `actions`     — (required) Set of permission strings granted by this role, e.g.
+                  `"SPACE_READ"`, `"SPACE_WRITE"`, `"SPACE_ADMIN"`, `"RUN_TRIGGER"`.
+                  Use the `spacelift_role_actions` data source to list all available actions.
+
+  Example:
+  ```
+  managed_roles = {
+    "ci-deployer" = {
+      name    = "CI Deployer"
+      actions = ["SPACE_READ", "RUN_TRIGGER"]
+    }
+  }
+  ```
+  EOT
+  default     = {}
+
+  validation {
+    condition = length(setintersection(
+      keys(var.managed_roles),
+      # Built-in Spacelift role slugs that should not be shadowed
+      toset(["space-admin", "space-writer", "space-reader"])
+    )) == 0
+    error_message = "managed_roles keys cannot collide with built-in Spacelift role slugs ('space-admin', 'space-writer', 'space-reader'). Please choose different keys for your managed roles."
+  }
 }
 
 variable "spaces" {

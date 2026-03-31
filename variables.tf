@@ -174,11 +174,6 @@ variable "common_config_file" {
   default     = "common.yaml"
 }
 # Default Stack Configuration
-variable "administrative" {
-  type        = bool
-  description = "Flag to mark the stack as administrative"
-  default     = false
-}
 
 variable "role_attachment" {
   type = object({

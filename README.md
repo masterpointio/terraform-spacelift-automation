@@ -43,7 +43,8 @@ Structure requirements:
 - Stack configs are placed in `<root_modules_path>/<root_module>/stacks` directory for each workspace / instance of that stack. e.g. `root-modules/k8s-cluster/stacks/dev.yaml` and `root-modules/k8s-cluster/stacks/stage.yaml`
 - Terraform variables are placed in `<root_modules_path>/<root_module>/tfvars` directory for each workspace / instance of that stack. e.g. `root-modules/k8s-cluster/tfvars/dev.tfvars` and `root-modules/k8s-cluster/tfvars/stage.tfvars`
 - Stack config files and tfvars files must be equal to OpenTofu/Terraform workspace, e.g. `stacks/dev.yaml` and `tfvars/dev.tfvars` for a workspace named `dev`.
-- Common configs are placed in `<root_modules_path>/<root_module>/stacks/common.yaml` file (or `var.common_config_file` value). This is useful when you know that some values should be shared across all the stacks created for a root module. For example, all stacks that manage Spacelift Policies must use the `administrative: true` setting or all stacks must share the same labels.
+- Common configs are placed in `<root_modules_path>/<root_module>/stacks/common.yaml` file (or `var.common_config_file` value). This is useful when you know that some values should be shared across all the stacks created for a root module.
+  - For example, all stacks that manage Spacelift resources can share `role_attachment_role_slug: space-admin` or all stacks can share the same labels.
 
 We have an example of this structure in the [examples/complete](./examples/complete/root-modules/), which looks like the following:
 
@@ -205,7 +206,7 @@ Below is a brief example. You can also see the full schema in our [JSON Schema f
 ```yaml
 kind: StackConfigV1
 stack_settings:
-  administrative: true
+  role_attachment_role_slug: space-admin
   autodeploy: true
   autoretry: true
   description: "Production EKS cluster configuration"
@@ -229,6 +230,60 @@ automation_settings:
   default_tf_workspace_enabled: true
   tfvars_enabled: false
 ```
+
+### How do I give a stack Spacelift management permissions? (Role Attachments)
+
+Stacks that manage other Spacelift resources (e.g. the spacelift-automation stack itself) need elevated permissions. The way to grant this is via a **role attachment**, which replaces the deprecated `administrative` flag.
+
+#### Using a built-in role
+
+The simplest approach is to attach Spacelift's built-in `space-admin` role. Set `role_attachment_role_slug` in the stack's YAML:
+
+```yaml
+# root-modules/spacelift-automation/stacks/common.yaml
+kind: StackConfigV1
+stack_settings:
+  role_attachment_role_slug: space-admin
+```
+
+Or apply it to every stack managed by a module instance via `var.role_attachment`:
+
+```hcl
+module "spacelift_automation" {
+  source  = "masterpointio/automation/spacelift"
+  version = "2.0.0"
+  # ...
+  role_attachment = {
+    role_slug = "space-admin"
+  }
+}
+```
+
+#### Creating and using a custom role
+
+For least-privilege access, create a custom role with only the actions your stack needs using `var.managed_roles`, then reference its map key in the attachment:
+
+```hcl
+module "spacelift_automation" {
+  source  = "masterpointio/automation/spacelift"
+  version = "2.0.0"
+  # ...
+
+  managed_roles = {
+    "ci-deployer" = {
+      name        = "CI Deployer"
+      description = "Least-privilege role — can read spaces and trigger runs"
+      actions     = ["SPACE_READ", "RUN_TRIGGER"]
+    }
+  }
+
+  role_attachment = {
+    role_slug = "ci-deployer"  # matches the managed_roles map key
+  }
+}
+```
+
+Use the `spacelift_role_actions` data source to discover all available action strings. The `spacelift_roles` output exposes the `id`, `slug`, and `actions` of every role created by the module.
 
 ### Why are variable values provided separately in `tfvars/` and not in the `yaml` file?
 
@@ -342,7 +397,6 @@ If you have many remote repositories that you need to manage via this pattern, y
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_additional_project_globs"></a> [additional\_project\_globs](#input\_additional\_project\_globs) | Project globs is an optional list of paths to track stack changes of outside of the project root. Push policies are another alternative to track changes in additional paths. | `set(string)` | `[]` | no |
-| <a name="input_administrative"></a> [administrative](#input\_administrative) | Flag to mark the stack as administrative | `bool` | `false` | no |
 | <a name="input_after_apply"></a> [after\_apply](#input\_after\_apply) | List of after-apply scripts | `list(string)` | `[]` | no |
 | <a name="input_after_destroy"></a> [after\_destroy](#input\_after\_destroy) | List of after-destroy scripts | `list(string)` | `[]` | no |
 | <a name="input_after_init"></a> [after\_init](#input\_after\_init) | List of after-init scripts | `list(string)` | `[]` | no |

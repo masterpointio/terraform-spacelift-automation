@@ -5,10 +5,9 @@ output "spacelift_stacks" {
   EOT
   value = {
     for name, stack in spacelift_stack.default : name => {
-      id             = stack.id
-      labels         = stack.labels
-      autodeploy     = stack.autodeploy
-      administrative = stack.administrative
+      id         = stack.id
+      labels     = stack.labels
+      autodeploy = stack.autodeploy
     }
   }
 }

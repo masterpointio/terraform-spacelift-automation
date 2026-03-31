@@ -208,21 +208,6 @@ locals {
   stacks = toset(keys(local.stack_configs))
 
   ## Labels
-  # Сreates a map of administrative labels for each stack that has the administrative property set to true.
-  # Example:
-  # {
-  #   "spacelift-automation-mp-main" = [
-  #     "administrative",
-  #   ]
-  #   "spacelift-policies-notify-tf-completed" = [
-  #     "administrative",
-  #   ]
-  # }
-
-  _administrative_labels = {
-    for stack, configs in local.stack_configs : stack => ["administrative"] if tobool(try(configs.administrative, false)) == true
-  }
-
   # Creates a map of `depends-on` labels for each stack based on the root module level dependency configuration.
   # Example:
   # {
@@ -261,7 +246,6 @@ locals {
   labels = {
     for stack in local.stacks :
     stack => compact(flatten([
-      lookup(local._administrative_labels, stack, []),
       lookup(local._folder_labels, stack, []),
       lookup(local._dependency_labels, stack, []),
       try(local.stack_configs[stack].labels, []),
@@ -292,7 +276,6 @@ locals {
   stack_property_resolver = {
     for stack in local.stacks : stack => {
       # Simple property resolution with fallback
-      administrative                   = try(local.stack_configs[stack].administrative, var.administrative)
       autoretry                        = try(local.stack_configs[stack].autoretry, var.autoretry)
       additional_project_globs         = try(local.stack_configs[stack].additional_project_globs, var.additional_project_globs)
       autodeploy                       = try(local.stack_configs[stack].autodeploy, var.autodeploy)
@@ -473,7 +456,6 @@ module "deep" {
 resource "spacelift_stack" "default" {
   for_each = local.stacks
 
-  administrative           = local.stack_property_resolver[each.key].administrative
   additional_project_globs = local.stack_property_resolver[each.key].additional_project_globs
   after_apply              = local.stack_array_merger[each.key].after_apply
   after_destroy            = local.stack_array_merger[each.key].after_destroy
@@ -629,6 +611,7 @@ resource "spacelift_space" "default" {
 }
 
 # Attach a Spacelift role to stacks that have role_attachment_role_slug set (per-stack or module-level).
+# This replaces the deprecated `administrative = true` flag.
 # The role slug must be provided explicitly via per-stack `role_attachment_role_slug` in YAML
 # or via the module-level `var.role_attachment.role_slug`. Use `role_attachment_space_id`
 # (per-stack or module-level) to attach in a space other than the stack's own space.

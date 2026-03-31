@@ -1,7 +1,7 @@
 kind: StackConfigV1
 stack_settings:
-  description: This Automation stack is used for Masterpoint's testing purposes
-  administrative: true
+  description: This Automation stack manages Spacelift stacks via the spacelift-automation module
+  role_attachment_role_slug: space-admin
   aws_integration_enabled: false
   labels:
     - common_label

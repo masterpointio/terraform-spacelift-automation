@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.9.0...v1.10.0) (2026-03-31)
+
+
+### Features
+
+* add spacelift roles and role attachments (INT-142) ([#110](https://github.com/masterpointio/terraform-spacelift-automation/issues/110)) ([bfd13bb](https://github.com/masterpointio/terraform-spacelift-automation/commit/bfd13bb6366fb08e2652fa58eb764e1752bd6917))
+
 ## [1.9.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.8.0...v1.9.0) (2026-03-26)
 
 

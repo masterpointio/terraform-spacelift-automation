@@ -48,6 +48,14 @@
           "type": "string",
           "description": "ID of the space in which the role attachment is created. Defaults to the stack's own space. Set to a different space ID for cross-space access."
         },
+        "role_attachment_role_slug": {
+          "type": "string",
+          "description": "Role to attach to this stack. Setting this creates a spacelift_role_attachment resource for the stack. Accepts: built-in slugs ('space-admin', 'space-writer', 'space-reader'), slugs of pre-existing custom roles, or a key from var.managed_roles to reference a role created by this module. Overrides the module-level var.role_attachment.role_slug for this stack."
+        },
+        "role_attachment_space_id": {
+          "type": "string",
+          "description": "ID of the space in which the role attachment is created. Defaults to the stack's own space. Set to a different space ID for cross-space access."
+        },
         "additional_project_globs": {
           "type": "array",
           "items": {

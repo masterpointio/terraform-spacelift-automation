@@ -366,7 +366,7 @@ variable "drift_detection_timezone" {
 variable "enable_local_preview" {
   type        = bool
   description = "Indicates whether local preview runs can be triggered on this Stack."
-  default     = false
+  default     = true
 }
 
 variable "enable_well_known_secret_masking" {
@@ -423,7 +423,7 @@ variable "terraform_smart_sanitization" {
   Indicates whether runs on this will use terraform's sensitive value system to sanitize
   the outputs of Terraform state and plans in spacelift instead of sanitizing all fields.
   EOT
-  default     = false
+  default     = true
 }
 
 variable "terraform_version" {

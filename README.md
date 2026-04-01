@@ -208,7 +208,6 @@ kind: StackConfigV1
 stack_settings:
   role_attachment_role_slug: space-admin
   autodeploy: true
-  autoretry: true
   description: "Production EKS cluster configuration"
   labels:
     - "prod"

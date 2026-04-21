@@ -213,6 +213,12 @@ variable "additional_project_globs" {
   default     = []
 }
 
+variable "git_sparse_checkout_paths" {
+  type        = list(string)
+  description = "List of paths used for Git sparse checkout. When set, only the specified paths are fetched from the repository during a run. This is particularly useful for large repositories where you only need to work with specific directories or files."
+  default     = null
+}
+
 variable "after_apply" {
   type        = list(string)
   description = "List of after-apply scripts"

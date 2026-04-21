@@ -164,6 +164,13 @@
           "type": "boolean",
           "description": "Whether to enable masking of well-known secrets"
         },
+        "git_sparse_checkout_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of paths used for Git sparse checkout. When set, only the specified paths are fetched from the repository during a run."
+        },
         "github_action_deploy": {
           "type": "boolean",
           "description": "Whether to enable GitHub Action deployment"

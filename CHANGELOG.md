@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v2.0.0...v2.1.0) (2026-04-21)
+
+
+### Features
+
+* support sparse checkout git ([#119](https://github.com/masterpointio/terraform-spacelift-automation/issues/119)) ([16a1ce2](https://github.com/masterpointio/terraform-spacelift-automation/commit/16a1ce28a0cff6448ac370dea012e032fa9f8705))
+
+
+### Bug Fixes
+
+* pin GitHub Actions to commit SHAs (INT-326) ([#116](https://github.com/masterpointio/terraform-spacelift-automation/issues/116)) ([109b50a](https://github.com/masterpointio/terraform-spacelift-automation/commit/109b50af8a705e09d731b36b364572c5f73fb132))
+
 ## [2.0.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.10.0...v2.0.0) (2026-03-31)
 
 

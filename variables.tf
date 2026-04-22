@@ -383,7 +383,7 @@ variable "enable_well_known_secret_masking" {
 
 variable "allow_run_promotion" {
   type        = bool
-  description = "Indicates whether a proposed run can be promoted to a tracked a run."
+  description = "Indicates whether a proposed run can be promoted to a tracked run."
   default     = true
 }
 

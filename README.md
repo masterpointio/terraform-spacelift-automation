@@ -403,7 +403,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_after_plan"></a> [after\_plan](#input\_after\_plan) | List of after-plan scripts | `list(string)` | `[]` | no |
 | <a name="input_after_run"></a> [after\_run](#input\_after\_run) | List of after-run (aka `finally` hook) scripts | `list(string)` | `[]` | no |
 | <a name="input_all_root_modules_enabled"></a> [all\_root\_modules\_enabled](#input\_all\_root\_modules\_enabled) | When set to true, all subdirectories in root\_modules\_path will be treated as root modules. | `bool` | `false` | no |
-| <a name="input_allow_run_promotion"></a> [allow\_run\_promotion](#input\_allow\_run\_promotion) | Indicates whether a proposed run can be promoted to a tracked a run. | `bool` | `true` | no |
+| <a name="input_allow_run_promotion"></a> [allow\_run\_promotion](#input\_allow\_run\_promotion) | Indicates whether a proposed run can be promoted to a tracked run. | `bool` | `true` | no |
 | <a name="input_autodeploy"></a> [autodeploy](#input\_autodeploy) | Flag to enable/disable automatic deployment of the stack | `bool` | `true` | no |
 | <a name="input_autoretry"></a> [autoretry](#input\_autoretry) | Flag to enable/disable automatically rerun proposed runs (PR plans) that have become out of date after a tracked run applies changes to the stack's state. Only supported with private worker pools. Docs: https://docs.spacelift.io/concepts/stack/stack-settings#autoretry | `bool` | `false` | no |
 | <a name="input_aws_integration_attachment_read"></a> [aws\_integration\_attachment\_read](#input\_aws\_integration\_attachment\_read) | Indicates whether this attachment is used for read operations. | `bool` | `true` | no |

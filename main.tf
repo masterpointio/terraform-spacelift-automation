@@ -283,7 +283,7 @@ locals {
       enable_local_preview             = try(local.stack_configs[stack].enable_local_preview, var.enable_local_preview)
       enable_well_known_secret_masking = try(local.stack_configs[stack].enable_well_known_secret_masking, var.enable_well_known_secret_masking)
       git_sparse_checkout_paths        = try(local.stack_configs[stack].git_sparse_checkout_paths, var.git_sparse_checkout_paths)
-      github_action_deploy             = try(local.stack_configs[stack].github_action_deploy, var.github_action_deploy)
+      allow_run_promotion              = try(local.stack_configs[stack].allow_run_promotion, var.allow_run_promotion)
       manage_state                     = try(local.stack_configs[stack].manage_state, var.manage_state)
       protect_from_deletion            = try(local.stack_configs[stack].protect_from_deletion, var.protect_from_deletion)
       repository                       = try(local.stack_configs[stack].repository, var.repository)
@@ -477,7 +477,7 @@ resource "spacelift_stack" "default" {
   enable_local_preview             = local.stack_property_resolver[each.key].enable_local_preview
   enable_well_known_secret_masking = local.stack_property_resolver[each.key].enable_well_known_secret_masking
   git_sparse_checkout_paths        = local.stack_property_resolver[each.key].git_sparse_checkout_paths
-  github_action_deploy             = local.stack_property_resolver[each.key].github_action_deploy
+  allow_run_promotion              = local.stack_property_resolver[each.key].allow_run_promotion
   labels                           = local.labels[each.key]
   manage_state                     = local.stack_property_resolver[each.key].manage_state
   name                             = each.key

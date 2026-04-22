@@ -171,9 +171,9 @@
           },
           "description": "List of paths used for Git sparse checkout. When set, only the specified paths are fetched from the repository during a run."
         },
-        "github_action_deploy": {
+        "allow_run_promotion": {
           "type": "boolean",
-          "description": "Whether to enable GitHub Action deployment"
+          "description": "Indicates whether a proposed run can be promoted to a tracked run."
         },
         "labels": {
           "type": "array",

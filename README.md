@@ -232,7 +232,7 @@ automation_settings:
 
 ### How do I give a stack Spacelift management permissions? (Role Attachments)
 
-Stacks that manage other Spacelift resources (e.g. the spacelift-automation stack itself) need elevated permissions. The way to grant this is via a **role attachment**, which replaces the deprecated `administrative` flag.
+Stacks that manage other Spacelift resources (e.g. the spacelift-automation stack itself) need elevated permissions. The way to grant this is via a **role attachment**, which replaces the deprecated `administrative` flag. At minimum, the spacelift-automation stack itself needs `space-admin` so it can manage other stacks and their role attachments.
 
 #### Using a built-in role
 
@@ -245,7 +245,7 @@ stack_settings:
   role_attachment_role_slug: space-admin
 ```
 
-Or apply it to every stack managed by a module instance via `var.role_attachment`:
+You can also give every stack managed by a module instance a role via `var.role_attachment`. `space-admin` is only needed when a stack itself manages Spacelift resources — otherwise pick a less-privileged role (or none):
 
 ```hcl
 module "spacelift_automation" {

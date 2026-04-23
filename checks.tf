@@ -39,4 +39,33 @@ check "aws_integrations_mutual_exclusivity" {
     condition     = var.aws_integration_id == null || var.aws_integration_name == null
     error_message = "aws_integration_id and aws_integration_name are mutually exclusive."
   }
+  assert {
+    condition     = var.aws_integration_read_id == null || var.aws_integration_read_name == null
+    error_message = "aws_integration_read_id and aws_integration_read_name are mutually exclusive."
+  }
+  assert {
+    condition     = var.aws_integration_write_id == null || var.aws_integration_write_name == null
+    error_message = "aws_integration_write_id and aws_integration_write_name are mutually exclusive."
+  }
+}
+
+check "aws_integration_per_side_must_be_paired" {
+  assert {
+    condition = (
+      (var.aws_integration_read_id != null || var.aws_integration_read_name != null) ==
+      (var.aws_integration_write_id != null || var.aws_integration_write_name != null)
+    )
+    error_message = "aws_integration_read_* and aws_integration_write_* must both be set or both be unset. Set both sides or use aws_integration_id/name for a single integration on both sides."
+  }
+}
+
+check "aws_integration_single_vs_split_exclusivity" {
+  assert {
+    condition = (
+      (var.aws_integration_id == null && var.aws_integration_name == null) ||
+      (var.aws_integration_read_id == null && var.aws_integration_read_name == null &&
+       var.aws_integration_write_id == null && var.aws_integration_write_name == null)
+    )
+    error_message = "Use either aws_integration_id/name (single integration for both sides) OR aws_integration_read_*/write_* (separate integrations per side), not both."
+  }
 }

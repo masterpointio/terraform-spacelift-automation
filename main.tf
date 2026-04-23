@@ -292,9 +292,6 @@ locals {
       terraform_version                = try(local.stack_configs[stack].terraform_version, var.terraform_version)
       worker_pool_id                   = try(local.stack_configs[stack].worker_pool_id, var.worker_pool_id)
 
-      # AWS Integration properties
-      aws_integration_id = local.resource_id_resolver.aws_integration[stack]
-
       # Drift detection properties
       drift_detection_ignore_state = try(local.stack_configs[stack].drift_detection_ignore_state, var.drift_detection_ignore_state)
       drift_detection_reconcile    = try(local.stack_configs[stack].drift_detection_reconcile, var.drift_detection_reconcile)
@@ -352,20 +349,13 @@ locals {
       name_attr     = "worker_pool_name"
       default_value = null
     }
-    aws_integration = {
-      id_attr       = "aws_integration_id"
-      name_attr     = "aws_integration_name"
-      default_value = null
-    }
   }
 
   var_lookup = { # We need this map to dynamically access vars like var.space_id when config.id_attr = "space_id". TF doesn't support var[dynamic_key] syntax, downside of it not being a full programming language.
-    space_id             = var.space_id
-    space_name           = var.space_name
-    worker_pool_id       = var.worker_pool_id
-    worker_pool_name     = var.worker_pool_name
-    aws_integration_id   = var.aws_integration_id
-    aws_integration_name = var.aws_integration_name
+    space_id         = var.space_id
+    space_name       = var.space_name
+    worker_pool_id   = var.worker_pool_id
+    worker_pool_name = var.worker_pool_name
   }
 
   # How it works:
@@ -394,6 +384,79 @@ locals {
     for stack, config in local.stack_configs :
     stack => config if try(config.aws_integration_enabled, var.aws_integration_enabled)
   }
+
+  # Per-side AWS integration ID resolution.
+  # Fallback chain (first non-null wins):
+  #   stack-level per-side id → stack-level per-side name →
+  #   stack-level generic id  → stack-level generic name  →
+  #   module-level per-side id → module-level per-side name →
+  #   module-level generic id  → module-level generic name  → null
+  _aws_integration_read_ids = {
+    for stack in local.stacks : stack => try(coalesce(
+      try(local.stack_configs[stack].aws_integration_read_id, null),
+      try(local.name_to_id_mappings.aws_integration[local.stack_configs[stack].aws_integration_read_name], null),
+      try(local.stack_configs[stack].aws_integration_id, null),
+      try(local.name_to_id_mappings.aws_integration[local.stack_configs[stack].aws_integration_name], null),
+      var.aws_integration_read_id,
+      try(local.name_to_id_mappings.aws_integration[var.aws_integration_read_name], null),
+      var.aws_integration_id,
+      try(local.name_to_id_mappings.aws_integration[var.aws_integration_name], null),
+    ), null)
+  }
+
+  _aws_integration_write_ids = {
+    for stack in local.stacks : stack => try(coalesce(
+      try(local.stack_configs[stack].aws_integration_write_id, null),
+      try(local.name_to_id_mappings.aws_integration[local.stack_configs[stack].aws_integration_write_name], null),
+      try(local.stack_configs[stack].aws_integration_id, null),
+      try(local.name_to_id_mappings.aws_integration[local.stack_configs[stack].aws_integration_name], null),
+      var.aws_integration_write_id,
+      try(local.name_to_id_mappings.aws_integration[var.aws_integration_write_name], null),
+      var.aws_integration_id,
+      try(local.name_to_id_mappings.aws_integration[var.aws_integration_name], null),
+    ), null)
+  }
+
+  # Flatten into the map consumed by spacelift_aws_integration_attachment.
+  #
+  # Key strategy (preserves backward-compatibility):
+  #   - Same integration for both sides (the pre-existing default case):
+  #       key = "<stack>" — identical to the v2 for_each key, so no state churn on upgrade.
+  #   - Different integrations per side:
+  #       keys = "<stack>::read" and/or "<stack>::write"
+  #
+  # Null on either side means no attachment is created for that side.
+  aws_integration_attachments = merge([
+    for stack in keys(local.aws_integration_stacks) : (
+      local._aws_integration_read_ids[stack] != null
+      && local._aws_integration_read_ids[stack] == local._aws_integration_write_ids[stack]
+    ) ? {
+      # Combined: single attachment, both flags true, bare stack key preserved from v2.
+      (stack) = {
+        stack          = stack
+        integration_id = local._aws_integration_read_ids[stack]
+        read           = true
+        write          = true
+      }
+    } : merge(
+      local._aws_integration_read_ids[stack] != null ? {
+        "${stack}::read" = {
+          stack          = stack
+          integration_id = local._aws_integration_read_ids[stack]
+          read           = true
+          write          = false
+        }
+      } : {},
+      local._aws_integration_write_ids[stack] != null ? {
+        "${stack}::write" = {
+          stack          = stack
+          integration_id = local._aws_integration_write_ids[stack]
+          read           = false
+          write          = true
+        }
+      } : {},
+    )
+  ]...)
   drift_detection_stacks = {
     for stack, config in local.stack_configs :
     stack => config if try(config.drift_detection_enabled, var.drift_detection_enabled)
@@ -569,12 +632,12 @@ resource "spacelift_stack_destructor" "default" {
 }
 
 resource "spacelift_aws_integration_attachment" "default" {
-  for_each = local.aws_integration_stacks
+  for_each = local.aws_integration_attachments
 
-  integration_id = local.stack_property_resolver[each.key].aws_integration_id
-  stack_id       = spacelift_stack.default[each.key].id
-  read           = var.aws_integration_attachment_read
-  write          = var.aws_integration_attachment_write
+  integration_id = each.value.integration_id
+  stack_id       = spacelift_stack.default[each.value.stack].id
+  read           = each.value.read
+  write          = each.value.write
 }
 
 resource "spacelift_drift_detection" "default" {

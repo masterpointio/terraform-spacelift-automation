@@ -145,26 +145,38 @@ variable "aws_integration_enabled" {
 
 variable "aws_integration_id" {
   type        = string
-  description = "ID of the AWS integration to attach."
+  description = "ID of the AWS integration to attach for both read and write operations. Override per-side with aws_integration_read_id / aws_integration_write_id."
   default     = null
 }
 
 variable "aws_integration_name" {
   type        = string
-  description = "Name of the AWS integration to attach, which will be resolved to aws_integration_id. We recommend using names rather than IDs to improve clarity & readability. Since Spacelift enforces unique names, you can rely on names as identifiers without worrying about duplication issues."
+  description = "Name of the AWS integration to attach for both read and write operations, resolved to an ID. Mutually exclusive with aws_integration_id. We recommend using names rather than IDs to improve clarity & readability. Since Spacelift enforces unique names, you can rely on names as identifiers without worrying about duplication issues."
   default     = null
 }
 
-variable "aws_integration_attachment_read" {
-  type        = bool
-  description = "Indicates whether this attachment is used for read operations."
-  default     = true
+variable "aws_integration_read_id" {
+  type        = string
+  description = "ID of the AWS integration to attach for read operations only. Overrides aws_integration_id for the read attachment. Leave null to fall back to aws_integration_id."
+  default     = null
 }
 
-variable "aws_integration_attachment_write" {
-  type        = bool
-  description = "Indicates whether this attachment is used for write operations."
-  default     = true
+variable "aws_integration_read_name" {
+  type        = string
+  description = "Name of the AWS integration to attach for read operations only, resolved to an ID. Mutually exclusive with aws_integration_read_id."
+  default     = null
+}
+
+variable "aws_integration_write_id" {
+  type        = string
+  description = "ID of the AWS integration to attach for write operations only. Overrides aws_integration_id for the write attachment. Leave null to fall back to aws_integration_id."
+  default     = null
+}
+
+variable "aws_integration_write_name" {
+  type        = string
+  description = "Name of the AWS integration to attach for write operations only, resolved to an ID. Mutually exclusive with aws_integration_write_id."
+  default     = null
 }
 
 # Configuration for the Spacelift Stack

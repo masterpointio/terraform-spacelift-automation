@@ -232,11 +232,27 @@
         },
         "aws_integration_id": {
           "type": "string",
-          "description": "AWS integration ID"
+          "description": "AWS integration ID to attach for both read and write operations. Override per-side with aws_integration_read_id / aws_integration_write_id."
         },
         "aws_integration_name": {
           "type": "string",
-          "description": "AWS integration name, this will be translated to an aws_integration_id. Mutually exclusive with aws_integration_id"
+          "description": "AWS integration name to attach for both read and write operations, resolved to an ID. Mutually exclusive with aws_integration_id."
+        },
+        "aws_integration_read_id": {
+          "type": "string",
+          "description": "AWS integration ID for the read attachment only. Overrides aws_integration_id on the read side."
+        },
+        "aws_integration_read_name": {
+          "type": "string",
+          "description": "AWS integration name for the read attachment only, resolved to an ID. Mutually exclusive with aws_integration_read_id."
+        },
+        "aws_integration_write_id": {
+          "type": "string",
+          "description": "AWS integration ID for the write attachment only. Overrides aws_integration_id on the write side."
+        },
+        "aws_integration_write_name": {
+          "type": "string",
+          "description": "AWS integration name for the write attachment only, resolved to an ID. Mutually exclusive with aws_integration_write_id."
         },
         "drift_detection_enabled": {
           "type": "boolean",

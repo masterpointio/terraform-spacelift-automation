@@ -792,7 +792,7 @@ run "test_workspace_as_stack_name_prefix_reverses_id" {
 
   assert {
     condition     = contains(keys(spacelift_stack.default), "test-root-module-a")
-    error_message = "Stack ID should be workspace-first (test-root-module-a): ${jsonencode(keys(spacelift_stack.default))}"
+    error_message = "Stack ID should be workspace-first (test-root-module-a, where `test` is the workspace.): ${jsonencode(keys(spacelift_stack.default))}"
   }
 }
 

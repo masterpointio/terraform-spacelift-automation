@@ -782,6 +782,20 @@ run "test_stack_resource_is_created_with_correct_name" {
   }
 }
 
+# Test that workspace_as_stack_name_prefix = true reverses the ID format
+run "test_workspace_as_stack_name_prefix_reverses_id" {
+  command = plan
+
+  variables {
+    workspace_as_stack_name_prefix = true
+  }
+
+  assert {
+    condition     = contains(keys(spacelift_stack.default), "test-root-module-a")
+    error_message = "Stack ID should be workspace-first (test-root-module-a): ${jsonencode(keys(spacelift_stack.default))}"
+  }
+}
+
 # Test that the folder labels get created with correct format
 run "test_folder_labels_are_correct_format" {
   command = plan

@@ -457,6 +457,19 @@ variable "worker_pool_name" {
   default     = null
 }
 
+variable "workspace_as_stack_name_prefix" {
+  type        = bool
+  description = <<-EOT
+  Controls the order of components in MultiInstance stack IDs.
+  - `false` (default): `$${module}-$${workspace}` (e.g. `network-dev`)
+  - `true`: `$${workspace}-$${module}` (e.g. `dev-network`)
+
+  Ignored for SingleInstance (stack ID is always `$${module}`).
+  Changing this renames stack IDs, forcing recreation of Spacelift stacks. Set deliberately.
+  EOT
+  default     = false
+}
+
 variable "managed_roles" {
   type = map(object({
     name        = string

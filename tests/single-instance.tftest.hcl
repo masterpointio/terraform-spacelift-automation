@@ -108,7 +108,7 @@ run "test_single_instance_stack_configs_custom_project_root_is_used_when_specifi
 }
 
 # Test that no role attachment is created for a single-instance stack without role_attachment_role_slug
-run "test_single_instance_role_attachment_is_not_created_for_non_administrative_stack" {
+run "test_single_instance_role_attachment_is_not_created_when_role_slug_absent" {
   command = plan
 
   assert {

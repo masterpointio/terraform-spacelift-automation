@@ -15,10 +15,9 @@
 # * Space IDs: in the majority of cases all the workspaces in a root module belong to the same Spacelift space, so
 # we allow setting a "global" space_id for all stacks on a root module level.
 # * Autodeploy: if all the stacks in a root module should be autodeployed.
-# * Administrative: if all the stacks in a root module are administrative, e.g stacks that manage Spacelift resources.
 #
 # 3. Labels (see ## Labels)
-# Generates labels for the stacks based on administrative, dependency, and folder information.
+# Generates labels for the stacks based on dependency and folder information.
 #
 # Syntax note:
 # The local expression started with an underscore `_` is used to store intermediate values
@@ -403,9 +402,8 @@ locals {
     stack => config if try(config.destructor_enabled, var.destructor_enabled)
   }
 
-  # Filter stacks that need a Spacelift role attached (replaces the deprecated administrative flag).
-  # A role attachment is created when a per-stack `role_attachment_role_slug` is set in the stack's
-  # YAML config, OR when the module-level `var.role_attachment` is configured (applies to all stacks).
+  # Role attachments are created for any stack with a per-stack `role_attachment_role_slug`
+  # or when module-level `var.role_attachment` is set (applies to all stacks).
   role_attachment_stacks = {
     for stack, config in local.stack_configs :
     stack => config if try(config.role_attachment_role_slug, null) != null || var.role_attachment != null
@@ -617,6 +615,11 @@ resource "spacelift_space" "default" {
 # The role slug must be provided explicitly via per-stack `role_attachment_role_slug` in YAML
 # or via the module-level `var.role_attachment.role_slug`. Use `role_attachment_space_id`
 # (per-stack or module-level) to attach in a space other than the stack's own space.
+#
+# Bootstrapping the automation stack itself: the spacelift-automation stack manages other Spacelift
+# resources (including role attachments for the stacks it creates), so its own stack config must set
+# `stack_settings.role_attachment_role_slug: space-admin` (or an equivalent custom role with
+# SPACE_ADMIN actions). Without it, runs fail with `could not create stack role binding: unauthorized`.
 resource "spacelift_role_attachment" "default" {
   for_each = local.role_attachment_stacks
 

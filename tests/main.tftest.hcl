@@ -820,7 +820,7 @@ run "test_workspace_when_default_tf_workspace_enabled" {
 }
 
 # Test that a role attachment is created for a stack with role_attachment_role_slug set in YAML
-run "test_role_attachment_is_created_for_administrative_stack" {
+run "test_role_attachment_is_created_when_role_slug_set" {
   command = plan
 
   assert {
@@ -830,7 +830,7 @@ run "test_role_attachment_is_created_for_administrative_stack" {
 }
 
 # Test that no role attachment is created for a stack without role_attachment_role_slug set
-run "test_role_attachment_is_not_created_for_non_administrative_stack" {
+run "test_role_attachment_is_not_created_when_role_slug_absent" {
   command = plan
 
   assert {

@@ -219,7 +219,7 @@
         },
         "aws_integration_id": {
           "type": "string",
-          "description": "AWS integration ID to attach for both read and write operations. Override per-side with aws_integration_read_id / aws_integration_write_id."
+          "description": "AWS integration ID to use for both read and write operations. Use this when a single integration covers both sides. For separate per-side integrations, use aws_integration_read_id and aws_integration_write_id instead — do not combine with the per-side variables."
         },
         "aws_integration_name": {
           "type": "string",
@@ -227,7 +227,7 @@
         },
         "aws_integration_read_id": {
           "type": "string",
-          "description": "AWS integration ID for the read attachment only. Overrides aws_integration_id on the read side."
+          "description": "AWS integration ID to attach for read operations. Use together with aws_integration_write_id when different integrations are needed per side. Mutually exclusive with aws_integration_id — do not set both."
         },
         "aws_integration_read_name": {
           "type": "string",
@@ -235,7 +235,7 @@
         },
         "aws_integration_write_id": {
           "type": "string",
-          "description": "AWS integration ID for the write attachment only. Overrides aws_integration_id on the write side."
+          "description": "AWS integration ID to attach for write operations. Use together with aws_integration_read_id when different integrations are needed per side. Mutually exclusive with aws_integration_id — do not set both."
         },
         "aws_integration_write_name": {
           "type": "string",

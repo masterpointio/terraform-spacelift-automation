@@ -184,17 +184,24 @@ run "test_worker_pool_name_takes_precedence_over_global_variable" {
 ### AWS Integration ID Resolution Tests ###
 ########################################################
 
-# Test AWS integration name-to-ID resolution via API lookup
+# Test AWS integration name-to-ID resolution via API lookup.
+# Both the read and write resolvers fall back through the generic aws_integration_name,
+# so a stack-level aws_integration_name populates both sides.
 run "test_aws_integration_name_resolves_to_correct_id" {
   command = plan
 
   assert {
-    condition     = local.resource_id_resolver.aws_integration["root-module-a-test"] == "example-aws-integration-id"
-    error_message = "AWS integration name not resolving to correct ID: ${jsonencode(local.resource_id_resolver.aws_integration)}"
+    condition     = local._aws_integration_read_ids["root-module-a-test"] == "example-aws-integration-id"
+    error_message = "AWS integration name not resolving to correct read ID: ${jsonencode(local._aws_integration_read_ids)}"
+  }
+
+  assert {
+    condition     = local._aws_integration_write_ids["root-module-a-test"] == "example-aws-integration-id"
+    error_message = "AWS integration name not resolving to correct write ID: ${jsonencode(local._aws_integration_write_ids)}"
   }
 }
 
-# Test that stack-level aws_integration_name takes precedence over global aws_integration_name variable
+# Test that stack-level aws_integration_name takes precedence over module-level aws_integration_name
 run "test_aws_integration_name_takes_precedence_over_global_variable" {
   command = plan
 
@@ -203,7 +210,77 @@ run "test_aws_integration_name_takes_precedence_over_global_variable" {
   }
 
   assert {
-    condition     = local.resource_id_resolver.aws_integration["root-module-a-test"] == "example-aws-integration-id"
-    error_message = "AWS integration name from stack settings not taking precedence over global variable aws_integration_name: ${jsonencode(local.resource_id_resolver.aws_integration)}"
+    condition     = local._aws_integration_read_ids["root-module-a-test"] == "example-aws-integration-id"
+    error_message = "Stack-level aws_integration_name not taking precedence over module-level for read: ${jsonencode(local._aws_integration_read_ids)}"
+  }
+
+  assert {
+    condition     = local._aws_integration_write_ids["root-module-a-test"] == "example-aws-integration-id"
+    error_message = "Stack-level aws_integration_name not taking precedence over module-level for write: ${jsonencode(local._aws_integration_write_ids)}"
   }
 }
+
+# Test that stack-level generic aws_integration_id takes precedence over module-level per-side IDs.
+# Fallback chain: stack-level specific > stack-level generic > module-level specific > module-level generic.
+run "test_stack_generic_id_beats_module_per_side" {
+  command = plan
+
+  variables {
+    aws_integration_read_id  = "module-level-read"
+    aws_integration_write_id = "module-level-write"
+  }
+
+  # default-example fixture sets stack-level aws_integration_id = "1234567890".
+  assert {
+    condition     = local._aws_integration_read_ids["root-module-a-default-example"] == "1234567890"
+    error_message = "Stack-level aws_integration_id should win over module-level per-side read id: ${jsonencode(local._aws_integration_read_ids)}"
+  }
+
+  assert {
+    condition     = local._aws_integration_write_ids["root-module-a-default-example"] == "1234567890"
+    error_message = "Stack-level aws_integration_id should win over module-level per-side write id: ${jsonencode(local._aws_integration_write_ids)}"
+  }
+}
+
+########################################################
+### AWS Integration shape validation checks ###
+########################################################
+
+# Setting only one side (read without write) must trigger aws_integration_per_side_must_be_paired.
+run "test_read_without_write_fails_paired_check" {
+  command = plan
+
+  expect_failures = [check.aws_integration_per_side_must_be_paired]
+
+  variables {
+    aws_integration_read_id = "read-only-integration"
+    # aws_integration_write_id intentionally omitted
+  }
+}
+
+# Setting only one side (write without read) must trigger aws_integration_per_side_must_be_paired.
+run "test_write_without_read_fails_paired_check" {
+  command = plan
+
+  expect_failures = [check.aws_integration_per_side_must_be_paired]
+
+  variables {
+    aws_integration_write_id = "write-only-integration"
+    # aws_integration_read_id intentionally omitted
+  }
+}
+
+# Mixing generic and per-side vars must trigger aws_integration_single_vs_split_exclusivity.
+run "test_generic_and_per_side_together_fails_exclusivity_check" {
+  command = plan
+
+  expect_failures = [check.aws_integration_single_vs_split_exclusivity]
+
+  variables {
+    aws_integration_id       = "generic-integration"
+    aws_integration_read_id  = "read-integration"
+    aws_integration_write_id = "write-integration"
+  }
+}
+
+

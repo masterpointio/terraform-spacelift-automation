@@ -251,10 +251,17 @@ run "test_default_example_stack_final_values" {
     error_message = "destructor_enabled was not correct on the default-example stack: ${jsonencode(spacelift_stack_destructor.default["root-module-a-default-example"])}"
   }
 
-  # aws_integration_id
+  # aws_integration_id — single integration, read+write attached in one resource
   assert {
     condition     = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "1234567890"
-    error_message = "aws_integration_id was not correct on the default-example stack: ${jsonencode(spacelift_aws_integration_attachment.default["root-module-a-default-example"])}"
+    error_message = "aws_integration_id was not correct on the default-example stack: ${jsonencode(spacelift_aws_integration_attachment.default)}"
+  }
+  assert {
+    condition = (
+      spacelift_aws_integration_attachment.default["root-module-a-default-example"].read == true
+      && spacelift_aws_integration_attachment.default["root-module-a-default-example"].write == true
+    )
+    error_message = "read/write flags were not both true for the combined attachment: ${jsonencode(spacelift_aws_integration_attachment.default)}"
   }
 
   # drift_detection_ignore_state
@@ -494,10 +501,10 @@ run "test_default_example_stack_runtime_overrides" {
     error_message = "worker_pool_id override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
-  # aws_integration_id
+  # aws_integration_id override
   assert {
     condition     = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "999"
-    error_message = "aws_integration_id override was not applied correctly: ${jsonencode(spacelift_aws_integration_attachment.default["root-module-a-default-example"])}"
+    error_message = "aws_integration_id override was not applied correctly: ${jsonencode(spacelift_aws_integration_attachment.default)}"
   }
 
   # drift_detection_ignore_state
@@ -704,7 +711,7 @@ run "test_default_example_stack_partial_runtime_overrides" {
   # aws_integration_id
   assert {
     condition     = spacelift_aws_integration_attachment.default["root-module-a-default-example"].integration_id == "1234567890"
-    error_message = "aws_integration_id was not correct on the default-example stack: ${jsonencode(spacelift_aws_integration_attachment.default["root-module-a-default-example"])}"
+    error_message = "aws_integration_id was not correct on the default-example stack: ${jsonencode(spacelift_aws_integration_attachment.default)}"
   }
 
   # drift_detection_ignore_state
@@ -1148,5 +1155,41 @@ run "test_role_attachment_created_with_module_level_managed_role" {
   assert {
     condition     = contains(keys(spacelift_role_attachment.default), "root-module-a-default-example")
     error_message = "Role attachment was not created for root-module-a-default-example with managed role: ${jsonencode(keys(spacelift_role_attachment.default))}"
+  }
+}
+
+########################################################
+### AWS Integration read/write split attachment tests ###
+########################################################
+
+# Split fixture — stack-level aws_integration_read_id and aws_integration_write_id differ.
+# Should emit two attachments keyed "<stack>::read" and "<stack>::write", with opposite flags.
+run "test_aws_integration_split_fixture_produces_two_attachments" {
+  command = plan
+
+  assert {
+    condition     = contains(keys(spacelift_aws_integration_attachment.default), "root-module-a-split-integration-example::read")
+    error_message = "Expected a read-side attachment for split-integration-example: ${jsonencode(keys(spacelift_aws_integration_attachment.default))}"
+  }
+
+  assert {
+    condition     = contains(keys(spacelift_aws_integration_attachment.default), "root-module-a-split-integration-example::write")
+    error_message = "Expected a write-side attachment for split-integration-example: ${jsonencode(keys(spacelift_aws_integration_attachment.default))}"
+  }
+
+  assert {
+    condition = (
+      spacelift_aws_integration_attachment.default["root-module-a-split-integration-example::read"].read == true
+      && spacelift_aws_integration_attachment.default["root-module-a-split-integration-example::read"].write == false
+    )
+    error_message = "Read-side attachment should have read=true, write=false: ${jsonencode(spacelift_aws_integration_attachment.default["root-module-a-split-integration-example::read"])}"
+  }
+
+  assert {
+    condition = (
+      spacelift_aws_integration_attachment.default["root-module-a-split-integration-example::write"].read == false
+      && spacelift_aws_integration_attachment.default["root-module-a-split-integration-example::write"].write == true
+    )
+    error_message = "Write-side attachment should have read=false, write=true: ${jsonencode(spacelift_aws_integration_attachment.default["root-module-a-split-integration-example::write"])}"
   }
 }

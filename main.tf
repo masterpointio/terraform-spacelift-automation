@@ -291,9 +291,6 @@ locals {
       terraform_version                = try(local.stack_configs[stack].terraform_version, var.terraform_version)
       worker_pool_id                   = try(local.stack_configs[stack].worker_pool_id, var.worker_pool_id)
 
-      # AWS Integration properties
-      aws_integration_id = local.resource_id_resolver.aws_integration[stack]
-
       # Drift detection properties
       drift_detection_ignore_state = try(local.stack_configs[stack].drift_detection_ignore_state, var.drift_detection_ignore_state)
       drift_detection_reconcile    = try(local.stack_configs[stack].drift_detection_reconcile, var.drift_detection_reconcile)
@@ -351,20 +348,13 @@ locals {
       name_attr     = "worker_pool_name"
       default_value = null
     }
-    aws_integration = {
-      id_attr       = "aws_integration_id"
-      name_attr     = "aws_integration_name"
-      default_value = null
-    }
   }
 
   var_lookup = { # We need this map to dynamically access vars like var.space_id when config.id_attr = "space_id". TF doesn't support var[dynamic_key] syntax, downside of it not being a full programming language.
-    space_id             = var.space_id
-    space_name           = var.space_name
-    worker_pool_id       = var.worker_pool_id
-    worker_pool_name     = var.worker_pool_name
-    aws_integration_id   = var.aws_integration_id
-    aws_integration_name = var.aws_integration_name
+    space_id         = var.space_id
+    space_name       = var.space_name
+    worker_pool_id   = var.worker_pool_id
+    worker_pool_name = var.worker_pool_name
   }
 
   # How it works:
@@ -387,12 +377,8 @@ locals {
     }
   }
 
-  ## Filter integration + drift detection stacks
+  ## Filter drift detection stacks
 
-  aws_integration_stacks = {
-    for stack, config in local.stack_configs :
-    stack => config if try(config.aws_integration_enabled, var.aws_integration_enabled)
-  }
   drift_detection_stacks = {
     for stack, config in local.stack_configs :
     stack => config if try(config.drift_detection_enabled, var.drift_detection_enabled)
@@ -564,15 +550,6 @@ resource "spacelift_stack_destructor" "default" {
     spacelift_drift_detection.default,
     spacelift_aws_integration_attachment.default
   ]
-}
-
-resource "spacelift_aws_integration_attachment" "default" {
-  for_each = local.aws_integration_stacks
-
-  integration_id = local.stack_property_resolver[each.key].aws_integration_id
-  stack_id       = spacelift_stack.default[each.key].id
-  read           = var.aws_integration_attachment_read
-  write          = var.aws_integration_attachment_write
 }
 
 resource "spacelift_drift_detection" "default" {

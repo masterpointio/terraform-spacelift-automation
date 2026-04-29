@@ -1,0 +1,7 @@
+kind: StackConfigV1
+stack_settings:
+  # Exercises the split read/write attachment behavior: different integration IDs per side
+  # should produce two spacelift_aws_integration_attachment resources, one per side.
+  aws_integration_enabled: true
+  aws_integration_read_id: "read-int"
+  aws_integration_write_id: "write-int"

@@ -145,7 +145,7 @@ variable "aws_integration_enabled" {
 
 variable "aws_integration_id" {
   type        = string
-  description = "ID of the AWS integration to attach for both read and write operations. Override per-side with aws_integration_read_id / aws_integration_write_id."
+  description = "ID of the AWS integration to use for both read and write operations. Use this when a single integration covers both sides. For separate per-side integrations, use aws_integration_read_id and aws_integration_write_id instead — do not combine with the per-side variables."
   default     = null
 }
 
@@ -157,7 +157,7 @@ variable "aws_integration_name" {
 
 variable "aws_integration_read_id" {
   type        = string
-  description = "ID of the AWS integration to attach for read operations only. Overrides aws_integration_id for the read attachment. Leave null to fall back to aws_integration_id."
+  description = "ID of the AWS integration to attach for read operations. Use together with aws_integration_write_id when different integrations are needed per side. Mutually exclusive with aws_integration_id — do not set both."
   default     = null
 }
 
@@ -169,7 +169,7 @@ variable "aws_integration_read_name" {
 
 variable "aws_integration_write_id" {
   type        = string
-  description = "ID of the AWS integration to attach for write operations only. Overrides aws_integration_id for the write attachment. Leave null to fall back to aws_integration_id."
+  description = "ID of the AWS integration to attach for write operations. Use together with aws_integration_read_id when different integrations are needed per side. Mutually exclusive with aws_integration_id — do not set both."
   default     = null
 }
 

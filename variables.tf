@@ -485,7 +485,7 @@ variable "worker_pool_name" {
   default     = null
 }
 
-variable "workspace_as_stack_name_prefix" {
+variable "workspace_prefix_enabled" {
   type        = bool
   description = <<-EOT
   Controls the order of components in MultiInstance stack IDs.

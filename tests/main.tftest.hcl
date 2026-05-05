@@ -782,12 +782,12 @@ run "test_stack_resource_is_created_with_correct_name" {
   }
 }
 
-# Test that workspace_as_stack_name_prefix = true reverses the ID format
-run "test_workspace_as_stack_name_prefix_reverses_id" {
+# Test that workspace_prefix_enabled = true reverses the ID format
+run "test_workspace_prefix_enabled_reverses_id" {
   command = plan
 
   variables {
-    workspace_as_stack_name_prefix = true
+    workspace_prefix_enabled = true
   }
 
   assert {

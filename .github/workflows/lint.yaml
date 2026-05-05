@@ -4,7 +4,7 @@ concurrency:
   group: lint-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-on: pull_request_target
+on: pull_request
 
 permissions:
   actions: read

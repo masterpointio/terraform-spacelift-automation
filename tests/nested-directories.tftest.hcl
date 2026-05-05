@@ -27,7 +27,8 @@ mock_provider "jsonschema" {
 }
 
 variables {
-  repository = "terraform-spacelift-automation"
+  workspace_prefix_enabled = false
+  repository               = "terraform-spacelift-automation"
   github_enterprise = {
     namespace = "masterpointio"
   }

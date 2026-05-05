@@ -489,13 +489,13 @@ variable "workspace_prefix_enabled" {
   type        = bool
   description = <<-EOT
   Controls the order of components in MultiInstance stack IDs.
-  - `false` (default): `$${module}-$${workspace}` (e.g. `network-dev`)
-  - `true`: `$${workspace}-$${module}` (e.g. `dev-network`)
+  - `true` (default): `$${workspace}-$${module}` (e.g. `dev-network`) — context (environment) first, matches `context.tf` and label naming conventions.
+  - `false`: `$${module}-$${workspace}` (e.g. `network-dev`)
 
   Ignored for SingleInstance (stack ID is always `$${module}`).
   Changing this renames stack IDs, forcing recreation of Spacelift stacks. Set deliberately.
   EOT
-  default     = false
+  default     = true
 }
 
 variable "managed_roles" {

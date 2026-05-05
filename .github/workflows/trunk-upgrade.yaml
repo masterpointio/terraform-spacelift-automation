@@ -22,12 +22,12 @@ jobs:
       pull-requests: write # needed by github-action-trunk-upgrade to write pull requests
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.22
         with:
           persist-credentials: false
 
       - name: Run Trunk Upgrade
-        uses: masterpointio/github-action-trunk-upgrade@a79fd65d524d92031fe167daee411d2f25d4a999 # v0.1.0
+        uses: masterpointio/github-action-trunk-upgrade@a79fd65d524d92031fe167daee411d2f25d4a999
         with:
           app-id: ${{ secrets.MP_BOT_APP_ID }}
           app-private-key: ${{ secrets.MP_BOT_APP_PRIVATE_KEY }}

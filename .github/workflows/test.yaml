@@ -6,6 +6,10 @@ on:
       - main
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 permissions: {}
 
 jobs:
@@ -13,11 +17,11 @@ jobs:
     name: 🧪 ${{ matrix.tf }} test
     runs-on: ubuntu-latest
     permissions:
-      actions: read
-      checks: write
-      contents: read
-      id-token: write
-      pull-requests: read
+      actions: read # needed by github-action-tf-test to read workflow run context
+      checks: write # needed by github-action-tf-test to write check results
+      contents: read # needed by github-action-tf-test to read repository contents
+      id-token: write # needed by github-action-tf-test to write id token
+      pull-requests: read # needed by github-action-tf-test to read pull request context
     env:
       SPACELIFT_API_KEY_ENDPOINT: ${{ secrets.SPACELIFT_API_KEY_ENDPOINT }}
       SPACELIFT_API_KEY_ID: ${{ secrets.SPACELIFT_API_KEY_ID }}

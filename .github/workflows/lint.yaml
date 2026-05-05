@@ -12,9 +12,9 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     permissions:
-      actions: read
-      checks: write
-      contents: read
+      actions: read # needed by trunk-action to read workflow run context
+      checks: write # needed by trunk-action to write check results
+      contents: read # needed by trunk-action to read repository contents
     steps:
       - name: Check out Git repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -30,7 +30,7 @@ jobs:
   conventional-title:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: read
+      pull-requests: read # needed by action-semantic-pull-request to inspect pull request context
     steps:
       - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
         env:

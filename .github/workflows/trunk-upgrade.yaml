@@ -6,6 +6,10 @@ on:
     - cron: 0 8 1 * *
   workflow_dispatch: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 permissions: {}
 
 jobs:
@@ -13,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       # For trunk to create PRs
-      contents: write
-      pull-requests: write
+      contents: write # needed by github-action-trunk-upgrade to write repository contents
+      pull-requests: write # needed by github-action-trunk-upgrade to write pull requests
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

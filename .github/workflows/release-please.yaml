@@ -13,6 +13,7 @@ permissions: {}
 
 jobs:
   release-please:
+    name: 📦 release please
     runs-on: ubuntu-latest
     permissions:
       contents: write # needed by release-please-action to write repository contents

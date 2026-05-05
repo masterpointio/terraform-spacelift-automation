@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions: {}
-  
+
 jobs:
   lint:
     name: 📝 lint

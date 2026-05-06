@@ -25,5 +25,8 @@ jobs:
       - name: Run zizmor 🌈
         uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
         with:
+          # Set to false, so zizmor will not upload results to Github Advanced Security
+          # and will instead print them to the Action's run log.
           advanced-security: false
+          # Set to pedantic so that zizmor will run it's stale-action-refs audit rule
           persona: pedantic

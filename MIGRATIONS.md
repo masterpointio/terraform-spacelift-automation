@@ -2,31 +2,97 @@
 
 ## v2.x → v3.0.0
 
-`root_modules_path` was overloaded: spacelift-automation needs a filesystem path relative to the consuming module to discover
-stacks, but Spacelift's `project_root` is relative to the repo root. v2.x bridged the two by silently stripping leading `../`
-segments from the variable — that only produced the right `project_root` when the consuming module sat at
-`<repo>/root-modules/spacelift-automation/`; any other layout produced a wrong `project_root` with no error, surfacing only
-as a Spacelift run failure.
+### Overview
 
-v3.0.0 splits the variable into `root_modules_discovery_path` (discovery, relative to this module) and `project_root_prefix`
-(relative to the repo root), and removes the silent strip. Set `project_root_prefix` explicitly when the discovery path
-contains `..`.
+v3.0.0 ships two breaking changes:
 
-### Replacing `root_modules_path`
+1. **`root_modules_path` is split** into `root_modules_discovery_path` and `project_root_prefix`, and the silent `../` strip is removed.
+2. **MultiInstance stack ID format changes** — the new variable `workspace_prefix_enabled` defaults to `true`, so stack IDs become `${workspace}-${module}` (e.g. `dev-network`) instead of `${module}-${workspace}` (e.g. `network-dev`).
 
-Substitute `root_modules_discovery_path` and (where needed) `project_root_prefix`:
+Read both sections below before upgrading.
 
-| v2.x                                                 | v3.0.0                                                                            |
-| ---------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `root_modules_path = "../../root-modules"`           | `root_modules_discovery_path = "../"` + `project_root_prefix = "root-modules"`    |
-| `root_modules_path = "../../stacks"` (remote stacks) | `root_modules_discovery_path = "../../stacks"` + `project_root_prefix = "stacks"` |
-| `root_modules_path = "root-modules"` (no `..`)       | `root_modules_discovery_path = "root-modules"` (no prefix needed)                 |
+---
+
+### 1. Path variable split: `root_modules_path` → `root_modules_discovery_path` + `project_root_prefix`
+
+#### Why
+
+`root_modules_path` was overloaded: spacelift-automation needs a filesystem path **relative to the consuming module** to discover stacks, but Spacelift's `project_root` is **relative to the repo root**. v2.x bridged the two by silently stripping leading `../` segments from the variable — that only produced the right `project_root` when the consuming module sat at `<repo>/root-modules/spacelift-automation/`. Any other layout produced a wrong `project_root` with no error, surfacing only as a Spacelift run failure.
+
+v3.0.0 splits the variable into two:
+
+- `root_modules_discovery_path` — discovery path, relative to this module.
+- `project_root_prefix` — prefix prepended to `project_root`, relative to the repo root.
+
+The silent `../` strip is gone. If the discovery path contains `..`, you must set `project_root_prefix` explicitly.
+
+#### Replacement table
+
+| v2.x                                                   | v3.0.0                                                                              |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `root_modules_path = "../../root-modules"`             | `root_modules_discovery_path = "../"` + `project_root_prefix = "root-modules"`      |
+| `root_modules_path = "../../stacks"` (remote stacks)   | `root_modules_discovery_path = "../../stacks"` + `project_root_prefix = "stacks"`   |
+| `root_modules_path = "root-modules"` (no `..`)         | `root_modules_discovery_path = "root-modules"` (no prefix needed)                   |
 
 If you leave `project_root_prefix` unset while the discovery path contains `..`, `tofu plan` fails with a validation error.
 
-### Verifying before apply
+#### How to verify
 
-v3.0.0 exposes each stack's resolved `project_root` on the `spacelift_stacks` output. Run `tofu plan` and inspect. If every value matches the v2.x `project_root`, no stack replacements occur.
+v3.0.0 exposes each stack's resolved `project_root` on the `spacelift_stacks` output. Run `tofu plan` and inspect — if every value matches the v2.x `project_root`, no stack replacements occur.
+
+---
+
+### 2. MultiInstance stack ID format flip: `workspace_prefix_enabled`
+
+#### Why
+
+The new default puts the workspace (environment) component **before** the root module name. This matches the conventions used by `context.tf` and label naming throughout the masterpoint ecosystem — context-identifying information first, the actual resource name last — so similar stacks group naturally when sorted/filtered in the Spacelift UI.
+
+#### What changed
+
+| Item                                       | v2.x                                          | v3.0.0                                                              |
+| ------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------- |
+| MultiInstance stack ID format (default)    | `${module}-${workspace}` (e.g. `network-dev`) | `${workspace}-${module}` (e.g. `dev-network`)                       |
+| `workspace_prefix_enabled` module variable | N/A (hardcoded format)                        | New `bool`, defaults to `true`. Set to `false` to keep v2.x format. |
+| Folder labels and dependency labels        | Unchanged                                     | Unchanged                                                           |
+| SingleInstance stack IDs                   | `${module}`                                   | Unchanged — variable does not apply.                                |
+
+> **Heads up:** Spacelift identifies stacks by ID. Renaming a stack ID destroys the old stack and creates a new one — state, run history, environment variables, and attachments do not transfer automatically. Plan the migration before you apply.
+
+#### Migration options
+
+##### Option A — Keep the v2.x naming (recommended for existing deployments)
+
+Set `workspace_prefix_enabled = false` in your module call. No stack IDs change, no recreation, no plan diff related to stack naming.
+
+```hcl
+module "spacelift_automation" {
+  source  = "masterpointio/automation/spacelift"
+  version = "3.0.0"
+
+  workspace_prefix_enabled = false # ${module}-${workspace} -> e.g. serviceA-dev
+  # ... rest of your config
+}
+```
+
+You can adopt the new default later when you're ready to recreate stacks.
+
+##### Option B — Adopt the new default (recreate stacks with workspace-first IDs)
+
+Accept the new default, run `tofu plan`, and confirm the diff shows every MultiInstance stack being destroyed and recreated with the new ID. Before applying:
+
+1. Inventory anything that references stack IDs by string (CI workflows, drift webhook URLs, dashboards, run trigger labels, dependency labels in YAML, external scripts).
+2. Update those references in lockstep with the apply.
+3. If state continuity matters, follow the Spacelift docs for migrating stack state across renames or use `terraform state mv` against the Spacelift state.
+
+#### How to verify
+
+After upgrading and applying, inspect a sample stack:
+
+- `tofu state show 'module.spacelift_automation.spacelift_stack.default["dev-network"]'` — Option B
+- `tofu state show 'module.spacelift_automation.spacelift_stack.default["network-dev"]'` — Option A (unchanged)
+
+The `terraform_workspace`, `project_root`, folder labels, and dependency labels should all remain identical to v2.x.
 
 ## v1.x → v2.0.0
 

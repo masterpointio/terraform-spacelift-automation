@@ -79,7 +79,9 @@ You can adopt the new default later when you're ready to recreate stacks.
 
 ##### Option B — Adopt the new default (recreate stacks with workspace-first IDs)
 
-Accept the new default, run `tofu plan`, and confirm the diff shows every MultiInstance stack being destroyed and recreated with the new ID. Before applying:
+THIS IS A BIG LIFT AND HIGHLY RISKY. WE DO NOT RECOMMEND THIS OPTION UNLESS NECESSARY AND YOU HAVE A GOOD MIGRATION PLAN IN PLACE TO EXECUTE THIS.
+
+Accept the new default, run `tofu plan`, and confirm the diff shows every MultiInstance stack being destroyed and recreated with the new ID. Also note that there will be other dependencies, such as between Spacelift stacks, or stack deletion protection. Before applying:
 
 1. Inventory anything that references stack IDs by string (CI workflows, drift webhook URLs, dashboards, run trigger labels, dependency labels in YAML, external scripts).
 2. Update those references in lockstep with the apply.
@@ -93,6 +95,8 @@ After upgrading and applying, inspect a sample stack:
 - `tofu state show 'module.spacelift_automation.spacelift_stack.default["network-dev"]'` — Option A (unchanged)
 
 The `terraform_workspace`, `project_root`, folder labels, and dependency labels should all remain identical to v2.x.
+
+---
 
 ## v1.x → v2.0.0
 

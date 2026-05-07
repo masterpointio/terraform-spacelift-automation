@@ -14,8 +14,5 @@ permissions: {}
 
 jobs:
   trunk-upgrade:
-    uses: masterpointio/.github/.github/workflows/trunk-upgrade.yaml@5b6a1958f98df1c9bbe63b7920f6f7bb9bd68f87
-    permissions:
-      contents: write
-      pull-requests: write
+    uses: masterpointio/.github/.github/workflows/trunk-upgrade.yaml@ed29c348c145f20ce0d2b6b24605c54fcdbdab34
     secrets: inherit

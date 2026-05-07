@@ -4,12 +4,13 @@
 
 ### Overview
 
-v3.0.0 ships two breaking changes:
+v3.0.0 ships three breaking changes:
 
 1. **`root_modules_path` is split** into `root_modules_discovery_path` and `project_root_prefix`, and the silent `../` strip is removed.
 2. **MultiInstance stack ID format changes** — the new variable `workspace_prefix_enabled` defaults to `true`, so stack IDs become `${workspace}-${module}` (e.g. `dev-network`) instead of `${module}-${workspace}` (e.g. `network-dev`).
+3. **`github_action_deploy` is renamed to `allow_run_promotion`** — both the module variable and the matching `stack_settings` YAML key.
 
-Read both sections below before upgrading.
+Read all three sections below before upgrading.
 
 ---
 
@@ -28,11 +29,11 @@ The silent `../` strip is gone. If the discovery path contains `..`, you must se
 
 #### Replacement table
 
-| v2.x                                                   | v3.0.0                                                                              |
-| ------------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| `root_modules_path = "../../root-modules"`             | `root_modules_discovery_path = "../"` + `project_root_prefix = "root-modules"`      |
-| `root_modules_path = "../../stacks"` (remote stacks)   | `root_modules_discovery_path = "../../stacks"` + `project_root_prefix = "stacks"`   |
-| `root_modules_path = "root-modules"` (no `..`)         | `root_modules_discovery_path = "root-modules"` (no prefix needed)                   |
+| v2.x                                                 | v3.0.0                                                                            |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `root_modules_path = "../../root-modules"`           | `root_modules_discovery_path = "../"` + `project_root_prefix = "root-modules"`    |
+| `root_modules_path = "../../stacks"` (remote stacks) | `root_modules_discovery_path = "../../stacks"` + `project_root_prefix = "stacks"` |
+| `root_modules_path = "root-modules"` (no `..`)       | `root_modules_discovery_path = "root-modules"` (no prefix needed)                 |
 
 If you leave `project_root_prefix` unset while the discovery path contains `..`, `tofu plan` fails with a validation error.
 
@@ -77,7 +78,7 @@ module "spacelift_automation" {
 
 You can adopt the new default later when you're ready to recreate stacks.
 
-##### Option B — Adopt the new default (recreate stacks with workspace-first IDs)
+##### Option B — Adopt the new default (recreate stacks with workspace-first IDs) (NOT RECOMMENDED UNLESS INTENTIONAL)
 
 THIS IS A BIG LIFT AND HIGHLY RISKY. WE DO NOT RECOMMEND THIS OPTION UNLESS NECESSARY AND YOU HAVE A GOOD MIGRATION PLAN IN PLACE TO EXECUTE THIS.
 
@@ -87,14 +88,13 @@ Accept the new default, run `tofu plan`, and confirm the diff shows every MultiI
 2. Update those references in lockstep with the apply.
 3. If state continuity matters, follow the Spacelift docs for migrating stack state across renames or use `terraform state mv` against the Spacelift state.
 
-#### How to verify
+---
 
-After upgrading and applying, inspect a sample stack:
+### 3. `github_action_deploy` → `allow_run_promotion`
 
-- `tofu state show 'module.spacelift_automation.spacelift_stack.default["dev-network"]'` — Option B
-- `tofu state show 'module.spacelift_automation.spacelift_stack.default["network-dev"]'` — Option A (unchanged)
+Spacelift renamed the underlying provider attribute from `github_action_deploy` to `allow_run_promotion` to reflect what it actually controls (promoting a proposed run to a tracked run), not just GitHub-specific deploys. v3.0.0 mirrors that rename in this module.
 
-The `terraform_workspace`, `project_root`, folder labels, and dependency labels should all remain identical to v2.x.
+See: [`spacelift_stack.allow_run_promotion`](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack#allow_run_promotion-1)
 
 ---
 

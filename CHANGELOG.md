@@ -1,5 +1,53 @@
 # Changelog
 
+## [2.1.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v2.0.0...v2.1.0) (2026-04-21)
+
+
+### Features
+
+* support sparse checkout git ([#119](https://github.com/masterpointio/terraform-spacelift-automation/issues/119)) ([16a1ce2](https://github.com/masterpointio/terraform-spacelift-automation/commit/16a1ce28a0cff6448ac370dea012e032fa9f8705))
+
+
+### Bug Fixes
+
+* pin GitHub Actions to commit SHAs (INT-326) ([#116](https://github.com/masterpointio/terraform-spacelift-automation/issues/116)) ([109b50a](https://github.com/masterpointio/terraform-spacelift-automation/commit/109b50af8a705e09d731b36b364572c5f73fb132))
+
+## [2.0.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.10.0...v2.0.0) (2026-03-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* Enable smart sanitization and local preview by default ([#106](https://github.com/masterpointio/terraform-spacelift-automation/issues/106))
+* Remove deprecate administrative flag for stack role attachments replacement (INT-142) ([#108](https://github.com/masterpointio/terraform-spacelift-automation/issues/108))
+
+### Features
+
+* Enable smart sanitization and local preview by default ([#106](https://github.com/masterpointio/terraform-spacelift-automation/issues/106)) ([bea5e68](https://github.com/masterpointio/terraform-spacelift-automation/commit/bea5e687163ed89d946efdcf0ef0d72f243f1f6f))
+* Remove deprecate administrative flag for stack role attachments replacement (INT-142) ([#108](https://github.com/masterpointio/terraform-spacelift-automation/issues/108)) ([53f44e9](https://github.com/masterpointio/terraform-spacelift-automation/commit/53f44e90890fd109cf36a189a3dc4cb4b7008fb4))
+
+### Migration Guide
+
+[MIGRATION GUIDE](MIGRATIONS.md)
+
+## [1.10.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.9.0...v1.10.0) (2026-03-31)
+
+
+### Features
+
+* add spacelift roles and role attachments (INT-142) ([#110](https://github.com/masterpointio/terraform-spacelift-automation/issues/110)) ([bfd13bb](https://github.com/masterpointio/terraform-spacelift-automation/commit/bfd13bb6366fb08e2652fa58eb764e1752bd6917))
+
+## [1.9.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.8.0...v1.9.0) (2026-03-26)
+
+
+### Features
+
+* dependency label of depends-on to be optional ([#109](https://github.com/masterpointio/terraform-spacelift-automation/issues/109)) ([fee5cc4](https://github.com/masterpointio/terraform-spacelift-automation/commit/fee5cc46557d948843df3de38ad51a53a908e750))
+
+
+### Bug Fixes
+
+* add mocked resources ([#102](https://github.com/masterpointio/terraform-spacelift-automation/issues/102)) ([bbd29ad](https://github.com/masterpointio/terraform-spacelift-automation/commit/bbd29ad681de45d6520e4da067aca8f563c335f0))
+
 ## [1.8.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v1.7.0...v1.8.0) (2025-09-18)
 
 

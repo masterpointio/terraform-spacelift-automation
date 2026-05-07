@@ -32,6 +32,17 @@ plugin "aws" {
   deep_check = false
 }
 
+# Allow locals prefixed with _ (used as a "private" convention throughout this module)
+# while still enforcing snake_case for everything after the prefix.
+# https://github.com/terraform-linters/tflint-ruleset-terraform/blob/main/docs/rules/terraform_naming_convention.md
+rule "terraform_naming_convention" {
+  enabled = true
+
+  local {
+    custom = "^_?[a-z][a-z0-9]*(_[a-z0-9]+)*$"
+  }
+}
+
 # Allow variables to exist in more files than ONLY variables.tf
 # Example use cases where we prefer for variables to exist in context,
 # - context.tf (applicable to the null-label module)

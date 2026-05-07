@@ -43,7 +43,8 @@ Structure requirements:
 - Stack configs are placed in `<root_modules_path>/<root_module>/stacks` directory for each workspace / instance of that stack. e.g. `root-modules/k8s-cluster/stacks/dev.yaml` and `root-modules/k8s-cluster/stacks/stage.yaml`
 - Terraform variables are placed in `<root_modules_path>/<root_module>/tfvars` directory for each workspace / instance of that stack. e.g. `root-modules/k8s-cluster/tfvars/dev.tfvars` and `root-modules/k8s-cluster/tfvars/stage.tfvars`
 - Stack config files and tfvars files must be equal to OpenTofu/Terraform workspace, e.g. `stacks/dev.yaml` and `tfvars/dev.tfvars` for a workspace named `dev`.
-- Common configs are placed in `<root_modules_path>/<root_module>/stacks/common.yaml` file (or `var.common_config_file` value). This is useful when you know that some values should be shared across all the stacks created for a root module. For example, all stacks that manage Spacelift Policies must use the `administrative: true` setting or all stacks must share the same labels.
+- Common configs are placed in `<root_modules_path>/<root_module>/stacks/common.yaml` file (or `var.common_config_file` value). This is useful when you know that some values should be shared across all the stacks created for a root module.
+  - For example, all stacks that manage Spacelift resources can share `role_attachment_role_slug: space-admin` or all stacks can share the same labels.
 
 We have an example of this structure in the [examples/complete](./examples/complete/root-modules/), which looks like the following:
 
@@ -205,9 +206,8 @@ Below is a brief example. You can also see the full schema in our [JSON Schema f
 ```yaml
 kind: StackConfigV1
 stack_settings:
-  administrative: true
+  role_attachment_role_slug: space-admin
   autodeploy: true
-  autoretry: true
   description: "Production EKS cluster configuration"
   labels:
     - "prod"
@@ -229,6 +229,60 @@ automation_settings:
   default_tf_workspace_enabled: true
   tfvars_enabled: false
 ```
+
+### How do I give a stack Spacelift management permissions? (Role Attachments)
+
+Stacks that manage other Spacelift resources (e.g. the spacelift-automation stack itself) need elevated permissions. The way to grant this is via a **role attachment**, which replaces the deprecated `administrative` flag. At minimum, the spacelift-automation stack itself needs `space-admin` so it can manage other stacks and their role attachments.
+
+#### Using a built-in role
+
+The simplest approach is to attach Spacelift's built-in `space-admin` role. Set `role_attachment_role_slug` in the stack's YAML:
+
+```yaml
+# root-modules/spacelift-automation/stacks/common.yaml
+kind: StackConfigV1
+stack_settings:
+  role_attachment_role_slug: space-admin
+```
+
+You can also give every stack managed by a module instance a role via `var.role_attachment`. `space-admin` is only needed when a stack itself manages Spacelift resources — otherwise pick a less-privileged role (or none):
+
+```hcl
+module "spacelift_automation" {
+  source  = "masterpointio/automation/spacelift"
+  version = "2.0.0"
+  # ...
+  role_attachment = {
+    role_slug = "space-admin"
+  }
+}
+```
+
+#### Creating and using a custom role
+
+For least-privilege access, create a custom role with only the actions your stack needs using `var.managed_roles`, then reference its map key in the attachment:
+
+```hcl
+module "spacelift_automation" {
+  source  = "masterpointio/automation/spacelift"
+  version = "2.0.0"
+  # ...
+
+  managed_roles = {
+    "ci-deployer" = {
+      name        = "CI Deployer"
+      description = "Least-privilege role — can read spaces and trigger runs"
+      actions     = ["SPACE_READ", "RUN_TRIGGER"]
+    }
+  }
+
+  role_attachment = {
+    role_slug = "ci-deployer"  # matches the managed_roles map key
+  }
+}
+```
+
+Use the `spacelift_role_actions` data source to discover all available action strings. The `spacelift_roles` output exposes the `id`, `slug`, and `actions` of every role created by the module.
 
 ### Why are variable values provided separately in `tfvars/` and not in the `yaml` file?
 
@@ -305,14 +359,14 @@ If you have many remote repositories that you need to manage via this pattern, y
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9 |
 | <a name="requirement_jsonschema"></a> [jsonschema](#requirement\_jsonschema) | >= 0.2.1 |
-| <a name="requirement_spacelift"></a> [spacelift](#requirement\_spacelift) | >= 1.14 |
+| <a name="requirement_spacelift"></a> [spacelift](#requirement\_spacelift) | >= 1.37 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_jsonschema"></a> [jsonschema](#provider\_jsonschema) | >= 0.2.1 |
-| <a name="provider_spacelift"></a> [spacelift](#provider\_spacelift) | >= 1.14 |
+| <a name="provider_spacelift"></a> [spacelift](#provider\_spacelift) | >= 1.37 |
 
 ## Modules
 
@@ -326,11 +380,14 @@ If you have many remote repositories that you need to manage via this pattern, y
 |------|------|
 | [spacelift_aws_integration_attachment.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/aws_integration_attachment) | resource |
 | [spacelift_drift_detection.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/drift_detection) | resource |
+| [spacelift_role.managed](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/role) | resource |
+| [spacelift_role_attachment.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/role_attachment) | resource |
 | [spacelift_space.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/space) | resource |
 | [spacelift_stack.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack) | resource |
 | [spacelift_stack_destructor.default](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack_destructor) | resource |
 | [jsonschema_validator.runtime_overrides](https://registry.terraform.io/providers/bpedman/jsonschema/latest/docs/data-sources/validator) | data source |
 | [spacelift_aws_integrations.all](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/aws_integrations) | data source |
+| [spacelift_role.attachments](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/role) | data source |
 | [spacelift_spaces.all](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/spaces) | data source |
 | [spacelift_worker_pools.all](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/data-sources/worker_pools) | data source |
 
@@ -339,7 +396,6 @@ If you have many remote repositories that you need to manage via this pattern, y
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_additional_project_globs"></a> [additional\_project\_globs](#input\_additional\_project\_globs) | Project globs is an optional list of paths to track stack changes of outside of the project root. Push policies are another alternative to track changes in additional paths. | `set(string)` | `[]` | no |
-| <a name="input_administrative"></a> [administrative](#input\_administrative) | Flag to mark the stack as administrative | `bool` | `false` | no |
 | <a name="input_after_apply"></a> [after\_apply](#input\_after\_apply) | List of after-apply scripts | `list(string)` | `[]` | no |
 | <a name="input_after_destroy"></a> [after\_destroy](#input\_after\_destroy) | List of after-destroy scripts | `list(string)` | `[]` | no |
 | <a name="input_after_init"></a> [after\_init](#input\_after\_init) | List of after-init scripts | `list(string)` | `[]` | no |
@@ -348,7 +404,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_after_run"></a> [after\_run](#input\_after\_run) | List of after-run (aka `finally` hook) scripts | `list(string)` | `[]` | no |
 | <a name="input_all_root_modules_enabled"></a> [all\_root\_modules\_enabled](#input\_all\_root\_modules\_enabled) | When set to true, all subdirectories in root\_modules\_path will be treated as root modules. | `bool` | `false` | no |
 | <a name="input_autodeploy"></a> [autodeploy](#input\_autodeploy) | Flag to enable/disable automatic deployment of the stack | `bool` | `true` | no |
-| <a name="input_autoretry"></a> [autoretry](#input\_autoretry) | Flag to enable/disable automatic retry of the stack | `bool` | `false` | no |
+| <a name="input_autoretry"></a> [autoretry](#input\_autoretry) | Flag to enable/disable automatically rerun proposed runs (PR plans) that have become out of date after a tracked run applies changes to the stack's state. Only supported with private worker pools. Docs: https://docs.spacelift.io/concepts/stack/stack-settings#autoretry | `bool` | `false` | no |
 | <a name="input_aws_integration_attachment_read"></a> [aws\_integration\_attachment\_read](#input\_aws\_integration\_attachment\_read) | Indicates whether this attachment is used for read operations. | `bool` | `true` | no |
 | <a name="input_aws_integration_attachment_write"></a> [aws\_integration\_attachment\_write](#input\_aws\_integration\_attachment\_write) | Indicates whether this attachment is used for write operations. | `bool` | `true` | no |
 | <a name="input_aws_integration_enabled"></a> [aws\_integration\_enabled](#input\_aws\_integration\_enabled) | Indicates whether the AWS integration is enabled. | `bool` | `false` | no |
@@ -365,6 +421,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_branch"></a> [branch](#input\_branch) | Specify which branch to use within the infrastructure repository. | `string` | `"main"` | no |
 | <a name="input_common_config_file"></a> [common\_config\_file](#input\_common\_config\_file) | Name of the common configuration file for the stack across a root module. | `string` | `"common.yaml"` | no |
 | <a name="input_default_tf_workspace_enabled"></a> [default\_tf\_workspace\_enabled](#input\_default\_tf\_workspace\_enabled) | Enables the use of `default` Terraform workspace instead of managing multiple workspaces within a root module.<br/><br/>NOTE: We encourage the use of Terraform workspaces to manage multiple environments.<br/>However, you will want to disable this behavior if you're utilizing different backends for each instance<br/>of your root modules (we call this "Dynamic Backends"). | `bool` | `false` | no |
+| <a name="input_dependency_labels_enabled"></a> [dependency\_labels\_enabled](#input\_dependency\_labels\_enabled) | Whether to automatically add `depends-on` labels to stacks. When enabled, each stack gets a `depends-on:<automation-stack-name>` label. You may set this to `false` if you do NOT want stacks to be triggered after the automation stack finishes running, or have a custom trigger policy in place that supports this. | `bool` | `true` | no |
 | <a name="input_description"></a> [description](#input\_description) | A description for the created Stacks. This is a template string that will be rendered with the final config object for the stack.<br/>    See the main.tf for full internals of that object and the documentation on templatestring for usage.<br/>    https://opentofu.org/docs/language/functions/templatestring/ | `string` | `"Root Module: ${root_module}\nProject Root: ${project_root}\nWorkspace: ${terraform_workspace}\nManaged by spacelift-automation Terraform root module."` | no |
 | <a name="input_destructor_deactivated"></a> [destructor\_deactivated](#input\_destructor\_deactivated) | Whether to deactivate the stack destructor by default | `bool` | `true` | no |
 | <a name="input_destructor_enabled"></a> [destructor\_enabled](#input\_destructor\_enabled) | Whether to enable the stack destructor by default | `bool` | `true` | no |
@@ -373,18 +430,21 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_drift_detection_reconcile"></a> [drift\_detection\_reconcile](#input\_drift\_detection\_reconcile) | Flag to enable/disable automatic reconciliation of drifts. | `bool` | `false` | no |
 | <a name="input_drift_detection_schedule"></a> [drift\_detection\_schedule](#input\_drift\_detection\_schedule) | The schedule for drift detection. | `list(string)` | <pre>[<br/>  "0 4 * * *"<br/>]</pre> | no |
 | <a name="input_drift_detection_timezone"></a> [drift\_detection\_timezone](#input\_drift\_detection\_timezone) | The timezone for drift detection. | `string` | `"UTC"` | no |
-| <a name="input_enable_local_preview"></a> [enable\_local\_preview](#input\_enable\_local\_preview) | Indicates whether local preview runs can be triggered on this Stack. | `bool` | `false` | no |
+| <a name="input_enable_local_preview"></a> [enable\_local\_preview](#input\_enable\_local\_preview) | Indicates whether local preview runs can be triggered on this Stack. | `bool` | `true` | no |
 | <a name="input_enable_well_known_secret_masking"></a> [enable\_well\_known\_secret\_masking](#input\_enable\_well\_known\_secret\_masking) | Indicates whether well-known secret masking is enabled. | `bool` | `true` | no |
 | <a name="input_enabled_root_modules"></a> [enabled\_root\_modules](#input\_enabled\_root\_modules) | List of root modules where to look for stack config files.<br/>Ignored when all\_root\_modules\_enabled is true.<br/>Example: ["spacelift-automation", "k8s-cluster"] | `list(string)` | `[]` | no |
+| <a name="input_git_sparse_checkout_paths"></a> [git\_sparse\_checkout\_paths](#input\_git\_sparse\_checkout\_paths) | List of paths used for Git sparse checkout. When set, only the specified paths are fetched from the repository during a run. This is particularly useful for large repositories where you only need to work with specific directories or files. | `list(string)` | `null` | no |
 | <a name="input_github_action_deploy"></a> [github\_action\_deploy](#input\_github\_action\_deploy) | Indicates whether GitHub users can deploy from the Checks API. | `bool` | `true` | no |
 | <a name="input_github_enterprise"></a> [github\_enterprise](#input\_github\_enterprise) | The GitHub VCS settings | <pre>object({<br/>    namespace = string<br/>    id        = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_gitlab"></a> [gitlab](#input\_gitlab) | The GitLab integration settings | <pre>object({<br/>    namespace = string<br/>    id        = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | List of labels to apply to the stacks. | `list(string)` | `[]` | no |
 | <a name="input_manage_state"></a> [manage\_state](#input\_manage\_state) | Determines if Spacelift should manage state for this stack. | `bool` | `false` | no |
+| <a name="input_managed_roles"></a> [managed\_roles](#input\_managed\_roles) | Map of Spacelift roles to create and manage. The map key acts as the Terraform resource<br/>identifier and is used to reference the role in `var.role_attachment.role_slug` or<br/>per-stack `role_attachment_role_slug` in stack YAML (in addition to built-in slugs like<br/>`"space-admin"`).<br/><br/>`name`        — (required) Human-readable display name shown in the Spacelift UI.<br/>`description` — (optional) Human-readable description of the role's purpose.<br/>`actions`     — (required) Set of permission strings granted by this role, e.g.<br/>                `"SPACE_READ"`, `"SPACE_WRITE"`, `"SPACE_ADMIN"`, `"RUN_TRIGGER"`.<br/>                Use the `spacelift_role_actions` data source to list all available actions.<br/><br/>Example:<pre>managed_roles = {<br/>  "ci-deployer" = {<br/>    name    = "CI Deployer"<br/>    actions = ["SPACE_READ", "RUN_TRIGGER"]<br/>  }<br/>}</pre> | <pre>map(object({<br/>    name        = string<br/>    description = optional(string, null)<br/>    actions     = set(string)<br/>  }))</pre> | `{}` | no |
 | <a name="input_project_root_prefix"></a> [project\_root\_prefix](#input\_project\_root\_prefix) | The path from the repository root to the root-modules directory. Used to set each stack's project\_root.<br/>This is the path Spacelift uses to find Terraform code in your repo.<br/><br/>When set, each stack's project\_root becomes: project\_root\_prefix/module\_name<br/>(e.g., "some-directory/root-modules" + "network" = "some-directory/root-modules/network")<br/><br/>Per-stack project\_root in YAML files takes precedence. | `string` | `null` | no |
 | <a name="input_protect_from_deletion"></a> [protect\_from\_deletion](#input\_protect\_from\_deletion) | Protect this stack from accidental deletion. If set, attempts to delete this stack will fail. | `bool` | `false` | no |
 | <a name="input_raw_git"></a> [raw\_git](#input\_raw\_git) | The raw Git integration settings | <pre>object({<br/>    namespace = string<br/>    url       = string<br/>  })</pre> | `null` | no |
 | <a name="input_repository"></a> [repository](#input\_repository) | The name of your infrastructure repo | `string` | n/a | yes |
+| <a name="input_role_attachment"></a> [role\_attachment](#input\_role\_attachment) | When set, a `spacelift_role_attachment` is created for every stack managed by this module,<br/>attaching the specified Spacelift role. This replaces the deprecated `administrative = true` flag.<br/><br/>`role_slug` — (required) slug of the Spacelift role to attach. Accepts: built-in slugs<br/>(`"space-admin"`, `"space-writer"`, `"space-reader"`), slugs of pre-existing custom roles, or<br/>a key from `var.managed_roles` to reference a role created by this module.<br/><br/>`space_id` — (optional) the space in which the attachment is created (the "binding space").<br/>Defaults to `null`, meaning the attachment is created in the stack's own space — equivalent to the<br/>old `administrative = true` behavior. Set to a different space ID to enable cross-space access.<br/><br/>Can be overridden per-stack via `stack_settings.role_attachment_role_slug` and<br/>`stack_settings.role_attachment_space_id` in the stack config YAML.<br/>Set to `null` (the default) to create no role attachment for any stack.<br/><br/>Example:<pre>role_attachment = {<br/>  role_slug = "space-admin"<br/>  # space_id = "root"  # optional: set to attach in a different space (e.g. for cross-space access)<br/>}</pre> | <pre>object({<br/>    role_slug = string<br/>    space_id  = optional(string, null)<br/>  })</pre> | `null` | no |
 | <a name="input_root_module_structure"></a> [root\_module\_structure](#input\_root\_module\_structure) | The root module structure of the Stacks that you're reading in. See README for full details.<br/><br/>MultiInstance - You're using Workspaces or Dynamic Backend configuration to create multiple instances of the same root module code.<br/>SingleInstance - You're using copies of a root module and your directory structure to create multiple instances of the same Terraform code. | `string` | `"MultiInstance"` | no |
 | <a name="input_root_modules_path"></a> [root\_modules\_path](#input\_root\_modules\_path) | The path where root modules can be found, used internally by spacelift-automation to discover<br/>stack YAML files via fileset(). This path is relative to the spacelift-automation root module.<br/><br/>NOTE: It does NOT affect the configuration of created stacks (use project\_root\_prefix for that).<br/><br/>Example: If spacelift-automation is at `some-directory/root-modules/spacelift-automation/`<br/>and you want to discover stacks in sibling directories, use `../../root-modules`. | `string` | `"root-modules"` | no |
 | <a name="input_runner_image"></a> [runner\_image](#input\_runner\_image) | URL of the Docker image used to process Runs. Defaults to `null` which is Spacelift's standard (Alpine) runner image. | `string` | `null` | no |
@@ -392,7 +452,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_space_id"></a> [space\_id](#input\_space\_id) | Place the created stacks in the specified space\_id. Mutually exclusive with space\_name. | `string` | `null` | no |
 | <a name="input_space_name"></a> [space\_name](#input\_space\_name) | Place the created stacks in the specified space\_name. Mutually exclusive with space\_id. We recommend using names rather than IDs to improve clarity & readability. Since Spacelift enforces unique names, you can rely on names as identifiers without worrying about duplication issues. | `string` | `null` | no |
 | <a name="input_spaces"></a> [spaces](#input\_spaces) | A map of Spacelift Spaces to create | <pre>map(object({<br/>    description      = optional(string, null)<br/>    inherit_entities = optional(bool, false)<br/>    labels           = optional(list(string), null)<br/>    parent_space_id  = optional(string, "root")<br/>  }))</pre> | `{}` | no |
-| <a name="input_terraform_smart_sanitization"></a> [terraform\_smart\_sanitization](#input\_terraform\_smart\_sanitization) | Indicates whether runs on this will use terraform's sensitive value system to sanitize<br/>the outputs of Terraform state and plans in spacelift instead of sanitizing all fields. | `bool` | `false` | no |
+| <a name="input_terraform_smart_sanitization"></a> [terraform\_smart\_sanitization](#input\_terraform\_smart\_sanitization) | Indicates whether runs on this will use terraform's sensitive value system to sanitize<br/>the outputs of Terraform state and plans in spacelift instead of sanitizing all fields. | `bool` | `true` | no |
 | <a name="input_terraform_version"></a> [terraform\_version](#input\_terraform\_version) | OpenTofu/Terraform version to use. Defaults to the latest available version of the `terraform_workflow_tool`. | `string` | `null` | no |
 | <a name="input_terraform_workflow_tool"></a> [terraform\_workflow\_tool](#input\_terraform\_workflow\_tool) | Defines the tool that will be used to execute the workflow.<br/>This can be one of OPEN\_TOFU, TERRAFORM\_FOSS or CUSTOM. | `string` | `"OPEN_TOFU"` | no |
 | <a name="input_worker_pool_id"></a> [worker\_pool\_id](#input\_worker\_pool\_id) | ID of the worker pool to use. Mutually exclusive with worker\_pool\_name.<br/>NOTE: worker\_pool\_name or worker\_pool\_id is required when using a self-hosted instance of Spacelift.<br/>We recommend using names rather than IDs to improve clarity & readability. Since Spacelift enforces unique names, you can rely on names as identifiers without worrying about duplication issues. | `string` | `null` | no |
@@ -402,6 +462,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 
 | Name | Description |
 |------|-------------|
+| <a name="output_spacelift_roles"></a> [spacelift\_roles](#output\_spacelift\_roles) | A map of managed Spacelift roles created by this module, keyed by the var.managed\_roles map key. |
 | <a name="output_spacelift_spaces"></a> [spacelift\_spaces](#output\_spacelift\_spaces) | A map of Spacelift spaces with all their attributes. |
 | <a name="output_spacelift_stacks"></a> [spacelift\_stacks](#output\_spacelift\_stacks) | A map of Spacelift stacks with selected attributes.<br/>To reduce the risk of accidentally exporting sensitive data, only a subset of attributes is exported. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

@@ -1,3 +1,66 @@
+mock_provider "spacelift" {
+  mock_data "spacelift_spaces" {
+    defaults = {
+      spaces = [
+        {
+          space_id         = "example-space-id"
+          name             = "example-space"
+          parent_space_id  = "root"
+          description      = "Test space"
+          labels           = []
+          inherit_entities = true
+        }
+      ]
+    }
+  }
+
+  mock_data "spacelift_worker_pools" {
+    defaults = {
+      worker_pools = [
+        {
+          worker_pool_id            = "example-worker-pool-id"
+          name                      = "example-worker-pool"
+          description               = "Test worker pool"
+          labels                    = []
+          config                    = ""
+          space_id                  = "root"
+          drift_detection_run_limit = 0
+        }
+      ]
+    }
+  }
+
+  mock_data "spacelift_aws_integrations" {
+    defaults = {
+      integrations = [
+        {
+          integration_id                 = "example-aws-integration-id"
+          name                           = "example-aws-integration"
+          role_arn                       = "arn:aws:iam::123456789012:role/spacelift"
+          external_id                    = "test"
+          duration_seconds               = 3600
+          generate_credentials_in_worker = false
+          space_id                       = "root"
+          labels                         = []
+          region                         = "us-east-1"
+          autoattach_enabled             = false
+          tag_assume_role                = false
+        }
+      ]
+    }
+  }
+
+  mock_data "spacelift_role" {
+    defaults = {
+      id          = "example-role-id"
+      name        = "Space Admin"
+      description = "Built-in space admin role"
+      actions     = []
+      is_system   = true
+    }
+  }
+}
+
 variables {
   root_modules_path  = "./tests/fixtures/multi-instance"
   common_config_file = "common.yaml"
@@ -20,10 +83,10 @@ variables {
 run "test_default_example_stack_final_values" {
   command = plan
 
-  # administrative
+  # role_attachment_role_slug is set — stack should have a role attachment created
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].administrative == true
-    error_message = "Administrative was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+    condition     = contains(keys(spacelift_role_attachment.default), "root-module-a-default-example")
+    error_message = "Role attachment was not created for the default-example stack"
   }
 
   # additional_project_globs
@@ -154,13 +217,13 @@ run "test_default_example_stack_final_values" {
 
   # runner_image
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].runner_image == "masterpointio/spacelift-runner:latest"
+    condition     = spacelift_stack.default["root-module-a-default-example"].runner_image == "example/spacelift-runner:latest"
     error_message = "runner_image was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # space_id
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
+    condition     = spacelift_stack.default["root-module-a-default-example"].space_id == "example-space-id"
     error_message = "space_id was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
@@ -227,7 +290,6 @@ run "test_default_example_stack_runtime_overrides" {
     runtime_overrides = {
       root-module-a = {
         stack_settings = {
-          administrative                   = false
           additional_project_globs         = ["changed/*"]
           after_apply                      = ["echo 'changed_after_apply'"]
           after_destroy                    = ["echo 'changed_after_destroy'"]
@@ -249,7 +311,7 @@ run "test_default_example_stack_runtime_overrides" {
           github_action_deploy             = true
           manage_state                     = false
           protect_from_deletion            = false
-          runner_image                     = "masterpointio/spacelift-runner:dev"
+          runner_image                     = "example/spacelift-runner:dev"
           space_id                         = "555"
           terraform_smart_sanitization     = false
           terraform_version                = "1.9.1"
@@ -270,10 +332,10 @@ run "test_default_example_stack_runtime_overrides" {
     }
   }
 
-  # administrative
+  # role_attachment_role_slug is set in the static config — attachment should still be present
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].administrative == false
-    error_message = "Administrative override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+    condition     = contains(keys(spacelift_role_attachment.default), "root-module-a-default-example")
+    error_message = "Role attachment should still be created when role_attachment_role_slug is set in the static config"
   }
 
   # additional_project_globs
@@ -404,7 +466,7 @@ run "test_default_example_stack_runtime_overrides" {
 
   # runner_image
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].runner_image == "masterpointio/spacelift-runner:dev"
+    condition     = spacelift_stack.default["root-module-a-default-example"].runner_image == "example/spacelift-runner:dev"
     error_message = "runner_image override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
@@ -463,7 +525,7 @@ run "test_default_example_stack_runtime_overrides" {
   }
 }
 
-# Test the default-example stack with only 1 runtime override, the static configs should not be overridden
+# Test the default-example stack with only 1 runtime override, the other static configs should not be overridden
 run "test_default_example_stack_partial_runtime_overrides" {
   command = plan
 
@@ -471,16 +533,22 @@ run "test_default_example_stack_partial_runtime_overrides" {
     runtime_overrides = {
       root-module-a = {
         stack_settings = {
-          administrative = false
+          autodeploy = true
         }
       }
     }
   }
 
-  # administrative is overridden by the runtime override
+  # role_attachment_role_slug is still set in the static config — attachment should be present
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].administrative == false
-    error_message = "Administrative is true because it's an override: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+    condition     = contains(keys(spacelift_role_attachment.default), "root-module-a-default-example")
+    error_message = "Role attachment should still be created when role_attachment_role_slug is set in static config"
+  }
+
+  # autodeploy should be overridden to true (static config has false)
+  assert {
+    condition     = spacelift_stack.default["root-module-a-default-example"].autodeploy == true
+    error_message = "autodeploy was not overridden correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # additional_project_globs
@@ -517,12 +585,6 @@ run "test_default_example_stack_partial_runtime_overrides" {
   assert {
     condition     = contains(spacelift_stack.default["root-module-a-default-example"].after_plan, "echo 'after_plan'")
     error_message = "after_plan was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
-  }
-
-  # autodeploy
-  assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].autodeploy == false
-    error_message = "autodeploy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # autoretry
@@ -605,13 +667,13 @@ run "test_default_example_stack_partial_runtime_overrides" {
 
   # runner_image
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].runner_image == "masterpointio/spacelift-runner:latest"
+    condition     = spacelift_stack.default["root-module-a-default-example"].runner_image == "example/spacelift-runner:latest"
     error_message = "runner_image was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # space_id
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].space_id == "mp-aws-automation-01JK7A21DW1YH3Q64JHS3RYNP9"
+    condition     = spacelift_stack.default["root-module-a-default-example"].space_id == "example-space-id"
     error_message = "space_id was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
@@ -750,23 +812,23 @@ run "test_workspace_when_default_tf_workspace_enabled" {
   }
 }
 
-# Test that the administrative label is added to the stack when the stack is set to administrative
-run "test_administrative_label_is_added_to_stack" {
+# Test that a role attachment is created for a stack with role_attachment_role_slug set in YAML
+run "test_role_attachment_is_created_when_role_slug_set" {
   command = plan
 
   assert {
-    condition     = contains(local.labels["root-module-a-default-example"], "administrative")
-    error_message = "Administrative label was not added to the stack: ${jsonencode(local.labels)}"
+    condition     = contains(keys(spacelift_role_attachment.default), "root-module-a-default-example")
+    error_message = "Role attachment was not created for the default-example stack: ${jsonencode(local.role_attachment_stacks)}"
   }
 }
 
-# Test that the administrative label is not added to the stack when the stack is not set to administrative
-run "test_administrative_label_is_not_added_to_stack_when_not_administrative" {
+# Test that no role attachment is created for a stack without role_attachment_role_slug set
+run "test_role_attachment_is_not_created_when_role_slug_absent" {
   command = plan
 
   assert {
-    condition     = !contains(local.labels["root-module-a-test"], "administrative")
-    error_message = "Administrative label was added to the stack when it should not have been: ${jsonencode(local.labels)}"
+    condition     = !contains(keys(spacelift_role_attachment.default), "root-module-a-test")
+    error_message = "Role attachment was unexpectedly created for root-module-a-test: ${jsonencode(local.role_attachment_stacks)}"
   }
 }
 
@@ -777,6 +839,20 @@ run "test_depends_on_label_is_added_to_stack" {
   assert {
     condition     = contains(local.labels["root-module-a-test"], "depends-on:spacelift-automation-default")
     error_message = "Depends-on label was not added to the stack: ${jsonencode(local.labels)}"
+  }
+}
+
+# Test that the depends-on label is not added to the stack when dependency_labels_enabled is false
+run "test_depends_on_label_is_not_added_when_disabled" {
+  command = plan
+
+  variables {
+    dependency_labels_enabled = false
+  }
+
+  assert {
+    condition     = !contains(local.labels["root-module-a-test"], "depends-on:spacelift-automation-default")
+    error_message = "Depends-on label should not be present when dependency_labels_enabled is false: ${jsonencode(local.labels)}"
   }
 }
 
@@ -981,3 +1057,96 @@ run "test_destructor_states" {
   }
 }
 
+# Test that no managed roles are created when managed_roles is empty (the default)
+run "test_no_managed_roles_created_by_default" {
+  command = plan
+
+  assert {
+    condition     = length(spacelift_role.managed) == 0
+    error_message = "No managed roles should be created by default: ${jsonencode(keys(spacelift_role.managed))}"
+  }
+}
+
+# Test that a managed role is created with the correct attributes
+run "test_managed_role_created_with_correct_attributes" {
+  command = plan
+
+  variables {
+    managed_roles = {
+      "ci-deployer" = {
+        name        = "CI Deployer"
+        description = "A role for CI deployments"
+        actions     = ["SPACE_READ", "RUN_TRIGGER"]
+      }
+    }
+  }
+
+  assert {
+    condition     = contains(keys(spacelift_role.managed), "ci-deployer")
+    error_message = "Managed role 'ci-deployer' was not created: ${jsonencode(keys(spacelift_role.managed))}"
+  }
+
+  assert {
+    condition     = spacelift_role.managed["ci-deployer"].name == "CI Deployer"
+    error_message = "Managed role name was not set correctly: ${jsonencode(spacelift_role.managed["ci-deployer"].name)}"
+  }
+
+  assert {
+    condition     = spacelift_role.managed["ci-deployer"].description == "A role for CI deployments"
+    error_message = "Managed role description was not set correctly: ${jsonencode(spacelift_role.managed["ci-deployer"].description)}"
+  }
+
+  assert {
+    condition     = contains(tolist(spacelift_role.managed["ci-deployer"].actions), "SPACE_READ") && contains(tolist(spacelift_role.managed["ci-deployer"].actions), "RUN_TRIGGER")
+    error_message = "Managed role actions were not set correctly: ${jsonencode(spacelift_role.managed["ci-deployer"].actions)}"
+  }
+}
+
+# Test that a managed role key is excluded from the external (data source) slug lookup
+run "test_managed_role_key_excluded_from_data_source_lookup" {
+  command = plan
+
+  variables {
+    managed_roles = {
+      "ci-deployer" = {
+        name    = "CI Deployer"
+        actions = ["SPACE_READ", "RUN_TRIGGER"]
+      }
+    }
+    role_attachment = {
+      role_slug = "ci-deployer"
+    }
+  }
+
+  assert {
+    condition     = !contains(local._external_role_attachment_slugs, "ci-deployer")
+    error_message = "Managed role key should not be in _external_role_attachment_slugs: ${jsonencode(local._external_role_attachment_slugs)}"
+  }
+}
+
+# Test that role attachments are created for all stacks when using a module-level managed role
+run "test_role_attachment_created_with_module_level_managed_role" {
+  command = plan
+
+  variables {
+    managed_roles = {
+      "ci-deployer" = {
+        name    = "CI Deployer"
+        actions = ["SPACE_READ", "RUN_TRIGGER"]
+      }
+    }
+    role_attachment = {
+      role_slug = "ci-deployer"
+    }
+  }
+
+  assert {
+    condition     = contains(keys(spacelift_role_attachment.default), "root-module-a-test")
+    error_message = "Role attachment was not created for root-module-a-test with managed role: ${jsonencode(keys(spacelift_role_attachment.default))}"
+  }
+
+  assert {
+    condition     = contains(keys(spacelift_role_attachment.default), "root-module-a-default-example")
+    error_message = "Role attachment was not created for root-module-a-default-example with managed role: ${jsonencode(keys(spacelift_role_attachment.default))}"
+  }
+}

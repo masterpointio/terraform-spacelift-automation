@@ -1,3 +1,30 @@
+mock_provider "spacelift" {
+  mock_data "spacelift_spaces" {
+    defaults = {
+      spaces = []
+    }
+  }
+
+  mock_data "spacelift_worker_pools" {
+    defaults = {
+      worker_pools = []
+    }
+  }
+
+  mock_data "spacelift_aws_integrations" {
+    defaults = {
+      integrations = []
+    }
+  }
+}
+
+mock_provider "jsonschema" {
+  mock_data "jsonschema_validator" {
+    defaults = {
+      validated = "{}"
+    }
+  }
+}
 
 variables {
   root_modules_path = "./tests/fixtures/single-instance"
@@ -80,13 +107,13 @@ run "test_single_instance_stack_configs_custom_project_root_is_used_when_specifi
   }
 }
 
-# Test that the administrative label is not added to the stack when the stack is not set to administrative
-run "test_single_instance_administrative_label_is_not_added_to_stack_when_not_administrative" {
+# Test that no role attachment is created for a single-instance stack without role_attachment_role_slug
+run "test_single_instance_role_attachment_is_not_created_when_role_slug_absent" {
   command = plan
 
   assert {
-    condition     = !contains(local.labels["root-module-a"], "administrative")
-    error_message = "Administrative label was added to the stack when it should not have been: ${jsonencode(local.labels)}"
+    condition     = !contains(keys(spacelift_role_attachment.default), "root-module-a")
+    error_message = "Role attachment was unexpectedly created for root-module-a: ${jsonencode(local.role_attachment_stacks)}"
   }
 }
 

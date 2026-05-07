@@ -33,10 +33,15 @@
     "stack_settings": {
       "type": "object",
       "description": "Core stack settings, these overwrite the defaults set in the spacelift-automation module",
+      "additionalProperties": false,
       "properties": {
-        "administrative": {
-          "type": "boolean",
-          "description": "Whether the stack is administrative"
+        "role_attachment_role_slug": {
+          "type": "string",
+          "description": "Role to attach to this stack. Setting this creates a spacelift_role_attachment resource for the stack. Accepts: built-in slugs ('space-admin', 'space-writer', 'space-reader'), slugs of pre-existing custom roles, or a key from var.managed_roles to reference a role created by this module. Overrides the module-level var.role_attachment.role_slug for this stack."
+        },
+        "role_attachment_space_id": {
+          "type": "string",
+          "description": "ID of the space in which the role attachment is created. Defaults to the stack's own space. Set to a different space ID for cross-space access."
         },
         "additional_project_globs": {
           "type": "array",
@@ -93,7 +98,7 @@
         },
         "autoretry": {
           "type": "boolean",
-          "description": "Whether to automatically retry failed runs"
+          "description": "Flag to enable/disable automatically rerun proposed runs (PR plans) that have become out of date after a tracked run applies changes to the stack's state. Only supported with private worker pools. Docs: https://docs.spacelift.io/concepts/stack/stack-settings#autoretry"
         },
         "before_apply": {
           "type": "array",
@@ -145,6 +150,13 @@
         "enable_well_known_secret_masking": {
           "type": "boolean",
           "description": "Whether to enable masking of well-known secrets"
+        },
+        "git_sparse_checkout_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of paths used for Git sparse checkout. When set, only the specified paths are fetched from the repository during a run."
         },
         "github_action_deploy": {
           "type": "boolean",

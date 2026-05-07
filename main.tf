@@ -15,10 +15,9 @@
 # * Space IDs: in the majority of cases all the workspaces in a root module belong to the same Spacelift space, so
 # we allow setting a "global" space_id for all stacks on a root module level.
 # * Autodeploy: if all the stacks in a root module should be autodeployed.
-# * Administrative: if all the stacks in a root module are administrative, e.g stacks that manage Spacelift resources.
 #
 # 3. Labels (see ## Labels)
-# Generates labels for the stacks based on administrative, dependency, and folder information.
+# Generates labels for the stacks based on dependency and folder information.
 #
 # Syntax note:
 # The local expression started with an underscore `_` is used to store intermediate values
@@ -213,21 +212,6 @@ locals {
   stacks = toset(keys(local.stack_configs))
 
   ## Labels
-  # Сreates a map of administrative labels for each stack that has the administrative property set to true.
-  # Example:
-  # {
-  #   "spacelift-automation-mp-main" = [
-  #     "administrative",
-  #   ]
-  #   "spacelift-policies-notify-tf-completed" = [
-  #     "administrative",
-  #   ]
-  # }
-
-  _administrative_labels = {
-    for stack, configs in local.stack_configs : stack => ["administrative"] if tobool(try(configs.administrative, false)) == true
-  }
-
   # Creates a map of `depends-on` labels for each stack based on the root module level dependency configuration.
   # Example:
   # {
@@ -238,7 +222,7 @@ locals {
   _dependency_labels = {
     for stack in local.stacks : stack => [
       "depends-on:spacelift-automation-${terraform.workspace}"
-    ]
+    ] if var.dependency_labels_enabled
   }
 
   # Creates a map of folder labels for each stack based on Git structure for a proper grouping stacks in Spacelift UI.
@@ -266,7 +250,6 @@ locals {
   labels = {
     for stack in local.stacks :
     stack => compact(flatten([
-      lookup(local._administrative_labels, stack, []),
       lookup(local._folder_labels, stack, []),
       lookup(local._dependency_labels, stack, []),
       try(local.stack_configs[stack].labels, []),
@@ -297,13 +280,13 @@ locals {
   stack_property_resolver = {
     for stack in local.stacks : stack => {
       # Simple property resolution with fallback
-      administrative                   = try(local.stack_configs[stack].administrative, var.administrative)
       autoretry                        = try(local.stack_configs[stack].autoretry, var.autoretry)
       additional_project_globs         = try(local.stack_configs[stack].additional_project_globs, var.additional_project_globs)
       autodeploy                       = try(local.stack_configs[stack].autodeploy, var.autodeploy)
       branch                           = try(local.stack_configs[stack].branch, var.branch)
       enable_local_preview             = try(local.stack_configs[stack].enable_local_preview, var.enable_local_preview)
       enable_well_known_secret_masking = try(local.stack_configs[stack].enable_well_known_secret_masking, var.enable_well_known_secret_masking)
+      git_sparse_checkout_paths        = try(local.stack_configs[stack].git_sparse_checkout_paths, var.git_sparse_checkout_paths)
       github_action_deploy             = try(local.stack_configs[stack].github_action_deploy, var.github_action_deploy)
       manage_state                     = try(local.stack_configs[stack].manage_state, var.manage_state)
       protect_from_deletion            = try(local.stack_configs[stack].protect_from_deletion, var.protect_from_deletion)
@@ -423,6 +406,35 @@ locals {
     for stack, config in local.stack_configs :
     stack => config if try(config.destructor_enabled, var.destructor_enabled)
   }
+
+  # Role attachments are created for any stack with a per-stack `role_attachment_role_slug`
+  # or when module-level `var.role_attachment` is set (applies to all stacks).
+  role_attachment_stacks = {
+    for stack, config in local.stack_configs :
+    stack => config if try(config.role_attachment_role_slug, null) != null || var.role_attachment != null
+  }
+
+  # Collect the unique role slugs/keys needed across all role attachment stacks so we can look them up once.
+  # role_attachment_role_slug is required — either per-stack in YAML or via var.role_attachment.role_slug.
+  _role_attachment_slugs = toset([
+    for stack in keys(local.role_attachment_stacks) :
+    try(local.stack_configs[stack].role_attachment_role_slug, var.role_attachment.role_slug)
+  ])
+
+  # Exclude managed role keys from the data source lookup — those roles are resolved directly
+  # from spacelift_role.managed, so we don't need (and can't) look them up via data source.
+  _external_role_attachment_slugs = toset([
+    for slug in local._role_attachment_slugs : slug
+    if !contains(keys(var.managed_roles), slug)
+  ])
+
+  # Unified key/slug → role ID map used by spacelift_role_attachment.
+  # Managed roles (keyed by var.managed_roles map key) take precedence, external roles
+  # are keyed by their Spacelift slug as looked up via data.spacelift_role.attachments.
+  _role_slug_to_id = merge(
+    { for slug, role in data.spacelift_role.attachments : slug => role.id },
+    { for key, role in spacelift_role.managed : key => role.id },
+  )
 }
 
 
@@ -448,7 +460,6 @@ module "deep" {
 resource "spacelift_stack" "default" {
   for_each = local.stacks
 
-  administrative           = local.stack_property_resolver[each.key].administrative
   additional_project_globs = local.stack_property_resolver[each.key].additional_project_globs
   after_apply              = local.stack_array_merger[each.key].after_apply
   after_destroy            = local.stack_array_merger[each.key].after_destroy
@@ -468,6 +479,7 @@ resource "spacelift_stack" "default" {
   branch                           = local.stack_property_resolver[each.key].branch
   enable_local_preview             = local.stack_property_resolver[each.key].enable_local_preview
   enable_well_known_secret_masking = local.stack_property_resolver[each.key].enable_well_known_secret_masking
+  git_sparse_checkout_paths        = local.stack_property_resolver[each.key].git_sparse_checkout_paths
   github_action_deploy             = local.stack_property_resolver[each.key].github_action_deploy
   labels                           = local.labels[each.key]
   manage_state                     = local.stack_property_resolver[each.key].manage_state
@@ -585,6 +597,14 @@ resource "spacelift_drift_detection" "default" {
   }
 }
 
+resource "spacelift_role" "managed" {
+  for_each = var.managed_roles
+
+  name        = each.value.name
+  description = each.value.description
+  actions     = each.value.actions
+}
+
 resource "spacelift_space" "default" {
   for_each = var.spaces
 
@@ -593,4 +613,31 @@ resource "spacelift_space" "default" {
   inherit_entities = each.value.inherit_entities
   labels           = each.value.labels
   parent_space_id  = each.value.parent_space_id
+}
+
+# Attach a Spacelift role to stacks that have role_attachment_role_slug set (per-stack or module-level).
+# This replaces the deprecated `administrative = true` flag.
+# The role slug must be provided explicitly via per-stack `role_attachment_role_slug` in YAML
+# or via the module-level `var.role_attachment.role_slug`. Use `role_attachment_space_id`
+# (per-stack or module-level) to attach in a space other than the stack's own space.
+#
+# Bootstrapping the automation stack itself: the spacelift-automation stack manages other Spacelift
+# resources (including role attachments for the stacks it creates), so its own stack config must set
+# `stack_settings.role_attachment_role_slug: space-admin` (or an equivalent custom role with
+# SPACE_ADMIN actions). Without it, runs fail with `could not create stack role binding: unauthorized`.
+resource "spacelift_role_attachment" "default" {
+  for_each = local.role_attachment_stacks
+
+  stack_id = spacelift_stack.default[each.key].id
+
+  # Precedence: per-stack space_id → module-level space_id → stack's own space
+  space_id = coalesce(
+    try(local.stack_configs[each.key].role_attachment_space_id, null),
+    try(var.role_attachment.space_id, null),
+    spacelift_stack.default[each.key].space_id,
+  )
+
+  role_id = local._role_slug_to_id[
+    try(local.stack_configs[each.key].role_attachment_role_slug, var.role_attachment.role_slug)
+  ]
 }

@@ -1,3 +1,31 @@
+mock_provider "spacelift" {
+  mock_data "spacelift_spaces" {
+    defaults = {
+      spaces = []
+    }
+  }
+
+  mock_data "spacelift_worker_pools" {
+    defaults = {
+      worker_pools = []
+    }
+  }
+
+  mock_data "spacelift_aws_integrations" {
+    defaults = {
+      integrations = []
+    }
+  }
+}
+
+mock_provider "jsonschema" {
+  mock_data "jsonschema_validator" {
+    defaults = {
+      validated = "{}"
+    }
+  }
+}
+
 variables {
   repository = "terraform-spacelift-automation"
   github_enterprise = {

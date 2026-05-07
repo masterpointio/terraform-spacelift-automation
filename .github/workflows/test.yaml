@@ -18,7 +18,7 @@ permissions: {}
 
 jobs:
   tf-test:
-    uses: masterpointio/.github/.github/workflows/test.yaml@7909bb0ba1864b969a63de7cb6917def18134e54
+    uses: masterpointio/.github/.github/workflows/test.yaml@6f1be5090fc5c310fc293d5abd3a5ce67d4be1c5
     with:
       aws_role_arn: ${{ vars.TF_TEST_AWS_ROLE_ARN }}
     secrets:

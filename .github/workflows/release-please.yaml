@@ -9,6 +9,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   release-please:
     uses: masterpointio/.github/.github/workflows/release-please.yaml@ed29c348c145f20ce0d2b6b24605c54fcdbdab34

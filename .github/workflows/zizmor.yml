@@ -14,5 +14,5 @@ permissions: {}
 
 jobs:
   zizmor:
-    uses: masterpointio/.github/.github/workflows/zizmor.yml@chore/INT-1582/add_mp_workflows
+    uses: masterpointio/.github/.github/workflows/zizmor.yml@5b6a1958f98df1c9bbe63b7920f6f7bb9bd68f87
     secrets: inherit

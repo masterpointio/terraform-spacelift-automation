@@ -18,24 +18,13 @@ permissions: {}
 
 jobs:
   tf-test:
-    name: 🧪 ${{ matrix.tf }} test
-    runs-on: ubuntu-latest
+    uses: masterpointio/.github/.github/workflows/test.yaml@chore/INT-1582/add_mp_workflows
     permissions:
-      actions: read # needed by github-action-tf-test to read workflow run context
-      checks: write # needed by github-action-tf-test to write check results
-      contents: read # needed by github-action-tf-test to read repository contents
-      id-token: write # needed by github-action-tf-test to write id token
-      pull-requests: read # needed by github-action-tf-test to read pull request context
-    env:
-      SPACELIFT_API_KEY_ENDPOINT: ${{ secrets.SPACELIFT_API_KEY_ENDPOINT }}
-      SPACELIFT_API_KEY_ID: ${{ secrets.SPACELIFT_API_KEY_ID }}
-      SPACELIFT_API_KEY_SECRET: ${{ secrets.SPACELIFT_API_KEY_SECRET }}
-    strategy:
-      matrix:
-        tf: [tofu, terraform]
-    steps:
-      - uses: masterpointio/github-action-tf-test@c1e41998f67925ac3f34e0bbcfcaa4a44d1f0cd9 # v1.0.1
-        with:
-          tf_type: ${{ matrix.tf }}
-          aws_role_arn: ${{ vars.TF_TEST_AWS_ROLE_ARN }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      actions: read
+      checks: write
+      contents: read
+      id-token: write
+      pull-requests: read
+    with:
+      aws_role_arn: ${{ vars.TF_TEST_AWS_ROLE_ARN }}
+    secrets: inherit

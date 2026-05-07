@@ -14,19 +14,5 @@ permissions: {}
 
 jobs:
   zizmor:
-    name: 🌈 zizmor
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          persist-credentials: false
-
-      - name: Run zizmor 🌈
-        uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
-        with:
-          # Set to false, so zizmor will not upload results to Github Advanced Security
-          # and will instead print them to the Action's run log.
-          advanced-security: false
-          # Set to pedantic so that zizmor will run it's stale-action-refs audit rule
-          persona: pedantic
+    uses: masterpointio/.github/.github/workflows/zizmor.yml@chore/INT-1582/add_mp_workflows
+    secrets: inherit

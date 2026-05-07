@@ -2,7 +2,6 @@
 data "spacelift_spaces" "all" {}
 data "spacelift_worker_pools" "all" {}
 data "spacelift_aws_integrations" "all" {}
-
 # Look up unique Spacelift role slugs needed for role attachments.
 # We use for_each over the set of unique slugs so each slug is resolved only once,
 # even if many stacks share the same role.

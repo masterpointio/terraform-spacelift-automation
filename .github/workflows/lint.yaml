@@ -1,23 +1,30 @@
 name: Lint
 
+# We ignore the dangerous-triggers warning because forked PRs
+# require repo secrets to run some of the defined checks,
+# and we protect against malicious actors by requiring approval
+# for all external contributors before workflows will run.
+on: pull_request_target # zizmor: ignore[dangerous-triggers]
+
 concurrency:
-  group: lint-${{ github.head_ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
-on: pull_request_target
-
-permissions:
-  actions: read
-  checks: write
-  contents: read
-  pull-requests: read
+permissions: {}
 
 jobs:
   lint:
+    name: 📝 lint
     runs-on: ubuntu-latest
+    permissions:
+      actions: read # needed by trunk-action to read workflow run context
+      checks: write # needed by trunk-action to write check results
+      contents: read # needed by trunk-action to read repository contents
     steps:
       - name: Check out Git repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Trunk Check
         uses: trunk-io/trunk-action@75699af9e26881e564e9d832ef7dc3af25ec031b # v1.2.4
         env:
@@ -26,7 +33,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   conventional-title:
+    name: 📝 conventional title
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read # needed by action-semantic-pull-request to inspect pull request context
     steps:
       - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
         env:

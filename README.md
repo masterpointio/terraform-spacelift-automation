@@ -40,10 +40,10 @@ This is the default structure that we expect and recommend. This is intended for
 
 Structure requirements:
 
-- Stack configs are placed in `<root_modules_path>/<root_module>/stacks` directory for each workspace / instance of that stack. e.g. `root-modules/k8s-cluster/stacks/dev.yaml` and `root-modules/k8s-cluster/stacks/stage.yaml`
-- Terraform variables are placed in `<root_modules_path>/<root_module>/tfvars` directory for each workspace / instance of that stack. e.g. `root-modules/k8s-cluster/tfvars/dev.tfvars` and `root-modules/k8s-cluster/tfvars/stage.tfvars`
+- Stack configs are placed in `<root-modules>/<root_module>/stacks` directory for each workspace / instance of that stack. e.g. `root-modules/k8s-cluster/stacks/dev.yaml` and `root-modules/k8s-cluster/stacks/stage.yaml`
+- Terraform variables are placed in `<root-modules>/<root_module>/tfvars` directory for each workspace / instance of that stack. e.g. `root-modules/k8s-cluster/tfvars/dev.tfvars` and `root-modules/k8s-cluster/tfvars/stage.tfvars`
 - Stack config files and tfvars files must be equal to OpenTofu/Terraform workspace, e.g. `stacks/dev.yaml` and `tfvars/dev.tfvars` for a workspace named `dev`.
-- Common configs are placed in `<root_modules_path>/<root_module>/stacks/common.yaml` file (or `var.common_config_file` value). This is useful when you know that some values should be shared across all the stacks created for a root module.
+- Common configs are placed in `<root-modules>/<root_module>/stacks/common.yaml` file (or `var.common_config_file` value). This is useful when you know that some values should be shared across all the stacks created for a root module.
   - For example, all stacks that manage Spacelift resources can share `role_attachment_role_slug: space-admin` or all stacks can share the same labels.
 
 We have an example of this structure in the [examples/complete](./examples/complete/root-modules/), which looks like the following:
@@ -87,9 +87,15 @@ github_enterprise = {
 }
 repository = "terraform-spacelift-automation"
 
-# Stacks configurations
-root_modules_path        = "root-modules"
-all_root_modules_enabled = true
+# Stacks configurations.
+# - root_modules_discovery_path is relative to THIS module (path.root) and used by
+#   fileset() to find stack YAML files.
+# - project_root_prefix is relative to the REPO ROOT and used to set each stack's
+#   Spacelift project_root. The two are intentionally separate — you only need
+#   project_root_prefix when the discovery path contains "../".
+root_modules_discovery_path = "../"
+project_root_prefix         = "root-modules"
+all_root_modules_enabled    = true
 
 aws_integration_id = "ZDPP8SKNVG0G27T4"
 ```
@@ -115,7 +121,7 @@ This is a special case where each root module directory only manages one state f
 
 Structure requirements:
 
-- Stack configs are placed in `<root_modules_path>/<root_module>/stack.yaml` directory. e.g. `root-modules/rds-cluster/stack.yaml`
+- Stack configs are placed in `<root-modules>/<root_module>/stack.yaml` directory. e.g. `root-modules/rds-cluster/stack.yaml`
 - Tfvars values are not supported in this structure. In this structure, we suggest you just add your tfvars as `***.auto.tfvars` or hardcode your values directly in root module code.
 
 Here is an example of this structure that we have in the [examples/single-instance](./examples/single-instance/) directory:
@@ -158,7 +164,7 @@ These stacks will be configured using the settings in the `stack.yaml` file.
 
 Spacelift Automation can manage itself as a Stack as well, and we recommend this so you can fully automate your Stack management upon merging to your given branch. Follow these steps to achieve that:
 
-1. Create a new vanilla OpenTofu/Terraform root module in `<root_modules_path>/spacelift-automation` that consumes this child module and supplies the necessary configuration for your unique setup. e.g.
+1. Create a new vanilla OpenTofu/Terraform root module in `<root-modules>/spacelift-automation` that consumes this child module and supplies the necessary configuration for your unique setup. e.g.
 
    ```hcl
    # root-modules/spacelift-automation/main.tf
@@ -173,9 +179,14 @@ Spacelift Automation can manage itself as a Stack as well, and we recommend this
      }
      repository = "your-infrastructure-repo"
 
-     # Stacks configurations
-     root_modules_path        = "../../root-modules"
-     all_root_modules_enabled = true
+     # Stacks configurations.
+     # The automation module lives at <repo>/root-modules/spacelift-automation/, and the
+     # other root modules live at <repo>/root-modules/<module-name>/. So:
+     #   - discovery path is "../"          (relative to THIS module)
+     #   - project_root prefix is "root-modules" (relative to the REPO ROOT)
+     root_modules_discovery_path = "../"
+     project_root_prefix         = "root-modules"
+     all_root_modules_enabled    = true
 
      aws_integration_id = "ZDPP8SKNVG0G27T4"
    }
@@ -232,7 +243,7 @@ automation_settings:
 
 ### How do I give a stack Spacelift management permissions? (Role Attachments)
 
-Stacks that manage other Spacelift resources (e.g. the spacelift-automation stack itself) need elevated permissions. The way to grant this is via a **role attachment**, which replaces the deprecated `administrative` flag.
+Stacks that manage other Spacelift resources (e.g. the spacelift-automation stack itself) need elevated permissions. The way to grant this is via a **role attachment**, which replaces the deprecated `administrative` flag. At minimum, the spacelift-automation stack itself needs `space-admin` so it can manage other stacks and their role attachments.
 
 #### Using a built-in role
 
@@ -245,7 +256,7 @@ stack_settings:
   role_attachment_role_slug: space-admin
 ```
 
-Or apply it to every stack managed by a module instance via `var.role_attachment`:
+You can also give every stack managed by a module instance a role via `var.role_attachment`. `space-admin` is only needed when a stack itself manages Spacelift resources — otherwise pick a less-privileged role (or none):
 
 ```hcl
 module "spacelift_automation" {
@@ -327,22 +338,24 @@ By default, this module assumes all stacks are in the same repo as the stack wit
      project_root: stacks/random-pet
    ```
 
-5. Add a new module block for the repo to `this-repo/stacks/spacelift-automation/main.tf`. The `root_modules_path` should point to the new `remote-stacks` subdirectory for the repo.
+5. Add a new module block for the repo to `this-repo/stacks/spacelift-automation/main.tf`. Set `root_modules_discovery_path` (relative to this module) to find the stack YAML files locally, and `project_root_prefix` (relative to the repo root) to tell Spacelift where to find each stack's Terraform code.
 
    ```hcl
    # this-repo/stacks/spacelift-automation/main.tf
    module "spacelift_automation_this_repo" {
      source = "git::https://github.com/masterpointio/terraform-spacelift-automation.git"
 
-     repository            = "this-repo"
-     root_modules_path     = "../../stacks"
+     repository                  = "this-repo"
+     root_modules_discovery_path = "../../stacks"
+     project_root_prefix         = "stacks"
    }
 
    module "spacelift_automation_other_repo" {
      source = "git::https://github.com/masterpointio/terraform-spacelift-automation.git"
 
-     repository            = "other-repo"
-     root_modules_path     = "../../remote-stacks/other-repo"
+     repository                  = "other-repo"
+     root_modules_discovery_path = "../../remote-stacks/other-repo"
+     project_root_prefix         = "stacks" # path inside the OTHER repo where root modules live
    }
    ```
 
@@ -403,6 +416,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_after_plan"></a> [after\_plan](#input\_after\_plan) | List of after-plan scripts | `list(string)` | `[]` | no |
 | <a name="input_after_run"></a> [after\_run](#input\_after\_run) | List of after-run (aka `finally` hook) scripts | `list(string)` | `[]` | no |
 | <a name="input_all_root_modules_enabled"></a> [all\_root\_modules\_enabled](#input\_all\_root\_modules\_enabled) | When set to true, all subdirectories in root\_modules\_path will be treated as root modules. | `bool` | `false` | no |
+| <a name="input_all_root_modules_enabled"></a> [all\_root\_modules\_enabled](#input\_all\_root\_modules\_enabled) | When set to true, all subdirectories in root\_modules\_discovery\_path will be treated as root modules. | `bool` | `false` | no |
 | <a name="input_allow_run_promotion"></a> [allow\_run\_promotion](#input\_allow\_run\_promotion) | Indicates whether a proposed run can be promoted to a tracked run. | `bool` | `true` | no |
 | <a name="input_autodeploy"></a> [autodeploy](#input\_autodeploy) | Flag to enable/disable automatic deployment of the stack | `bool` | `true` | no |
 | <a name="input_autoretry"></a> [autoretry](#input\_autoretry) | Flag to enable/disable automatically rerun proposed runs (PR plans) that have become out of date after a tracked run applies changes to the stack's state. Only supported with private worker pools. Docs: https://docs.spacelift.io/concepts/stack/stack-settings#autoretry | `bool` | `false` | no |
@@ -440,12 +454,13 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_labels"></a> [labels](#input\_labels) | List of labels to apply to the stacks. | `list(string)` | `[]` | no |
 | <a name="input_manage_state"></a> [manage\_state](#input\_manage\_state) | Determines if Spacelift should manage state for this stack. | `bool` | `false` | no |
 | <a name="input_managed_roles"></a> [managed\_roles](#input\_managed\_roles) | Map of Spacelift roles to create and manage. The map key acts as the Terraform resource<br/>identifier and is used to reference the role in `var.role_attachment.role_slug` or<br/>per-stack `role_attachment_role_slug` in stack YAML (in addition to built-in slugs like<br/>`"space-admin"`).<br/><br/>`name`        — (required) Human-readable display name shown in the Spacelift UI.<br/>`description` — (optional) Human-readable description of the role's purpose.<br/>`actions`     — (required) Set of permission strings granted by this role, e.g.<br/>                `"SPACE_READ"`, `"SPACE_WRITE"`, `"SPACE_ADMIN"`, `"RUN_TRIGGER"`.<br/>                Use the `spacelift_role_actions` data source to list all available actions.<br/><br/>Example:<pre>managed_roles = {<br/>  "ci-deployer" = {<br/>    name    = "CI Deployer"<br/>    actions = ["SPACE_READ", "RUN_TRIGGER"]<br/>  }<br/>}</pre> | <pre>map(object({<br/>    name        = string<br/>    description = optional(string, null)<br/>    actions     = set(string)<br/>  }))</pre> | `{}` | no |
+| <a name="input_project_root_prefix"></a> [project\_root\_prefix](#input\_project\_root\_prefix) | Repo-root-relative path joined with each module name to form that stack's Spacelift<br/>project\_root. e.g. "root-modules" produces project\_root = "root-modules/network" for<br/>the network module.<br/><br/>If null, falls back to root\_modules\_discovery\_path verbatim — only valid when that<br/>path is already repo-root-relative (no "../"). Per-stack stack\_settings.project\_root<br/>in YAML always wins. | `string` | `null` | no |
 | <a name="input_protect_from_deletion"></a> [protect\_from\_deletion](#input\_protect\_from\_deletion) | Protect this stack from accidental deletion. If set, attempts to delete this stack will fail. | `bool` | `false` | no |
 | <a name="input_raw_git"></a> [raw\_git](#input\_raw\_git) | The raw Git integration settings | <pre>object({<br/>    namespace = string<br/>    url       = string<br/>  })</pre> | `null` | no |
 | <a name="input_repository"></a> [repository](#input\_repository) | The name of your infrastructure repo | `string` | n/a | yes |
 | <a name="input_role_attachment"></a> [role\_attachment](#input\_role\_attachment) | When set, a `spacelift_role_attachment` is created for every stack managed by this module,<br/>attaching the specified Spacelift role. This replaces the deprecated `administrative = true` flag.<br/><br/>`role_slug` — (required) slug of the Spacelift role to attach. Accepts: built-in slugs<br/>(`"space-admin"`, `"space-writer"`, `"space-reader"`), slugs of pre-existing custom roles, or<br/>a key from `var.managed_roles` to reference a role created by this module.<br/><br/>`space_id` — (optional) the space in which the attachment is created (the "binding space").<br/>Defaults to `null`, meaning the attachment is created in the stack's own space — equivalent to the<br/>old `administrative = true` behavior. Set to a different space ID to enable cross-space access.<br/><br/>Can be overridden per-stack via `stack_settings.role_attachment_role_slug` and<br/>`stack_settings.role_attachment_space_id` in the stack config YAML.<br/>Set to `null` (the default) to create no role attachment for any stack.<br/><br/>Example:<pre>role_attachment = {<br/>  role_slug = "space-admin"<br/>  # space_id = "root"  # optional: set to attach in a different space (e.g. for cross-space access)<br/>}</pre> | <pre>object({<br/>    role_slug = string<br/>    space_id  = optional(string, null)<br/>  })</pre> | `null` | no |
 | <a name="input_root_module_structure"></a> [root\_module\_structure](#input\_root\_module\_structure) | The root module structure of the Stacks that you're reading in. See README for full details.<br/><br/>MultiInstance - You're using Workspaces or Dynamic Backend configuration to create multiple instances of the same root module code.<br/>SingleInstance - You're using copies of a root module and your directory structure to create multiple instances of the same Terraform code. | `string` | `"MultiInstance"` | no |
-| <a name="input_root_modules_path"></a> [root\_modules\_path](#input\_root\_modules\_path) | The path, relative to the root of the repository, where the root module can be found. | `string` | `"root-modules"` | no |
+| <a name="input_root_modules_discovery_path"></a> [root\_modules\_discovery\_path](#input\_root\_modules\_discovery\_path) | Directory that spacelift-automation scans during plan/apply to discover stack YAML<br/>files (`<module>/stacks/*.yaml` for MultiInstance, `<module>/stack.yaml` for<br/>SingleInstance), creating one Spacelift Stack per file found. Resolved relative to<br/>the consuming root module (path.root); it does not affect the project\_root of<br/>generated stacks — set project\_root\_prefix for that.<br/><br/>Example: with this module at <repo>/root-modules/spacelift-automation/ and sibling<br/>root modules at <repo>/root-modules/<module>/, use "../". | `string` | `"../"` | no |
 | <a name="input_runner_image"></a> [runner\_image](#input\_runner\_image) | URL of the Docker image used to process Runs. Defaults to `null` which is Spacelift's standard (Alpine) runner image. | `string` | `null` | no |
 | <a name="input_runtime_overrides"></a> [runtime\_overrides](#input\_runtime\_overrides) | Runtime overrides that are merged into the stack config.<br/>  This allows for per-root-module overrides of the stack resources at runtime<br/>  so you have more flexibility beyond the variable defaults and the static stack config files.<br/>  Keys are the root module names and values match the StackConfig schema.<br/>  See `stack-config.schema.json` for full details on the schema and<br/>  `tests/fixtures/multi-instance/root-module-a/stacks/default-example.yaml` for a complete example. | `any` | `{}` | no |
 | <a name="input_space_id"></a> [space\_id](#input\_space\_id) | Place the created stacks in the specified space\_id. Mutually exclusive with space\_name. | `string` | `null` | no |
@@ -463,7 +478,7 @@ If you have many remote repositories that you need to manage via this pattern, y
 |------|-------------|
 | <a name="output_spacelift_roles"></a> [spacelift\_roles](#output\_spacelift\_roles) | A map of managed Spacelift roles created by this module, keyed by the var.managed\_roles map key. |
 | <a name="output_spacelift_spaces"></a> [spacelift\_spaces](#output\_spacelift\_spaces) | A map of Spacelift spaces with all their attributes. |
-| <a name="output_spacelift_stacks"></a> [spacelift\_stacks](#output\_spacelift\_stacks) | A map of Spacelift stacks with selected attributes.<br/>To reduce the risk of accidentally exporting sensitive data, only a subset of attributes is exported. |
+| <a name="output_spacelift_stacks"></a> [spacelift\_stacks](#output\_spacelift\_stacks) | A map of Spacelift stacks with selected attributes (id, labels, autodeploy, project\_root).<br/>To reduce the risk of accidentally exporting sensitive data, only a subset of attributes is exported. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->

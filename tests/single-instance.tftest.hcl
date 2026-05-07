@@ -27,7 +27,7 @@ mock_provider "jsonschema" {
 }
 
 variables {
-  root_modules_path = "./tests/fixtures/single-instance"
+  root_modules_discovery_path = "./tests/fixtures/single-instance"
   github_enterprise = {
     namespace = "masterpointio"
   }
@@ -92,7 +92,7 @@ run "test_single_instance_stack_configs_project_root_is_correct" {
   command = plan
 
   assert {
-    condition     = local._root_module_stack_configs["root-module-a"].project_root == "${var.root_modules_path}/root-module-a"
+    condition     = local._root_module_stack_configs["root-module-a"].project_root == "${var.root_modules_discovery_path}/root-module-a"
     error_message = "project_root is not correct for root-module-a: ${jsonencode(local._root_module_stack_configs)}"
   }
 }
@@ -108,7 +108,7 @@ run "test_single_instance_stack_configs_custom_project_root_is_used_when_specifi
 }
 
 # Test that no role attachment is created for a single-instance stack without role_attachment_role_slug
-run "test_single_instance_role_attachment_is_not_created_for_non_administrative_stack" {
+run "test_single_instance_role_attachment_is_not_created_when_role_slug_absent" {
   command = plan
 
   assert {

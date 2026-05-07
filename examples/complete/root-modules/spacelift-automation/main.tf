@@ -7,8 +7,12 @@ module "automation" {
   repository = "terraform-spacelift-automation"
   branch     = "main"
 
-  root_modules_path        = "../../../../examples/complete/root-modules"
-  all_root_modules_enabled = true
+  # This example's spacelift-automation module lives many directories deep, so the
+  # discovery path is relative to *this module*, while project_root_prefix points to the
+  # path Spacelift uses inside the repo.
+  root_modules_discovery_path = "../../../../examples/complete/root-modules"
+  project_root_prefix         = "examples/complete/root-modules"
+  all_root_modules_enabled    = true
 
   aws_integration_id      = "YOUR_AWS_INTEGRATION_ID"
   aws_integration_enabled = true

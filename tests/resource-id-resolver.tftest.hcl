@@ -7,11 +7,11 @@ mock_provider "spacelift" {
     defaults = {
       spaces = [
         {
-          space_id    = "example-space-id"
-          name        = "example-space"
-          parent_space_id = "root"
-          description = "Test space"
-          labels      = []
+          space_id         = "example-space-id"
+          name             = "example-space"
+          parent_space_id  = "root"
+          description      = "Test space"
+          labels           = []
           inherit_entities = true
         }
       ]
@@ -22,12 +22,12 @@ mock_provider "spacelift" {
     defaults = {
       worker_pools = [
         {
-          worker_pool_id           = "example-worker-pool-id"
-          name                     = "example-worker-pool"
-          description              = "Test worker pool"
-          labels                   = []
-          config                   = ""
-          space_id                 = "root"
+          worker_pool_id            = "example-worker-pool-id"
+          name                      = "example-worker-pool"
+          description               = "Test worker pool"
+          labels                    = []
+          config                    = ""
+          space_id                  = "root"
           drift_detection_run_limit = 0
         }
       ]
@@ -44,6 +44,7 @@ mock_provider "spacelift" {
           external_id                    = "test"
           duration_seconds               = 3600
           generate_credentials_in_worker = false
+          autoattach_enabled             = false
           space_id                       = "root"
           labels                         = []
           region                         = "us-east-1"
@@ -64,8 +65,8 @@ mock_provider "jsonschema" {
 }
 
 variables {
-  root_modules_path  = "./tests/fixtures/multi-instance"
-  common_config_file = "common.yaml"
+  root_modules_discovery_path = "./tests/fixtures/multi-instance"
+  common_config_file          = "common.yaml"
   github_enterprise = {
     namespace = "masterpointio"
   }
@@ -110,9 +111,9 @@ run "test_global_space_id_variable_is_used" {
   command = plan
 
   variables {
-    space_id = "global-space-id-from-variable"
-    root_modules_path = "./tests/fixtures/single-instance"
-    root_module_structure = "SingleInstance"
+    space_id                    = "global-space-id-from-variable"
+    root_modules_discovery_path = "./tests/fixtures/single-instance"
+    root_module_structure       = "SingleInstance"
   }
 
   assert {
@@ -126,8 +127,8 @@ run "test_default_space_id_is_used_when_no_values_provided" {
   command = plan
 
   variables {
-    root_modules_path = "./tests/fixtures/single-instance"
-    root_module_structure = "SingleInstance"
+    root_modules_discovery_path = "./tests/fixtures/single-instance"
+    root_module_structure       = "SingleInstance"
   }
 
   assert {
@@ -141,8 +142,8 @@ run "test_single_instance_space_id_from_stack_yaml" {
   command = plan
 
   variables {
-    root_modules_path = "./tests/fixtures/single-instance"
-    root_module_structure = "SingleInstance"
+    root_modules_discovery_path = "./tests/fixtures/single-instance"
+    root_module_structure       = "SingleInstance"
   }
 
   assert {

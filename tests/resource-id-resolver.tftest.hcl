@@ -65,6 +65,7 @@ mock_provider "jsonschema" {
 }
 
 variables {
+  workspace_prefix_enabled    = false
   root_modules_discovery_path = "./tests/fixtures/multi-instance"
   common_config_file          = "common.yaml"
   github_enterprise = {

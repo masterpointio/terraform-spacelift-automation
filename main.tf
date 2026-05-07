@@ -154,7 +154,11 @@ locals {
   # }
   _root_module_stack_configs = merge([for module, files in local._root_module_yaml_decoded : {
     for file, content in files :
-    local._multi_instance_structure ? "${module}-${trimsuffix(file, ".yaml")}" : module =>
+    local._multi_instance_structure ? (
+      var.workspace_prefix_enabled ?
+      "${trimsuffix(file, ".yaml")}-${module}" : # example: prod-network
+      "${module}-${trimsuffix(file, ".yaml")}"   # example: network-prod
+    ) : module =>
     merge(
       {
         # Resolve each stack's Spacelift project_root with this precedence:

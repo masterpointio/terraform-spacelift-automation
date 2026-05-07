@@ -62,6 +62,9 @@ mock_provider "spacelift" {
 }
 
 variables {
+  # Pin to false so existing assertions referencing module-prefixed stack IDs (e.g. "root-module-a-test")
+  # remain valid. The new default (true) is exercised explicitly in test_workspace_prefix_enabled_*.
+  workspace_prefix_enabled    = false
   root_modules_discovery_path = "./tests/fixtures/multi-instance"
   common_config_file          = "common.yaml"
   github_enterprise = {
@@ -779,6 +782,20 @@ run "test_stack_resource_is_created_with_correct_name" {
   assert {
     condition     = spacelift_stack.default["root-module-a-test"].name == "root-module-a-test"
     error_message = "Stack resource was not created correctly: ${jsonencode(spacelift_stack.default)}"
+  }
+}
+
+# Test that workspace_prefix_enabled = true reverses the ID format
+run "test_workspace_prefix_enabled_reverses_id" {
+  command = plan
+
+  variables {
+    workspace_prefix_enabled = true
+  }
+
+  assert {
+    condition     = contains(keys(spacelift_stack.default), "test-root-module-a")
+    error_message = "Stack ID should be workspace-first (test-root-module-a, where `test` is the workspace.): ${jsonencode(keys(spacelift_stack.default))}"
   }
 }
 

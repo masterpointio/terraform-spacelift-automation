@@ -197,10 +197,10 @@ run "test_default_example_stack_final_values" {
     error_message = "enable_well_known_secret_masking was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
-  # github_action_deploy
+  # allow_run_promotion
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == false
-    error_message = "github_action_deploy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+    condition     = spacelift_stack.default["root-module-a-default-example"].allow_run_promotion == false
+    error_message = "allow_run_promotion was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # manage_state
@@ -308,7 +308,7 @@ run "test_default_example_stack_runtime_overrides" {
           description                      = "This is a changed test of the emergency broadcast system"
           enable_local_preview             = false
           enable_well_known_secret_masking = true
-          github_action_deploy             = true
+          allow_run_promotion              = true
           manage_state                     = false
           protect_from_deletion            = false
           runner_image                     = "example/spacelift-runner:dev"
@@ -446,10 +446,10 @@ run "test_default_example_stack_runtime_overrides" {
     error_message = "enable_well_known_secret_masking override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
-  # github_action_deploy
+  # allow_run_promotion
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == true
-    error_message = "github_action_deploy override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+    condition     = spacelift_stack.default["root-module-a-default-example"].allow_run_promotion == true
+    error_message = "allow_run_promotion override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # manage_state
@@ -647,10 +647,10 @@ run "test_default_example_stack_partial_runtime_overrides" {
     error_message = "enable_well_known_secret_masking was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
-  # github_action_deploy
+  # allow_run_promotion
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == false
-    error_message = "github_action_deploy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+    condition     = spacelift_stack.default["root-module-a-default-example"].allow_run_promotion == false
+    error_message = "allow_run_promotion was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # manage_state

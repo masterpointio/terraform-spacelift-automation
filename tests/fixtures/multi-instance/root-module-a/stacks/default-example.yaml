@@ -21,7 +21,7 @@ stack_settings:
   destructor_deactivated: false
   enable_local_preview: true
   enable_well_known_secret_masking: false
-  github_action_deploy: false
+  allow_run_promotion: false
   manage_state: true
   protect_from_deletion: true
   runner_image: example/spacelift-runner:latest

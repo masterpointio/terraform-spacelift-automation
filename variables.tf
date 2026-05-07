@@ -409,9 +409,9 @@ variable "enable_well_known_secret_masking" {
   default     = true
 }
 
-variable "github_action_deploy" {
+variable "allow_run_promotion" {
   type        = bool
-  description = "Indicates whether GitHub users can deploy from the Checks API."
+  description = "Indicates whether a proposed run can be promoted to a tracked run."
   default     = true
 }
 

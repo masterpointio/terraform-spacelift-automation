@@ -14,5 +14,5 @@ permissions: {}
 
 jobs:
   zizmor:
-    uses: masterpointio/.github/.github/workflows/zizmor.yml@5b6a1958f98df1c9bbe63b7920f6f7bb9bd68f87
+    uses: masterpointio/.github/.github/workflows/zizmor.yml@7909bb0ba1864b969a63de7cb6917def18134e54
     secrets: inherit

@@ -1,0 +1,17 @@
+name: Zizmor
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  zizmor:
+    uses: masterpointio/.github/.github/workflows/zizmor.yaml@104587c2b845fc2f5c82486212acdf7b94d7281f

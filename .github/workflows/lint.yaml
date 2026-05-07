@@ -14,30 +14,6 @@ permissions: {}
 
 jobs:
   lint:
-    name: 📝 lint
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read # needed by trunk-action to read workflow run context
-      checks: write # needed by trunk-action to write check results
-      contents: read # needed by trunk-action to read repository contents
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          persist-credentials: false
-      - name: Trunk Check
-        uses: trunk-io/trunk-action@75699af9e26881e564e9d832ef7dc3af25ec031b # v1.2.4
-        env:
-          # NOTE: inject the GITHUB_TOKEN for the trunk managed tflint linter
-          # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  conventional-title:
-    name: 📝 conventional title
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read # needed by action-semantic-pull-request to inspect pull request context
-    steps:
-      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: masterpointio/.github/.github/workflows/lint.yaml@104587c2b845fc2f5c82486212acdf7b94d7281f
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

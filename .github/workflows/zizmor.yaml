@@ -14,5 +14,4 @@ permissions: {}
 
 jobs:
   zizmor:
-    uses: masterpointio/.github/.github/workflows/zizmor.yml@6f1be5090fc5c310fc293d5abd3a5ce67d4be1c5
-    # NEED TO RENAME TO .yaml in upstream
+    uses: masterpointio/.github/.github/workflows/zizmor.yml@1cefc6e164887844bbfc220f9daf8ed3917f22f6

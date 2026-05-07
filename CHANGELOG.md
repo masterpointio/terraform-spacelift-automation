@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v2.1.0...v3.0.0) (2026-05-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* allow_run_promotion, in favor of github_action_deploy ([#121](https://github.com/masterpointio/terraform-spacelift-automation/issues/121))
+
+### Features
+
+* allow_run_promotion, in favor of github_action_deploy ([#121](https://github.com/masterpointio/terraform-spacelift-automation/issues/121)) ([afdb731](https://github.com/masterpointio/terraform-spacelift-automation/commit/afdb7311e9cc63e056bc3f116d5b0e858da64ade))
+
 ## [2.1.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v2.0.0...v2.1.0) (2026-04-21)
 
 

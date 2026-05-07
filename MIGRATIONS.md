@@ -1,5 +1,89 @@
 # Migration Guide
 
+## v2.x → v3.0.0
+
+### Overview
+
+`root_modules_path` was a single variable doing two unrelated jobs: a filesystem path (relative
+to the consuming module) used for stack discovery, _and_ the basis for Spacelift's `project_root`
+(silently derived by stripping leading `../` segments). The strip "happened to work" only when
+the consuming module sat at `<repo>/root-modules/spacelift-automation/`. Any other layout would
+silently produce wrong `project_root` values with no error.
+
+v3.0.0 splits the two responsibilities into two variables and removes the silent stripping
+behavior entirely.
+
+### Breaking changes
+
+| What changed              | v2.x                                                         | v3.0.0                                                                                                |
+| ------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `root_modules_path`       | One variable; doubled as project_root source via `../`-strip | Renamed to `root_modules_discovery_path`. Discovery only — never affects project_root                 |
+| Default value             | `"root-modules"` (only worked at repo root)                  | `"../"` (matches the recommended layout)                                                              |
+| `project_root` derivation | `replace("${var.root_modules_path}/${module}", "../", "")`   | `"${coalesce(var.project_root_prefix, var.root_modules_discovery_path)}/${module}"`                   |
+| Implicit `../`-stripping  | Performed silently when prefix was unset                     | Removed. Validation rejects `..` in `root_modules_discovery_path` unless `project_root_prefix` is set |
+| `spacelift_stacks` output | Exposed `id`, `labels`, `autodeploy`                         | Adds `project_root` so consumers can verify the resolved value at plan time                           |
+
+### Migration steps
+
+#### 1. Rename `root_modules_path` → `root_modules_discovery_path`
+
+Mechanical rename in every module block that consumes spacelift-automation, and in any
+stack-config tooling that referenced the old name.
+
+```hcl
+# Before
+module "spacelift_automation" {
+  source = "masterpointio/automation/spacelift"
+
+  root_modules_path = "../../root-modules"
+  # ...
+}
+
+# After
+module "spacelift_automation" {
+  source = "masterpointio/automation/spacelift"
+
+  root_modules_discovery_path = "../"
+  project_root_prefix         = "root-modules"
+  # ...
+}
+```
+
+#### 2. Set `project_root_prefix` whenever your discovery path contains `..`
+
+If you previously relied on the silent strip — i.e. you set `root_modules_path = "../../root-modules"`
+expecting the resulting `project_root` to be `root-modules/<module>` — set `project_root_prefix`
+explicitly to that repo-root-relative path:
+
+| Old (silently stripped)                                     | New (explicit)                                                                    |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `root_modules_path = "../../root-modules"`                  | `root_modules_discovery_path = "../"` + `project_root_prefix = "root-modules"`    |
+| `root_modules_path = "../../stacks"` (remote-stacks recipe) | `root_modules_discovery_path = "../../stacks"` + `project_root_prefix = "stacks"` |
+| `root_modules_path = "root-modules"` (module at repo root)  | `root_modules_discovery_path = "root-modules"` (no prefix needed)                 |
+
+`tofu plan` (or `terraform plan`) will fail with a clear validation error if you leave
+`project_root_prefix` unset while the discovery path still contains `..`.
+
+#### 3. Verify the resolved `project_root` per stack before applying
+
+`v3.0.0` exposes `project_root` on the `spacelift_stacks` output. After updating, run:
+
+```shell
+tofu plan
+tofu output -json spacelift_stacks | jq 'to_entries[] | {key, project_root: .value.project_root}'
+```
+
+Confirm each stack's `project_root` matches what Spacelift should use to find that stack's
+Terraform code in your repo. This is the recommended verification step before applying
+v3.0.0 against an existing deployment.
+
+#### 4. State-compatibility note
+
+`root_modules_path` and `project_root_prefix` only influence values written to the
+`spacelift_stack.default[*].project_root` attribute and the discovery side of stack creation.
+Provided every stack's resolved `project_root` matches its v2.x value (verified via step 3),
+no stack replacements will occur.
+
 ## v1.x → v2.0.0
 
 ### Overview

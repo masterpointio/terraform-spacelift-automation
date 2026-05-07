@@ -99,32 +99,41 @@ variable "branch" {
   default     = "main"
 }
 
-variable "root_modules_path" {
+variable "root_modules_discovery_path" {
   type        = string
   description = <<-EOT
-  The path where root modules can be found, used internally by spacelift-automation to discover
-  stack YAML files via fileset(). This path is relative to the spacelift-automation root module.
+  Filesystem path used by spacelift-automation to discover stack YAML files via fileset().
 
-  NOTE: It does NOT affect the configuration of created stacks (use project_root_prefix for that).
+  - Relative to: this module's directory (path.root) — i.e. the consuming root module.
+  - Used for:    DISCOVERY ONLY. Has no effect on the project_root of generated stacks.
+  - Example:     "../" when this module lives at `<repo>/root-modules/spacelift-automation/`
+                 and the sibling root modules live at `<repo>/root-modules/<module-name>/`.
 
-  Example: If spacelift-automation is at `some-directory/root-modules/spacelift-automation/`
-  and you want to discover stacks in sibling directories, use `../../root-modules`.
+  Pair with `project_root_prefix` whenever this path is not already the repo-root-relative
+  path Spacelift should use for stack runs (i.e. whenever this path contains "../").
   EOT
-  default     = "root-modules"
+  default     = "../"
 }
 
 variable "project_root_prefix" {
   type        = string
   description = <<-EOT
-  The path from the repository root to the root-modules directory. Used to set each stack's project_root.
-  This is the path Spacelift uses to find Terraform code in your repo.
+  Repo-root-relative prefix prepended to each module name to form each stack's Spacelift `project_root`.
 
-  When set, each stack's project_root becomes: project_root_prefix/module_name
-  (e.g., "some-directory/root-modules" + "network" = "some-directory/root-modules/network")
+  - Relative to: the repository root.
+  - Used for:    Spacelift project_root only. Has no effect on local discovery.
+  - Example:     "root-modules" → stack `network` gets project_root = "root-modules/network".
 
-  Per-stack project_root in YAML files takes precedence.
+  If null, falls back to `root_modules_discovery_path` verbatim — only safe when that path
+  is already repo-root-relative (no "../" segments). Per-stack `stack_settings.project_root`
+  in YAML always wins.
   EOT
   default     = null
+
+  validation {
+    condition     = var.project_root_prefix != null || !can(regex("\\.\\.", var.root_modules_discovery_path))
+    error_message = "project_root_prefix must be set when root_modules_discovery_path contains '..' segments. The discovery path is relative to this module (path.root); the project_root prefix is relative to the repository root, and the two cannot be derived from each other automatically."
+  }
 }
 
 variable "enabled_root_modules" {
@@ -139,7 +148,7 @@ variable "enabled_root_modules" {
 
 variable "all_root_modules_enabled" {
   type        = bool
-  description = "When set to true, all subdirectories in root_modules_path will be treated as root modules."
+  description = "When set to true, all subdirectories in root_modules_discovery_path will be treated as root modules."
   default     = false
 }
 

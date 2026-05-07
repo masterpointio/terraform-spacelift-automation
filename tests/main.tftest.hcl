@@ -62,8 +62,8 @@ mock_provider "spacelift" {
 }
 
 variables {
-  root_modules_path  = "./tests/fixtures/multi-instance"
-  common_config_file = "common.yaml"
+  root_modules_discovery_path = "./tests/fixtures/multi-instance"
+  common_config_file          = "common.yaml"
   github_enterprise = {
     namespace = "masterpointio"
   }

@@ -1,4 +1,4 @@
-# This Terraform code automates the creation and management of Spacelift stacks based on the structure
+# This Terraform code automates the creation and management of Spacelift stacks based on the structured
 # and configurations defined in the Git repository, default Stack values and additional input variables.
 # It primarily relies on dynamic local expressions to generate configurations based on the
 # input variables and Git structure so it can be consumed by Spacelift resources.

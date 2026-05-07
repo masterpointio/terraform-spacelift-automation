@@ -2,9 +2,15 @@
 
 ## v2.x → v3.0.0
 
-`root_modules_path` was overloaded: spacelift-automation needs a filesystem path relative to the consuming module to discover stacks, but Spacelift's `project_root` is relative to the repo root. v2.x bridged the two by silently stripping leading `../` segments from the variable — that only produced the right `project_root` when the consuming module sat at `<repo>/root-modules/spacelift-automation/`; any other layout produced a wrong `project_root` with no error, surfacing only as a Spacelift run failure.
+`root_modules_path` was overloaded: spacelift-automation needs a filesystem path relative to the consuming module to discover
+stacks, but Spacelift's `project_root` is relative to the repo root. v2.x bridged the two by silently stripping leading `../`
+segments from the variable — that only produced the right `project_root` when the consuming module sat at
+`<repo>/root-modules/spacelift-automation/`; any other layout produced a wrong `project_root` with no error, surfacing only
+as a Spacelift run failure.
 
-v3.0.0 splits the variable into `root_modules_discovery_path` (discovery, relative to this module) and `project_root_prefix` (relative to the repo root), and removes the silent strip. Set `project_root_prefix` explicitly when the discovery path contains `..`.
+v3.0.0 splits the variable into `root_modules_discovery_path` (discovery, relative to this module) and `project_root_prefix`
+(relative to the repo root), and removes the silent strip. Set `project_root_prefix` explicitly when the discovery path
+contains `..`.
 
 ### Replacing `root_modules_path`
 
@@ -21,11 +27,6 @@ If you leave `project_root_prefix` unset while the discovery path contains `..`,
 ### Verifying before apply
 
 v3.0.0 exposes each stack's resolved `project_root` on the `spacelift_stacks` output. Run `tofu plan` and inspect. If every value matches the v2.x `project_root`, no stack replacements occur.
-
-### Other changes
-
-- **Default change.** `root_modules_discovery_path` defaults to `"../"` (was `"root-modules"`), matching the layout the README recommends. Set it explicitly to `"root-modules"` if you relied on the old default.
-- **Output addition.** `spacelift_stacks` now includes `project_root` per stack alongside `id`, `labels`, and `autodeploy`.
 
 ## v1.x → v2.0.0
 

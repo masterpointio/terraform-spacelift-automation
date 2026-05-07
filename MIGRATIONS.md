@@ -18,7 +18,9 @@ Read all three sections below before upgrading.
 
 #### Why
 
-`root_modules_path` was overloaded: spacelift-automation needs a filesystem path **relative to the consuming module** to discover stacks, but Spacelift's `project_root` is **relative to the repo root**. v2.x bridged the two by silently stripping leading `../` segments from the variable — that only produced the right `project_root` when the consuming module sat at `<repo>/root-modules/spacelift-automation/`. Any other layout produced a wrong `project_root` with no error, surfacing only as a Spacelift run failure.
+`root_modules_path` was overloaded: spacelift-automation needs a filesystem path **relative to the consuming module** to discover stacks, but Spacelift's `project_root` is **relative to the repo root**.
+
+v2.x bridged the two by silently stripping leading `../` segments from the variable — that only produced the right `project_root` when the consuming module sat at `<repo>/root-modules/spacelift-automation/`. Any other layout produced a wrong `project_root` with no error, surfacing only as a Spacelift run failure.
 
 v3.0.0 splits the variable into two:
 

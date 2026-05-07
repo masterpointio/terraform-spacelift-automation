@@ -21,4 +21,8 @@ jobs:
     uses: masterpointio/.github/.github/workflows/test.yaml@ed29c348c145f20ce0d2b6b24605c54fcdbdab34
     with:
       aws_role_arn: ${{ vars.TF_TEST_AWS_ROLE_ARN }}
-    secrets: inherit
+    secrets:
+      SPACELIFT_API_KEY_ENDPOINT: ${{ secrets.SPACELIFT_API_KEY_ENDPOINT }}
+      SPACELIFT_API_KEY_ID: ${{ secrets.SPACELIFT_API_KEY_ID }}
+      SPACELIFT_API_KEY_SECRET: ${{ secrets.SPACELIFT_API_KEY_SECRET }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

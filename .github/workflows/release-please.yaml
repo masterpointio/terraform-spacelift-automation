@@ -14,4 +14,6 @@ permissions: {}
 jobs:
   release-please:
     uses: masterpointio/.github/.github/workflows/release-please.yaml@ed29c348c145f20ce0d2b6b24605c54fcdbdab34
-    secrets: inherit
+    secrets:
+      MP_BOT_APP_ID: ${{ secrets.MP_BOT_APP_ID }}
+      MP_BOT_APP_PRIVATE_KEY: ${{ secrets.MP_BOT_APP_PRIVATE_KEY }}

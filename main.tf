@@ -59,8 +59,8 @@ locals {
   #   "../data-infrastructure/redshift-clusters/financial-reporting/stacks/example.yaml",
   #   "../data-infrastructure/redshift-clusters/bi-reporting/stacks/example.yaml",
   # ]
-  _multi_instance_stack_files_raw  = fileset("${path.root}/${var.root_modules_path}", "**/stacks/*.yaml")
-  _single_instance_stack_files_raw = fileset("${path.root}/${var.root_modules_path}", "**/stack.yaml")
+  _multi_instance_stack_files_raw  = fileset("${path.root}/${var.root_modules_discovery_path}", "**/stacks/*.yaml")
+  _single_instance_stack_files_raw = fileset("${path.root}/${var.root_modules_discovery_path}", "**/stack.yaml")
 
   # Filter out any files that are in .terraform directories to avoid picking up module cache now that it's using ** as the wildcard
   _multi_instance_stack_files  = [for file in local._multi_instance_stack_files_raw : file if !can(regex("\\.terraform/", file))]
@@ -101,14 +101,14 @@ locals {
   # }
   _multi_instance_root_module_yaml_decoded = {
     for module in local.enabled_root_modules : module => {
-      for yaml_file in fileset("${path.root}/${var.root_modules_path}/${module}/stacks", "*.yaml") :
-      yaml_file => yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stacks/${yaml_file}"))
+      for yaml_file in fileset("${path.root}/${var.root_modules_discovery_path}/${module}/stacks", "*.yaml") :
+      yaml_file => yamldecode(file("${path.root}/${var.root_modules_discovery_path}/${module}/stacks/${yaml_file}"))
     } if local._multi_instance_structure
   }
 
   _single_instance_root_module_yaml_decoded = {
     for module in local.enabled_root_modules : module => {
-      (local.default_workspace_name) = yamldecode(file("${path.root}/${var.root_modules_path}/${module}/stack.yaml"))
+      (local.default_workspace_name) = yamldecode(file("${path.root}/${var.root_modules_discovery_path}/${module}/stack.yaml"))
     } if !local._multi_instance_structure
   }
 
@@ -157,9 +157,17 @@ locals {
     local._multi_instance_structure ? "${module}-${trimsuffix(file, ".yaml")}" : module =>
     merge(
       {
-        # Use specified project_root, if not, build it using the root_modules_path and module name
-        "project_root" = try(content.stack_settings.project_root, replace(format("%s/%s", var.root_modules_path, module), "../", "")),
-        "root_module"  = module,
+        # Resolve each stack's Spacelift project_root with this precedence:
+        # 1. Per-stack `stack_settings.project_root` from YAML (always wins).
+        # 2. `var.project_root_prefix` + module name (the explicit, repo-root-relative path).
+        # 3. `var.root_modules_discovery_path` + module name verbatim — only valid when the
+        #    discovery path is already repo-root-relative. A variable validation rejects
+        #    this case at plan time when discovery_path contains "../".
+        "project_root" = try(
+          content.stack_settings.project_root,
+          format("%s/%s", coalesce(var.project_root_prefix, var.root_modules_discovery_path), module),
+        ),
+        "root_module" = module,
 
         # If default_tf_workspace_enabled is true, use "default" workspace, otherwise our file name is the workspace name
         "terraform_workspace" = try(content.automation_settings.default_tf_workspace_enabled, local._default_tf_workspace_enabled) ? local.default_workspace_name : trimsuffix(file, ".yaml"),

@@ -99,10 +99,38 @@ variable "branch" {
   default     = "main"
 }
 
-variable "root_modules_path" {
+variable "root_modules_discovery_path" {
   type        = string
-  description = "The path, relative to the root of the repository, where the root module can be found."
-  default     = "root-modules"
+  description = <<-EOT
+  Directory that spacelift-automation scans during plan/apply to discover stack YAML
+  files (`<module>/stacks/*.yaml` for MultiInstance, `<module>/stack.yaml` for
+  SingleInstance), creating one Spacelift Stack per file found. Resolved relative to
+  the consuming root module (path.root); it does not affect the project_root of
+  generated stacks — set project_root_prefix for that.
+
+  Example: with this module at <repo>/root-modules/spacelift-automation/ and sibling
+  root modules at <repo>/root-modules/<module>/, use "../".
+  EOT
+  default     = "../"
+}
+
+variable "project_root_prefix" {
+  type        = string
+  description = <<-EOT
+  Repo-root-relative path joined with each module name to form that stack's Spacelift
+  project_root. e.g. "root-modules" produces project_root = "root-modules/network" for
+  the network module.
+
+  If null, falls back to root_modules_discovery_path verbatim — only valid when that
+  path is already repo-root-relative (no "../"). Per-stack stack_settings.project_root
+  in YAML always wins.
+  EOT
+  default     = null
+
+  validation {
+    condition     = var.project_root_prefix != null || !can(regex("\\.\\.", var.root_modules_discovery_path))
+    error_message = "Set project_root_prefix when root_modules_discovery_path contains '..'. Discovery path is relative to this module; project_root_prefix is relative to the repo root, so neither can be derived from the other."
+  }
 }
 
 variable "enabled_root_modules" {
@@ -117,7 +145,7 @@ variable "enabled_root_modules" {
 
 variable "all_root_modules_enabled" {
   type        = bool
-  description = "When set to true, all subdirectories in root_modules_path will be treated as root modules."
+  description = "When set to true, all subdirectories in root_modules_discovery_path will be treated as root modules."
   default     = false
 }
 

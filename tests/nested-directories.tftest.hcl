@@ -38,8 +38,8 @@ run "test_nested_directory_multi_instance_support" {
   command = plan
 
   variables {
-    root_modules_path        = "./tests/fixtures/nested-multi-instance"
-    all_root_modules_enabled = true
+    root_modules_discovery_path = "./tests/fixtures/nested-multi-instance"
+    all_root_modules_enabled    = true
   }
 
   # Test that nested directories are discovered
@@ -83,7 +83,7 @@ run "test_nested_directory_multi_instance_support" {
   }
 
   assert {
-    condition     = spacelift_stack.default["parent/nested-prod"].branch == "main"  
+    condition     = spacelift_stack.default["parent/nested-prod"].branch == "main"
     error_message = "Nested directory prod stack should have main branch: ${spacelift_stack.default["parent/nested-prod"].branch}"
   }
 }
@@ -93,9 +93,9 @@ run "test_nested_directory_single_instance_support" {
   command = plan
 
   variables {
-    root_module_structure    = "SingleInstance"
-    root_modules_path        = "./tests/fixtures/nested-single-instance"
-    all_root_modules_enabled = true
+    root_module_structure       = "SingleInstance"
+    root_modules_discovery_path = "./tests/fixtures/nested-single-instance"
+    all_root_modules_enabled    = true
   }
 
   # Test that nested directory is discovered
@@ -140,8 +140,8 @@ run "test_terraform_directory_filtering" {
   command = plan
 
   variables {
-    root_modules_path        = "./tests/fixtures/multi-instance"
-    all_root_modules_enabled = true
+    root_modules_discovery_path = "./tests/fixtures/multi-instance"
+    all_root_modules_enabled    = true
   }
 
   # Verify that no stack names contain .terraform paths
@@ -168,8 +168,8 @@ run "test_nested_directory_root_module_discovery" {
   command = plan
 
   variables {
-    root_modules_path        = "./tests/fixtures/nested-multi-instance"
-    all_root_modules_enabled = true
+    root_modules_discovery_path = "./tests/fixtures/nested-multi-instance"
+    all_root_modules_enabled    = true
   }
 
   # Test that the nested root module path is correctly identified
@@ -191,9 +191,9 @@ run "test_deeply_nested_directory_support" {
 
   # Create a temporary fixture for deeply nested structure
   variables {
-    root_modules_path        = "./tests/fixtures"
-    all_root_modules_enabled = true
-    enabled_root_modules     = ["nested-multi-instance/parent/nested"]
+    root_modules_discovery_path = "./tests/fixtures"
+    all_root_modules_enabled    = true
+    enabled_root_modules        = ["nested-multi-instance/parent/nested"]
   }
 
   # Test that deeply nested paths work correctly

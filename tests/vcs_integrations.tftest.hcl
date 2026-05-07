@@ -27,11 +27,11 @@ mock_provider "jsonschema" {
 }
 
 variables {
-  root_modules_path        = "./tests/fixtures/multi-instance"
-  common_config_file       = "common.yaml"
-  repository               = "terraform-spacelift-automation"
-  all_root_modules_enabled = true
-  aws_integration_enabled  = false
+  root_modules_discovery_path = "./tests/fixtures/multi-instance"
+  common_config_file          = "common.yaml"
+  repository                  = "terraform-spacelift-automation"
+  all_root_modules_enabled    = true
+  aws_integration_enabled     = false
 }
 
 # Test gitlab dynamic block is created correctly
@@ -149,9 +149,9 @@ run "test_vcs_blocks_empty_when_null" {
 
   variables {
     github_enterprise    = null
-    raw_git             = null
-    gitlab              = null
-    bitbucket_cloud     = null
+    raw_git              = null
+    gitlab               = null
+    bitbucket_cloud      = null
     bitbucket_datacenter = null
   }
 

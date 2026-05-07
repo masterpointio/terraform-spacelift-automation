@@ -156,8 +156,8 @@ locals {
     for file, content in files :
     local._multi_instance_structure ? (
       var.workspace_prefix_enabled ?
-      "${trimsuffix(file, ".yaml")}-${module}" :
-      "${module}-${trimsuffix(file, ".yaml")}"
+      "${trimsuffix(file, ".yaml")}-${module}" : # example: prod-network
+      "${module}-${trimsuffix(file, ".yaml")}"   # example: network-prod
     ) : module =>
     merge(
       {

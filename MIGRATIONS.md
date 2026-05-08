@@ -54,12 +54,12 @@ The new default puts the workspace (environment) component **before** the root m
 
 #### What changed
 
-| Item                                       | v2.x                                          | v3.0.0                                                             |
-| ------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------ |
-| MultiInstance stack ID format (default)    | `${module}-${workspace}` (e.g. `network-dev`) | `${workspace}-${module}` (e.g. `dev-network`)                      |
-| `workspace_prefix_enabled` module variable | N/A (hardcoded format)                        | New`bool`, defaults to `true`. Set to `false` to keep v2.x format. |
-| Folder labels and dependency labels        | Unchanged                                     | Unchanged                                                          |
-| SingleInstance stack IDs                   | `${module}`                                   | Unchanged — variable does not apply.                               |
+| Item                                       | v2.x                                          | v3.0.0                                                              |
+| ------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------- |
+| MultiInstance stack ID format (default)    | `${module}-${workspace}` (e.g. `network-dev`) | `${workspace}-${module}` (e.g. `dev-network`)                       |
+| `workspace_prefix_enabled` module variable | N/A (hardcoded format)                        | New `bool`, defaults to `true`. Set to `false` to keep v2.x format. |
+| Folder labels and dependency labels        | Unchanged                                     | Unchanged                                                           |
+| SingleInstance stack IDs                   | `${module}`                                   | Unchanged — variable does not apply.                                |
 
 > **Heads up:** Spacelift identifies stacks by ID. Renaming a stack ID destroys the old stack and creates a new one — state, run history, environment variables, and attachments do not transfer automatically. Plan the migration before you apply.
 

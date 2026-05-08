@@ -101,7 +101,7 @@ See: [`spacelift_stack.allow_run_promotion`](https://registry.terraform.io/provi
 
 ---
 
-### 4. \*\*`aws_integration_attachment_read` and `aws_integration_attachment_write` variables are removed.
+### 4. `aws_integration_attachment_read` and `aws_integration_attachment_write` variables removed
 
 #### Why
 

@@ -49,7 +49,7 @@ locals {
     for stack in keys(local.aws_integration_stacks) : (
       local._aws_integration_read_ids[stack] != null
       && local._aws_integration_read_ids[stack] == local._aws_integration_write_ids[stack]
-    ) ? {
+      ) ? {
       # Combined: single attachment, both flags true, bare stack key preserved from v2.
       (stack) = {
         stack          = stack
@@ -57,7 +57,7 @@ locals {
         read           = true
         write          = true
       }
-    } : merge(
+      } : merge(
       local._aws_integration_read_ids[stack] != null ? {
         "${stack}::read" = {
           stack          = stack

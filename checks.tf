@@ -64,7 +64,7 @@ check "aws_integration_single_vs_split_exclusivity" {
     condition = (
       (var.aws_integration_id == null && var.aws_integration_name == null) ||
       (var.aws_integration_read_id == null && var.aws_integration_read_name == null &&
-       var.aws_integration_write_id == null && var.aws_integration_write_name == null)
+      var.aws_integration_write_id == null && var.aws_integration_write_name == null)
     )
     error_message = "Use either aws_integration_id/name (single integration for both sides) OR aws_integration_read_*/write_* (separate integrations per side), not both."
   }

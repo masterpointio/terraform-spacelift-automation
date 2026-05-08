@@ -8,7 +8,9 @@ module "automation_azure_devops" {
   repository = "MyProject-Spacelift-Project"
   branch     = "main"
 
-  root_modules_discovery_path = "../../examples/complete/root-modules"
+  # Reuses the `examples/complete` fixtures: discovery_path is relative to THIS module,
+  # project_root_prefix is the repo-root-relative path Spacelift records on each stack.
+  root_modules_discovery_path = "../complete/root-modules"
   project_root_prefix         = "examples/complete/root-modules"
   all_root_modules_enabled    = true
 

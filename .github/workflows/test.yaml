@@ -4,19 +4,28 @@ on:
   push:
     branches:
       - main
-  pull_request_target:
+  # We ignore the dangerous-triggers warning because forked PRs
+  # require repo secrets to run some of the defined checks,
+  # and we protect against malicious actors by requiring approval
+  # for all external contributors before workflows will run.
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
 
-permissions:
-  actions: read
-  checks: write
-  contents: read
-  id-token: write
-  pull-requests: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
 
 jobs:
   tf-test:
     name: 🧪 ${{ matrix.tf }} test
     runs-on: ubuntu-latest
+    permissions:
+      actions: read # needed by github-action-tf-test to read workflow run context
+      checks: write # needed by github-action-tf-test to write check results
+      contents: read # needed by github-action-tf-test to read repository contents
+      id-token: write # needed by github-action-tf-test to write id token
+      pull-requests: read # needed by github-action-tf-test to read pull request context
     env:
       SPACELIFT_API_KEY_ENDPOINT: ${{ secrets.SPACELIFT_API_KEY_ENDPOINT }}
       SPACELIFT_API_KEY_ID: ${{ secrets.SPACELIFT_API_KEY_ID }}

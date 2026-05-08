@@ -62,8 +62,11 @@ mock_provider "spacelift" {
 }
 
 variables {
-  root_modules_path  = "./tests/fixtures/multi-instance"
-  common_config_file = "common.yaml"
+  # Pin to false so existing assertions referencing module-prefixed stack IDs (e.g. "root-module-a-test")
+  # remain valid. The new default (true) is exercised explicitly in test_workspace_prefix_enabled_*.
+  workspace_prefix_enabled    = false
+  root_modules_discovery_path = "./tests/fixtures/multi-instance"
+  common_config_file          = "common.yaml"
   github_enterprise = {
     namespace = "masterpointio"
   }
@@ -197,10 +200,10 @@ run "test_default_example_stack_final_values" {
     error_message = "enable_well_known_secret_masking was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
-  # github_action_deploy
+  # allow_run_promotion
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == false
-    error_message = "github_action_deploy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+    condition     = spacelift_stack.default["root-module-a-default-example"].allow_run_promotion == false
+    error_message = "allow_run_promotion was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # manage_state
@@ -315,7 +318,7 @@ run "test_default_example_stack_runtime_overrides" {
           description                      = "This is a changed test of the emergency broadcast system"
           enable_local_preview             = false
           enable_well_known_secret_masking = true
-          github_action_deploy             = true
+          allow_run_promotion              = true
           manage_state                     = false
           protect_from_deletion            = false
           runner_image                     = "example/spacelift-runner:dev"
@@ -453,10 +456,10 @@ run "test_default_example_stack_runtime_overrides" {
     error_message = "enable_well_known_secret_masking override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
-  # github_action_deploy
+  # allow_run_promotion
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == true
-    error_message = "github_action_deploy override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+    condition     = spacelift_stack.default["root-module-a-default-example"].allow_run_promotion == true
+    error_message = "allow_run_promotion override was not applied correctly: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # manage_state
@@ -654,10 +657,10 @@ run "test_default_example_stack_partial_runtime_overrides" {
     error_message = "enable_well_known_secret_masking was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
-  # github_action_deploy
+  # allow_run_promotion
   assert {
-    condition     = spacelift_stack.default["root-module-a-default-example"].github_action_deploy == false
-    error_message = "github_action_deploy was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
+    condition     = spacelift_stack.default["root-module-a-default-example"].allow_run_promotion == false
+    error_message = "allow_run_promotion was not correct on the default-example stack: ${jsonencode(spacelift_stack.default["root-module-a-default-example"])}"
   }
 
   # manage_state
@@ -786,6 +789,20 @@ run "test_stack_resource_is_created_with_correct_name" {
   assert {
     condition     = spacelift_stack.default["root-module-a-test"].name == "root-module-a-test"
     error_message = "Stack resource was not created correctly: ${jsonencode(spacelift_stack.default)}"
+  }
+}
+
+# Test that workspace_prefix_enabled = true reverses the ID format
+run "test_workspace_prefix_enabled_reverses_id" {
+  command = plan
+
+  variables {
+    workspace_prefix_enabled = true
+  }
+
+  assert {
+    condition     = contains(keys(spacelift_stack.default), "test-root-module-a")
+    error_message = "Stack ID should be workspace-first (test-root-module-a, where `test` is the workspace.): ${jsonencode(keys(spacelift_stack.default))}"
   }
 }
 

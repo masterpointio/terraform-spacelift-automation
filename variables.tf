@@ -99,10 +99,38 @@ variable "branch" {
   default     = "main"
 }
 
-variable "root_modules_path" {
+variable "root_modules_discovery_path" {
   type        = string
-  description = "The path, relative to the root of the repository, where the root module can be found."
-  default     = "root-modules"
+  description = <<-EOT
+  Directory that spacelift-automation scans during plan/apply to discover stack YAML
+  files (`<module>/stacks/*.yaml` for MultiInstance, `<module>/stack.yaml` for
+  SingleInstance), creating one Spacelift Stack per file found. Resolved relative to
+  the consuming root module (path.root); it does not affect the project_root of
+  generated stacks — set project_root_prefix for that.
+
+  Example: with this module at <repo>/root-modules/spacelift-automation/ and sibling
+  root modules at <repo>/root-modules/<module>/, use "../".
+  EOT
+  default     = "../"
+}
+
+variable "project_root_prefix" {
+  type        = string
+  description = <<-EOT
+  Repo-root-relative path joined with each module name to form that stack's Spacelift
+  project_root. e.g. "root-modules" produces project_root = "root-modules/network" for
+  the network module.
+
+  If null, falls back to root_modules_discovery_path verbatim — only valid when that
+  path is already repo-root-relative (no "../"). Per-stack stack_settings.project_root
+  in YAML always wins.
+  EOT
+  default     = null
+
+  validation {
+    condition     = var.project_root_prefix != null || !can(regex("\\.\\.", var.root_modules_discovery_path))
+    error_message = "Set project_root_prefix when root_modules_discovery_path contains '..'. Discovery path is relative to this module; project_root_prefix is relative to the repo root, so neither can be derived from the other."
+  }
 }
 
 variable "enabled_root_modules" {
@@ -117,7 +145,7 @@ variable "enabled_root_modules" {
 
 variable "all_root_modules_enabled" {
   type        = bool
-  description = "When set to true, all subdirectories in root_modules_path will be treated as root modules."
+  description = "When set to true, all subdirectories in root_modules_discovery_path will be treated as root modules."
   default     = false
 }
 
@@ -393,9 +421,9 @@ variable "enable_well_known_secret_masking" {
   default     = true
 }
 
-variable "github_action_deploy" {
+variable "allow_run_promotion" {
   type        = bool
-  description = "Indicates whether GitHub users can deploy from the Checks API."
+  description = "Indicates whether a proposed run can be promoted to a tracked run."
   default     = true
 }
 
@@ -467,6 +495,19 @@ variable "worker_pool_name" {
   NOTE: worker_pool_name or worker_pool_id is required when using a self-hosted instance of Spacelift.
   EOT
   default     = null
+}
+
+variable "workspace_prefix_enabled" {
+  type        = bool
+  description = <<-EOT
+  Controls the order of components in MultiInstance stack IDs.
+  - `true` (default): `$${workspace}-$${module}` (e.g. `dev-network`) — context (environment) first, matches `context.tf` and label naming conventions.
+  - `false`: `$${module}-$${workspace}` (e.g. `network-dev`)
+
+  Ignored for SingleInstance (stack ID is always `$${module}`).
+  Changing this renames stack IDs, forcing recreation of Spacelift stacks. Set deliberately.
+  EOT
+  default     = true
 }
 
 variable "managed_roles" {

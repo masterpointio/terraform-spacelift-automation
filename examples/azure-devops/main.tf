@@ -8,8 +8,9 @@ module "automation_azure_devops" {
   repository = "MyProject-Spacelift-Project"
   branch     = "main"
 
-  root_modules_path        = "../../examples/complete/root-modules"
-  all_root_modules_enabled = true
+  root_modules_discovery_path = "../../examples/complete/root-modules"
+  project_root_prefix         = "examples/complete/root-modules"
+  all_root_modules_enabled    = true
 
   aws_integration_id      = "YOUR_AWS_INTEGRATION_ID"
   aws_integration_enabled = true

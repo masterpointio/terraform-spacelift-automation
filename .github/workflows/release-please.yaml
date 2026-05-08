@@ -13,7 +13,7 @@ permissions: {}
 
 jobs:
   release-please:
-    uses: masterpointio/.github/.github/workflows/release-please.yaml@104587c2b845fc2f5c82486212acdf7b94d7281f
+    uses: masterpointio/.github/.github/workflows/release-please.yaml@8faad24219c6897ee567cdc4b1af8d62a891398b
     secrets:
       MP_BOT_APP_ID: ${{ secrets.MP_BOT_APP_ID }}
       MP_BOT_APP_PRIVATE_KEY: ${{ secrets.MP_BOT_APP_PRIVATE_KEY }}

@@ -14,6 +14,6 @@ permissions: {}
 
 jobs:
   lint:
-    uses: masterpointio/.github/.github/workflows/lint.yaml@104587c2b845fc2f5c82486212acdf7b94d7281f
+    uses: masterpointio/.github/.github/workflows/lint.yaml@8faad24219c6897ee567cdc4b1af8d62a891398b
     secrets:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

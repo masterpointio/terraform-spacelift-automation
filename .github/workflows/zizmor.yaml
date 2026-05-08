@@ -14,4 +14,4 @@ permissions: {}
 
 jobs:
   zizmor:
-    uses: masterpointio/.github/.github/workflows/zizmor.yaml@104587c2b845fc2f5c82486212acdf7b94d7281f
+    uses: masterpointio/.github/.github/workflows/zizmor.yaml@8faad24219c6897ee567cdc4b1af8d62a891398b

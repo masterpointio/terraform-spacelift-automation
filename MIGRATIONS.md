@@ -4,13 +4,14 @@
 
 ### Overview
 
-v3.0.0 ships three breaking changes:
+v3.0.0 ships four breaking changes:
 
 1. **`root_modules_path` is split** into `root_modules_discovery_path` and `project_root_prefix`, and the silent `../` strip is removed.
 2. **MultiInstance stack ID format changes** — the new variable `workspace_prefix_enabled` defaults to `true`, so stack IDs become `${workspace}-${module}` (e.g. `dev-network`) instead of `${module}-${workspace}` (e.g. `network-dev`).
 3. **`github_action_deploy` is renamed to `allow_run_promotion`** — both the module variable and the matching `stack_settings` YAML key.
+4. \*\*`aws_integration_attachment_read` and `aws_integration_attachment_write` variables are removed.
 
-Read all three sections below before upgrading.
+Read all four sections below before upgrading.
 
 ---
 
@@ -97,6 +98,16 @@ Accept the new default, run `tofu plan`, and confirm the diff shows every MultiI
 Spacelift renamed the underlying provider attribute from `github_action_deploy` to `allow_run_promotion` to reflect what it actually controls (promoting a proposed run to a tracked run), not just GitHub-specific deploys. v3.0.0 mirrors that rename in this module.
 
 See: [`spacelift_stack.allow_run_promotion`](https://registry.terraform.io/providers/spacelift-io/spacelift/latest/docs/resources/stack#allow_run_promotion-1)
+
+---
+
+### 4. `aws_integration_attachment_read` and `aws_integration_attachment_write` variables removed
+
+#### Why
+
+These variables used to control the behavior of the single aws_integration in v2.x, but v3.0.0 changes the behavior when using a single aws_integration so that it's always used for both read and write phases.
+
+For splitting read and write access, unique [read and write](https://spacelift.io/blog/spacelift-cloud-integrations#read-vs-write-attachments) aws intergrations can now be attached.
 
 ---
 

@@ -7,10 +7,10 @@ module "automation" {
   repository = "terraform-spacelift-automation"
   branch     = "main"
 
-  # This example's spacelift-automation module lives many directories deep, so the
-  # discovery path is relative to *this module*, while project_root_prefix points to the
-  # path Spacelift uses inside the repo.
-  root_modules_discovery_path = "../../../../examples/complete/root-modules"
+  # discovery_path is relative to THIS module — siblings (network/, random-pet/) live one
+  # level up. project_root_prefix is relative to the REPO ROOT — the path Spacelift records
+  # for each stack inside this repo.
+  root_modules_discovery_path = ".."
   project_root_prefix         = "examples/complete/root-modules"
   all_root_modules_enabled    = true
 

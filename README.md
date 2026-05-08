@@ -24,6 +24,7 @@ It automates the creation of "child" stacks and all the required accompanying Sp
    Required to destroy the resources of a Stack before deleting it. Destroying this resource will delete the resources in the stack. If this resource needs to be deleted and the resources in the stacks are to be preserved, ensure that the deactivated attribute is set to true.
 3. [Spacelift AWS Integration Attachment](https://docs.spacelift.io/integrations/cloud-providers/aws#lets-explain)
    Associates a specific AWS IAM role with a stack to allow it to assume that role. The IAM role typically has permissions to manage specific AWS resources, and Spacelift assumes this role to run the operations required by the stack.
+   An integration can be attached to a stack as either [read or write](https://spacelift.io/blog/spacelift-cloud-integrations#read-vs-write-attachments) in order to implement least-privelage access.
 4. [Spacelift Initialization Hook](https://docs.spacelift.io/concepts/run#initializing)
    Prepares your environment before executing infrastructure code. This custom script copies corresponding Terraform tfvars files into a working directory before any Spacelift run or task as a `spacelift.auto.tfvars` file. This ensures your tfvars are [automatically loaded](https://opentofu.org/docs/v1.7/language/values/variables/#variable-definitions-tfvars-files) into the OpenTofu/Terraform execution environment.
 

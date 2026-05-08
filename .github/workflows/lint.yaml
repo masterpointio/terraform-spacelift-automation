@@ -14,7 +14,7 @@ permissions: {}
 
 jobs:
   lint:
-    name: 📝 lint
+    name: lint
     runs-on: ubuntu-latest
     permissions:
       actions: read # needed by trunk-action to read workflow run context
@@ -33,7 +33,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   conventional-title:
-    name: 📝 conventional title
+    name: conventional title
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read # needed by action-semantic-pull-request to inspect pull request context

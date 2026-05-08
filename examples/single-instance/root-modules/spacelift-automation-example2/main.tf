@@ -4,8 +4,11 @@ module "automation" {
   github_enterprise = {
     namespace = "masterpointio"
   }
-  repository                  = "terraform-spacelift-automation"
-  root_modules_discovery_path = "../../../../examples/single-instance/root-modules"
+  repository = "terraform-spacelift-automation"
+
+  # discovery_path is relative to THIS module — siblings (random-pet/, rds-cluster-*/) live
+  # one level up. project_root_prefix is the repo-root-relative path Spacelift records.
+  root_modules_discovery_path = ".."
   project_root_prefix         = "examples/single-instance/root-modules"
   all_root_modules_enabled    = true
 

@@ -8,17 +8,23 @@
 * aws_integration read/write split (AIR-1495) ([#124](https://github.com/masterpointio/terraform-spacelift-automation/issues/124))
 * add workspace_as_stack_name_prefix for preference in workspace vs root module ([#122](https://github.com/masterpointio/terraform-spacelift-automation/issues/122))
 * allow_run_promotion, in favor of github_action_deploy ([#121](https://github.com/masterpointio/terraform-spacelift-automation/issues/121))
+* split root_modules_path into discovery + project_root_prefix ([#104](https://github.com/masterpointio/terraform-spacelift-automation/issues/104))
 
 ### Features
 
 * add workspace_as_stack_name_prefix for preference in workspace vs root module ([#122](https://github.com/masterpointio/terraform-spacelift-automation/issues/122)) ([5ca2b2e](https://github.com/masterpointio/terraform-spacelift-automation/commit/5ca2b2e430fdc250b0c41cf47c666e1ebb0a5291))
 * allow_run_promotion, in favor of github_action_deploy ([#121](https://github.com/masterpointio/terraform-spacelift-automation/issues/121)) ([afdb731](https://github.com/masterpointio/terraform-spacelift-automation/commit/afdb7311e9cc63e056bc3f116d5b0e858da64ade))
 * aws_integration read/write split (AIR-1495) ([#124](https://github.com/masterpointio/terraform-spacelift-automation/issues/124)) ([e545e8d](https://github.com/masterpointio/terraform-spacelift-automation/commit/e545e8d39745e49efd2504d6a12e4268032b3ce3))
+* split root_modules_path into discovery + project_root_prefix ([#104](https://github.com/masterpointio/terraform-spacelift-automation/issues/104)) ([b8ce0bd](https://github.com/masterpointio/terraform-spacelift-automation/commit/b8ce0bd588270e2abd14fd3dac8e6d6990aff5bc))
 
 
 ### Bug Fixes
 
 * rm lint emoji until I roll out new centralized workflows ([#133](https://github.com/masterpointio/terraform-spacelift-automation/issues/133)) ([40436a6](https://github.com/masterpointio/terraform-spacelift-automation/commit/40436a62fa6e11c41e475c6d0c37a43fe901dca4))
+
+### Migration Guide
+
+[MIGRATION GUIDE](MIGRATIONS.md)
 
 ## [2.1.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v2.0.0...v2.1.0) (2026-04-21)
 

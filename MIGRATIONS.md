@@ -8,8 +8,8 @@ v3.0.0 ships four breaking changes:
 
 1. **`root_modules_path` is split** into `root_modules_discovery_path` and `project_root_prefix`, and the silent `../` strip is removed.
 2. **MultiInstance stack ID format changes** — the new variable `workspace_prefix_enabled` defaults to `true`, so stack IDs become `${workspace}-${module}` (e.g. `dev-network`) instead of `${module}-${workspace}` (e.g. `network-dev`).
-3. **`github_action_deploy` is renamed to `allow_run_promotion`** — both the module variable and the matching `stack_settings` YAML key.
-4. \*\*`aws_integration_attachment_read` and `aws_integration_attachment_write` variables are removed.
+3. **`github_action_deploy` is renamed to `allow_run_promotion`** to match with the [Terraform Spacelift Provider](https://github.com/spacelift-io/terraform-provider-spacelift) — both the module variable and the matching `stack_settings` YAML key.
+4. **`aws_integration_attachment_read` / `aws_integration_attachment_write` are removed** — replaced with explicit per-side `aws_integration_read_*` / `aws_integration_write_*` variables for split read/write integrations. Most users on the v1.x or v2.x defaults need no changes.
 
 Read all four sections below before upgrading.
 
@@ -54,12 +54,12 @@ The new default puts the workspace (environment) component **before** the root m
 
 #### What changed
 
-| Item                                       | v2.x                                          | v3.0.0                                                              |
-| ------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------- |
-| MultiInstance stack ID format (default)    | `${module}-${workspace}` (e.g. `network-dev`) | `${workspace}-${module}` (e.g. `dev-network`)                       |
-| `workspace_prefix_enabled` module variable | N/A (hardcoded format)                        | New `bool`, defaults to `true`. Set to `false` to keep v2.x format. |
-| Folder labels and dependency labels        | Unchanged                                     | Unchanged                                                           |
-| SingleInstance stack IDs                   | `${module}`                                   | Unchanged — variable does not apply.                                |
+| Item                                       | v2.x                                          | v3.0.0                                                             |
+| ------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------ |
+| MultiInstance stack ID format (default)    | `${module}-${workspace}` (e.g. `network-dev`) | `${workspace}-${module}` (e.g. `dev-network`)                      |
+| `workspace_prefix_enabled` module variable | N/A (hardcoded format)                        | New`bool`, defaults to `true`. Set to `false` to keep v2.x format. |
+| Folder labels and dependency labels        | Unchanged                                     | Unchanged                                                          |
+| SingleInstance stack IDs                   | `${module}`                                   | Unchanged — variable does not apply.                               |
 
 > **Heads up:** Spacelift identifies stacks by ID. Renaming a stack ID destroys the old stack and creates a new one — state, run history, environment variables, and attachments do not transfer automatically. Plan the migration before you apply.
 
@@ -101,7 +101,7 @@ See: [`spacelift_stack.allow_run_promotion`](https://registry.terraform.io/provi
 
 ---
 
-### 4. `aws_integration_attachment_read` and `aws_integration_attachment_write` variables removed
+### 4. `aws_integration_attachment_read` / `aws_integration_attachment_write` removed
 
 #### Why
 

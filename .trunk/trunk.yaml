@@ -36,7 +36,7 @@ lint:
     - name: zizmor
       commands:
         - name: lint
-          # Set to pedantic so that zizmor will run it's stale-action-refs audit rule
+          # Set to pedantic so that zizmor will run its stale-action-refs audit rule
           run: zizmor --format=sarif --persona=pedantic ${target}
   ignore:
     - linters: [tofu]

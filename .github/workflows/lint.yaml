@@ -14,6 +14,8 @@ permissions: {}
 
 jobs:
   lint:
-    uses: masterpointio/actions/.github/workflows/lint.yaml@dc403c87226db5bac0f18d0dcdd99c305d864472 #v0.1.0
+    uses: masterpointio/actions/.github/workflows/lint.yaml@06de5f4f74e246a9039b4f58baca9c79c3c1fd05
+    with:
+      head-ref: ${{ (github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number)) || github.event.pull_request.head.sha || github.sha }}
     secrets:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

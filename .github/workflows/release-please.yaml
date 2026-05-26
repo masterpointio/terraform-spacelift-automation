@@ -13,7 +13,7 @@ permissions: {}
 
 jobs:
   release-please:
-    uses: masterpointio/actions/.github/workflows/release-please.yaml@dc403c87226db5bac0f18d0dcdd99c305d864472 #v0.1.0
+    uses: masterpointio/actions/.github/workflows/release-please.yaml@e0014f7ceb85ea1b94e89c18e95c58a9e301140d #v0.2.0
     with:
       release-type: terraform-module
     secrets:

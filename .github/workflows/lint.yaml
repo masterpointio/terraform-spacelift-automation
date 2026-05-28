@@ -14,7 +14,7 @@ permissions: {}
 
 jobs:
   lint:
-    uses: glaracuente/gerry-actions/.github/workflows/lint.yaml@60a30d1a8f6b30864f52ffadf8e7040fd2d94fe8
+    uses: glaracuente/gerry-actions/.github/workflows/lint.yaml@SHA #VER
     permissions:
       actions: read # for trunk-action
       checks: write # for trunk-action

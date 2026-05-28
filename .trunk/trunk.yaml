@@ -34,9 +34,15 @@ lint:
     - zizmor@1.24.1
   definitions:
     - name: zizmor
+      environment:
+        # Optional token here so that it's not needed locally, but can be used
+        # when trunk is called from our lint workflow in GHA
+        - name: ZIZMOR_GITHUB_TOKEN
+          value: ${env.GITHUB_TOKEN}
+          optional: true
       commands:
-        - name: lint
-          # Set to pedantic so that zizmor will run its stale-action-refs audit rule
+        # Set to pedantic so that zizmor will run its stale-action-refs audit rule
+        - name: zizmor-static-analysis
           run: zizmor --format=sarif --persona=pedantic ${target}
   ignore:
     - linters: [tofu]

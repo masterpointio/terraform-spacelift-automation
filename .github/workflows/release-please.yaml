@@ -13,7 +13,7 @@ permissions: {}
 
 jobs:
   release-please:
-    uses: glaracuente/gerry-actions/.github/workflows/release-please.yaml@SHA #VER
+    uses: masterpointio/actions/.github/workflows/release-please.yaml@SHA #VER
     with:
       release-type: terraform-module
     secrets:

@@ -18,11 +18,16 @@ permissions: {}
 
 jobs:
   tf-test:
-    uses: masterpointio/actions/.github/workflows/tf-test.yaml@e0014f7ceb85ea1b94e89c18e95c58a9e301140d #v0.2.0
+    uses: glaracuente/gerry-actions/.github/workflows/tf-test.yaml@60a30d1a8f6b30864f52ffadf8e7040fd2d94fe8
     with:
       aws_role_arn: ${{ vars.TF_TEST_AWS_ROLE_ARN }}
     secrets:
       SPACELIFT_API_KEY_ENDPOINT: ${{ secrets.SPACELIFT_API_KEY_ENDPOINT }}
       SPACELIFT_API_KEY_ID: ${{ secrets.SPACELIFT_API_KEY_ID }}
       SPACELIFT_API_KEY_SECRET: ${{ secrets.SPACELIFT_API_KEY_SECRET }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      actions: read # needed by github-action-tf-test
+      checks: write # needed by github-action-tf-test
+      contents: read # needed by github-action-tf-test
+      id-token: write # needed by github-action-tf-test
+      pull-requests: read # needed by github-action-tf-test

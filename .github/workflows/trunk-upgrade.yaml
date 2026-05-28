@@ -14,8 +14,11 @@ permissions: {}
 
 jobs:
   trunk-upgrade:
-    uses: masterpointio/actions/.github/workflows/trunk-upgrade.yaml@e0014f7ceb85ea1b94e89c18e95c58a9e301140d #v0.2.0
+    uses: glaracuente/gerry-actions/.github/workflows/trunk-upgrade.yaml@60a30d1a8f6b30864f52ffadf8e7040fd2d94fe8
     secrets:
       MP_BOT_APP_ID: ${{ secrets.MP_BOT_APP_ID }}
       MP_BOT_APP_PRIVATE_KEY: ${{ secrets.MP_BOT_APP_PRIVATE_KEY }}
       MASTERPOINT_TEAM_PAT: ${{ secrets.MASTERPOINT_TEAM_PAT }}
+    permissions:
+      contents: write # needed by github-action-trunk-upgrade
+      pull-requests: write # needed by github-action-trunk-upgrade

@@ -18,7 +18,7 @@ permissions: {}
 
 jobs:
   tf-test:
-    uses: glaracuente/gerry-actions/.github/workflows/tf-test.yaml@60a30d1a8f6b30864f52ffadf8e7040fd2d94fe8
+    uses: glaracuente/gerry-actions/.github/workflows/tf-test.yaml@SHA #VER
     with:
       aws_role_arn: ${{ vars.TF_TEST_AWS_ROLE_ARN }}
     secrets:

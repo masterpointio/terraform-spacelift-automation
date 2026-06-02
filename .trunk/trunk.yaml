@@ -44,6 +44,7 @@ lint:
         # Set to pedantic so that zizmor will run its stale-action-refs audit rule
         - name: zizmor-static-analysis
           run: zizmor --format=sarif --persona=pedantic ${target}
+          success_codes: [0]
   ignore:
     - linters: [tofu]
       paths:

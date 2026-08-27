@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v3.0.0...v3.0.1) (2026-08-01)
+
+
+### Bug Fixes
+
+* zizmor cmd name fix (INT-1582) ([#138](https://github.com/masterpointio/terraform-spacelift-automation/issues/138)) ([c435eff](https://github.com/masterpointio/terraform-spacelift-automation/commit/c435effdf0947ccab7a352b3f080f3b819a0844f))
+
 ## [3.0.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v2.1.0...v3.0.0) (2026-05-08)
 
 

@@ -246,7 +246,7 @@ automation_settings:
 
 Precedence is `common.yaml` < `<stack>.yaml` < `var.runtime_overrides`, with the module's own inputs (`var.*`) applied as a final layer. A **single value** (string, number, boolean) is replaced by the highest-precedence one, but a **list** is combined — the values are appended, not swapped out:
 
-```
+```text
 # stacks/common.yaml           # stacks/dev.yaml             # var.* module input
 stack_settings:                stack_settings:
   labels: ["team:platform"]      labels: ["env:dev"]         labels = ["repository:acme-infra"]

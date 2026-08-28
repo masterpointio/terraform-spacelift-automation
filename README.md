@@ -213,7 +213,7 @@ Check out an example configuration in the [examples/complete](./examples/complet
 
 Most settings that you would set on [the Spacelift Stack resource](https://search.opentofu.org/provider/spacelift-io/spacelift/latest/docs/resources/stack) are supported. Additionally, you can include certain automation settings that will override this module's defaults like `automation_settings.default_tf_workspace_enabled`, `automation_settings.tfvars_enabled`, `space_name`, and similar.
 
-Below is a brief example. You can also see the full schema in our [JSON Schema file](./stack-config.schema.json). When the same setting is also set in `common.yaml` or as a module input, single values are replaced and lists like `labels` are combined — see [How are configurations merged from multiple files, and which values win?](#how-are-configurations-merged-from-multiple-files-and-which-values-win).
+Below is a brief example. You can also see the full schema in our [JSON Schema file](./stack-config.schema.json).
 
 ```yaml
 kind: StackConfigV1

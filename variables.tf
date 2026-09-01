@@ -435,7 +435,7 @@ variable "dependency_labels_enabled" {
 
 variable "labels" {
   type        = list(string)
-  description = "List of labels to apply to the stacks."
+  description = "List of labels to apply to the stacks. These are deep merged (appended) with the common configs (along with the other lists in the stack config YAML files)."
   default     = []
 }
 

@@ -41,7 +41,7 @@ variable "azure_devops" {
     project = string
     id      = optional(string)
   })
-  description = "The Azure DevOps integration settings"
+  description = "The Azure DevOps integration settings."
   default     = null
 }
 

@@ -475,8 +475,6 @@ If you have many remote repositories that you need to manage via this pattern, y
 | <a name="input_worker_pool_name"></a> [worker\_pool\_name](#input\_worker\_pool\_name) | Name of the worker pool to use. Mutually exclusive with worker\_pool\_id.<br/>NOTE: worker\_pool\_name or worker\_pool\_id is required when using a self-hosted instance of Spacelift. | `string` | `null` | no |
 | <a name="input_workspace_prefix_enabled"></a> [workspace\_prefix\_enabled](#input\_workspace\_prefix\_enabled) | Controls the order of components in MultiInstance stack IDs.<br/>- `true` (default): `${workspace}-${module}` (e.g. `dev-network`) — context (environment) first, matches `context.tf` and label naming conventions.<br/>- `false`: `${module}-${workspace}` (e.g. `network-dev`)<br/><br/>Ignored for SingleInstance (stack ID is always `${module}`).<br/>Changing this renames stack IDs, forcing recreation of Spacelift stacks. Set deliberately. | `bool` | `true` | no |
 
-## Outputs
-
 | Name | Description |
 |------|-------------|
 | <a name="output_spacelift_roles"></a> [spacelift\_roles](#output\_spacelift\_roles) | A map of managed Spacelift roles created by this module, keyed by the var.managed\_roles map key. |

@@ -1,0 +1,6 @@
+kind: StackConfigV1
+stack_settings:
+  # No name override: this stack keeps the derived "root-module-a-dev" name.
+  description: Control stack for the name override test
+automation_settings:
+  tfvars_enabled: false

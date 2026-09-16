@@ -311,6 +311,10 @@ locals {
 
       # Destructor properties
       destructor_deactivated = try(local.stack_configs[stack].destructor_deactivated, var.destructor_deactivated)
+
+      # Stack name. YAML-only: there is no module-level default, so the fallback is the
+      # derived stack key (root module + workspace/file name).
+      name = coalesce(try(local.stack_configs[stack].name, null), stack)
     }
   }
 
@@ -476,7 +480,7 @@ resource "spacelift_stack" "default" {
   allow_run_promotion              = local.stack_property_resolver[each.key].allow_run_promotion
   labels                           = local.labels[each.key]
   manage_state                     = local.stack_property_resolver[each.key].manage_state
-  name                             = each.key
+  name                             = local.stack_property_resolver[each.key].name
   project_root                     = local.configs[each.key].project_root
   protect_from_deletion            = local.stack_property_resolver[each.key].protect_from_deletion
   repository                       = local.stack_property_resolver[each.key].repository

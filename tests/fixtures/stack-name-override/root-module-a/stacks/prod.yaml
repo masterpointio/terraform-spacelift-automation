@@ -1,6 +1,0 @@
-kind: StackConfigV1
-stack_settings:
-  # Custom name should win over the derived "root-module-a-prod" key.
-  name: "Root Module A :: Production"
-automation_settings:
-  tfvars_enabled: false

@@ -286,6 +286,8 @@ locals {
   # Helper for property resolution with fallback to defaults
   stack_property_resolver = {
     for stack in local.stacks : stack => {
+      name = coalesce(try(local.stack_configs[stack].name, null), stack) # If consumer needs to override the auto-generated stack name.
+
       # Simple property resolution with fallback
       autoretry                        = try(local.stack_configs[stack].autoretry, var.autoretry)
       additional_project_globs         = try(local.stack_configs[stack].additional_project_globs, var.additional_project_globs)
@@ -311,10 +313,6 @@ locals {
 
       # Destructor properties
       destructor_deactivated = try(local.stack_configs[stack].destructor_deactivated, var.destructor_deactivated)
-
-      # Stack name. YAML-only: there is no module-level default, so the fallback is the
-      # derived stack key (root module + workspace/file name).
-      name = coalesce(try(local.stack_configs[stack].name, null), stack)
     }
   }
 

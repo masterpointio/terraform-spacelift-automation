@@ -37,8 +37,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "minLength": 1,
-          "description": "Overrides the Spacelift stack name. Defaults to the derived stack key: '<root_module>-<workspace>' for MultiInstance ('<workspace>-<root_module>' when workspace_prefix_enabled is true), or '<root_module>' for SingleInstance. Must be unique across the Spacelift account. Do not set this in common.yaml: every stack in that root module would get the same name."
+          "description": "Overrides the Spacelift stack name if needed. Defaults to the auto-generated stack key from the directory structure read by the Spacelift Automation module."
         },
         "role_attachment_role_slug": {
           "type": "string",

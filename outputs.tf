@@ -6,6 +6,7 @@ output "spacelift_stacks" {
   value = {
     for name, stack in spacelift_stack.default : name => {
       id           = stack.id
+      name         = stack.name
       labels       = stack.labels
       autodeploy   = stack.autodeploy
       project_root = stack.project_root

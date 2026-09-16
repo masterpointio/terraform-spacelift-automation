@@ -287,6 +287,7 @@ locals {
   stack_property_resolver = {
     for stack in local.stacks : stack => {
       # Simple property resolution with fallback
+      name                             = coalesce(try(local.stack_configs[stack].name, null), stack) # If consumer needs to override the auto-generated stack name.
       autoretry                        = try(local.stack_configs[stack].autoretry, var.autoretry)
       additional_project_globs         = try(local.stack_configs[stack].additional_project_globs, var.additional_project_globs)
       autodeploy                       = try(local.stack_configs[stack].autodeploy, var.autodeploy)
@@ -476,7 +477,7 @@ resource "spacelift_stack" "default" {
   allow_run_promotion              = local.stack_property_resolver[each.key].allow_run_promotion
   labels                           = local.labels[each.key]
   manage_state                     = local.stack_property_resolver[each.key].manage_state
-  name                             = each.key
+  name                             = local.stack_property_resolver[each.key].name
   project_root                     = local.configs[each.key].project_root
   protect_from_deletion            = local.stack_property_resolver[each.key].protect_from_deletion
   repository                       = local.stack_property_resolver[each.key].repository

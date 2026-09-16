@@ -286,9 +286,8 @@ locals {
   # Helper for property resolution with fallback to defaults
   stack_property_resolver = {
     for stack in local.stacks : stack => {
-      name = coalesce(try(local.stack_configs[stack].name, null), stack) # If consumer needs to override the auto-generated stack name.
-
       # Simple property resolution with fallback
+      name                             = coalesce(try(local.stack_configs[stack].name, null), stack) # If consumer needs to override the auto-generated stack name.
       autoretry                        = try(local.stack_configs[stack].autoretry, var.autoretry)
       additional_project_globs         = try(local.stack_configs[stack].additional_project_globs, var.additional_project_globs)
       autodeploy                       = try(local.stack_configs[stack].autodeploy, var.autodeploy)

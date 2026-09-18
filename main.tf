@@ -181,7 +181,7 @@ locals {
         "tfvars_file_name" = trimsuffix(file, ".yaml"),
       },
       content,
-    ) if basename(file) != var.common_config_file
+    ) if file != var.common_config_file
     }
   ]...)
 

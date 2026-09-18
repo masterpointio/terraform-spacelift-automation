@@ -103,8 +103,11 @@ variable "root_modules_discovery_path" {
   type        = string
   description = <<-EOT
   Directory that spacelift-automation scans during plan/apply to discover stack YAML
-  files (`<module>/stacks/*.yaml` for MultiInstance, `<module>/stack.yaml` for
-  SingleInstance), creating one Spacelift Stack per file found. Resolved relative to
+  files (`<module>/stacks/**/*.yaml` for MultiInstance, `<module>/stack.yaml` for
+  SingleInstance), creating one Spacelift Stack per file found. Subdirectories under
+  `stacks/` are organizational only: they group files in Git and in the Spacelift UI
+  folder label, but do not contribute to the stack or workspace name, so stack file
+  base names must be unique within a root module. Resolved relative to
   the consuming root module (path.root); it does not affect the project_root of
   generated stacks — set project_root_prefix for that.
 

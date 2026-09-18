@@ -30,42 +30,42 @@ run "test_stack_subdirectories_are_discovered" {
 
   assert {
     condition = toset(keys(spacelift_stack.default)) == toset([
-      "tenant-infra-acme-prod",
-      "tenant-infra-acme-stage",
-      "tenant-infra-globex-prod",
-      "tenant-infra-globex-stage",
+      "tenant-infra-prod-acme",
+      "tenant-infra-stage-acme",
+      "tenant-infra-prod-globex",
+      "tenant-infra-stage-globex",
     ])
     error_message = "Unexpected stacks: ${jsonencode(keys(spacelift_stack.default))}"
   }
 
   # The root module is resolved from the path before stacks/, not from the tenant subdirectory.
   assert {
-    condition     = spacelift_stack.default["tenant-infra-acme-prod"].project_root == "./tests/fixtures/single-tenant-multi-instance/tenant-infra"
-    error_message = "project_root incorrect: ${spacelift_stack.default["tenant-infra-acme-prod"].project_root}"
+    condition     = spacelift_stack.default["tenant-infra-prod-acme"].project_root == "./tests/fixtures/single-tenant-multi-instance/tenant-infra"
+    error_message = "project_root incorrect: ${spacelift_stack.default["tenant-infra-prod-acme"].project_root}"
   }
 
   # The tenant subdirectory must not leak into the workspace name; Terraform rejects "/" there.
   assert {
-    condition     = spacelift_stack.default["tenant-infra-acme-prod"].terraform_workspace == "acme-prod"
-    error_message = "Workspace incorrect: ${spacelift_stack.default["tenant-infra-acme-prod"].terraform_workspace}"
+    condition     = spacelift_stack.default["tenant-infra-prod-acme"].terraform_workspace == "prod-acme"
+    error_message = "Workspace incorrect: ${spacelift_stack.default["tenant-infra-prod-acme"].terraform_workspace}"
   }
 
   # Two stacks in the same tenant subdirectory resolve independently.
   assert {
-    condition     = spacelift_stack.default["tenant-infra-acme-stage"].terraform_workspace == "acme-stage"
-    error_message = "Workspace incorrect: ${spacelift_stack.default["tenant-infra-acme-stage"].terraform_workspace}"
+    condition     = spacelift_stack.default["tenant-infra-stage-acme"].terraform_workspace == "stage-acme"
+    error_message = "Workspace incorrect: ${spacelift_stack.default["tenant-infra-stage-acme"].terraform_workspace}"
   }
 
   # tfvars/ mirrors the stacks/ layout, so the copied file keeps the tenant subdirectory.
   assert {
-    condition     = contains(spacelift_stack.default["tenant-infra-globex-stage"].before_init, "cp tfvars/globex/globex-stage.tfvars spacelift.auto.tfvars")
-    error_message = "tfvars copy incorrect: ${jsonencode(spacelift_stack.default["tenant-infra-globex-stage"].before_init)}"
+    condition     = contains(spacelift_stack.default["tenant-infra-stage-globex"].before_init, "cp tfvars/globex/stage-globex.tfvars spacelift.auto.tfvars")
+    error_message = "tfvars copy incorrect: ${jsonencode(spacelift_stack.default["tenant-infra-stage-globex"].before_init)}"
   }
 
   # The folder label keeps the full structure so stacks group by tenant in the Spacelift UI.
   assert {
-    condition     = contains(spacelift_stack.default["tenant-infra-globex-prod"].labels, "folder:tenant-infra/globex/globex-prod")
-    error_message = "Folder label incorrect: ${jsonencode(spacelift_stack.default["tenant-infra-globex-prod"].labels)}"
+    condition     = contains(spacelift_stack.default["tenant-infra-prod-globex"].labels, "folder:tenant-infra/globex/prod-globex")
+    error_message = "Folder label incorrect: ${jsonencode(spacelift_stack.default["tenant-infra-prod-globex"].labels)}"
   }
 
   # The module-level common.yaml still merges into every stack, at any subdirectory depth.

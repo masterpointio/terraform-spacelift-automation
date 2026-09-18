@@ -73,7 +73,7 @@ locals {
   _all_root_modules = distinct([
     for file in local._all_stack_files :
     local._multi_instance_structure ?
-    split("/stacks/", file)[0] : # example2/nested/stacks/stack.yaml -> example2/nested
+    split("/stacks/", file)[0] : # For MultiInstance: example2/nested/stacks/stack.yaml -> example2/nested
     dirname(file)                # For SingleInstance: example2/nested/stack.yaml -> example2/nested
   ])
 

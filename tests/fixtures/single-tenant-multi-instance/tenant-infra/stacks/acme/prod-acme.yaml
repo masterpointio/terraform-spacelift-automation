@@ -1,0 +1,5 @@
+kind: StackConfigV1
+stack_settings:
+  manage_state: true
+  labels:
+    - tenant:acme

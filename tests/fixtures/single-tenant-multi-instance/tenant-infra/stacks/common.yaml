@@ -1,0 +1,4 @@
+kind: StackConfigV1
+stack_settings:
+  labels:
+    - tenant_infra_common_label

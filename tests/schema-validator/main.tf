@@ -1,7 +1,7 @@
 locals {
   # Getting these file sets is a bit of a hack because the paths are all sorts of gunked up.
   # We fix this below with the normalize_paths and stack_config_contents locals, but it's goofy.
-  multi_instance_stack_configs  = fileset("${path.root}/../**/stacks", "*.yaml")
+  multi_instance_stack_configs  = fileset("${path.root}/../**/stacks", "**/*.yaml")
   single_instance_stack_configs = fileset("${path.root}/../**", "stack.yaml")
 
   stack_configs = toset(concat(

@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v3.0.1...v3.1.0) (2026-09-20)
+
+
+### Features
+
+* support stack config subdirectories under stacks/ ([#150](https://github.com/masterpointio/terraform-spacelift-automation/issues/150)) ([615e2be](https://github.com/masterpointio/terraform-spacelift-automation/commit/615e2be44c2a826b8daec59c44669d6d8c878829))
+
 ## [3.0.1](https://github.com/masterpointio/terraform-spacelift-automation/compare/v3.0.0...v3.0.1) (2026-08-01)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v3.1.0...v3.2.0) (2026-09-21)
+
+
+### Features
+
+* allow overriding the Spacelift stack name via stack_settings.name if needed ([#149](https://github.com/masterpointio/terraform-spacelift-automation/issues/149)) ([9a79f48](https://github.com/masterpointio/terraform-spacelift-automation/commit/9a79f48393b47304d5fc16406a4e0edfa977e83a))
+
 ## [3.1.0](https://github.com/masterpointio/terraform-spacelift-automation/compare/v3.0.1...v3.1.0) (2026-09-20)
 
 

@@ -59,7 +59,7 @@ locals {
   #   "../data-infrastructure/redshift-clusters/financial-reporting/stacks/example.yaml",
   #   "../data-infrastructure/redshift-clusters/bi-reporting/stacks/example.yaml",
   # ]
-  _multi_instance_stack_files_raw  = fileset("${path.root}/${var.root_modules_discovery_path}", "**/stacks/*.yaml")
+  _multi_instance_stack_files_raw  = fileset("${path.root}/${var.root_modules_discovery_path}", "**/stacks/**/*.yaml")
   _single_instance_stack_files_raw = fileset("${path.root}/${var.root_modules_discovery_path}", "**/stack.yaml")
 
   # Filter out any files that are in .terraform directories to avoid picking up module cache now that it's using ** as the wildcard
@@ -73,8 +73,8 @@ locals {
   _all_root_modules = distinct([
     for file in local._all_stack_files :
     local._multi_instance_structure ?
-    dirname(dirname(file)) : # For MultiInstance: example2/nested/stacks/stack.yaml -> example2/nested
-    dirname(file)            # For SingleInstance: example2/nested/stack.yaml -> example2/nested
+    split("/stacks/", file)[0] : # For MultiInstance: example2/nested/stacks/stack.yaml -> example2/nested
+    dirname(file)                # For SingleInstance: example2/nested/stack.yaml -> example2/nested
   ])
 
   # If all root modules are enabled, use all root modules, otherwise use only those given to us
@@ -101,7 +101,7 @@ locals {
   # }
   _multi_instance_root_module_yaml_decoded = {
     for module in local.enabled_root_modules : module => {
-      for yaml_file in fileset("${path.root}/${var.root_modules_discovery_path}/${module}/stacks", "*.yaml") :
+      for yaml_file in fileset("${path.root}/${var.root_modules_discovery_path}/${module}/stacks", "**/*.yaml") :
       yaml_file => yamldecode(file("${path.root}/${var.root_modules_discovery_path}/${module}/stacks/${yaml_file}"))
     } if local._multi_instance_structure
   }
@@ -156,8 +156,8 @@ locals {
     for file, content in files :
     local._multi_instance_structure ? (
       var.workspace_prefix_enabled ?
-      "${trimsuffix(file, ".yaml")}-${module}" : # example: prod-network
-      "${module}-${trimsuffix(file, ".yaml")}"   # example: network-prod
+      "${trimsuffix(basename(file), ".yaml")}-${module}" : # example: prod-network
+      "${module}-${trimsuffix(basename(file), ".yaml")}"   # example: network-prod
     ) : module =>
     merge(
       {
@@ -174,7 +174,7 @@ locals {
         "root_module" = module,
 
         # If default_tf_workspace_enabled is true, use "default" workspace, otherwise our file name is the workspace name
-        "terraform_workspace" = try(content.automation_settings.default_tf_workspace_enabled, local._default_tf_workspace_enabled) ? local.default_workspace_name : trimsuffix(file, ".yaml"),
+        "terraform_workspace" = try(content.automation_settings.default_tf_workspace_enabled, local._default_tf_workspace_enabled) ? local.default_workspace_name : trimsuffix(basename(file), ".yaml"),
 
         # tfvars_file_name only pertains to MultiInstance, as SingleInstance expects consumers to use an auto.tfvars file.
         # `yaml` is intentionally used here as we require Stack and `tfvars` config files to be named equally

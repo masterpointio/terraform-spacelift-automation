@@ -69,3 +69,10 @@ check "aws_integration_single_vs_split_exclusivity" {
     error_message = "Use either aws_integration_id/name (single integration for both sides) OR aws_integration_read_*/write_* (separate integrations per side), not both."
   }
 }
+
+check "stack_names_are_unique" {
+  assert {
+    condition     = length(distinct([for stack in local.stacks : local.stack_property_resolver[stack].name])) == length(local.stacks)
+    error_message = "Stack names must be unique within a Spacelift account. A `stack_settings.name` override collides with another stack: ${jsonencode([for stack in local.stacks : local.stack_property_resolver[stack].name])}"
+  }
+}
